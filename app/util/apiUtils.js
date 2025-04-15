@@ -65,6 +65,17 @@ export function getWeatherData(baseURL, time, lat, lon) {
     });
 }
 
+export function getXTPInfoList(baseURL, data) {
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  return retryFetch(baseURL, 0, 0, options).then(res => res.json());
+}
+
 export function getRefPoint(origin, destination, location) {
   if (!isEmpty(origin)) {
     return origin;
