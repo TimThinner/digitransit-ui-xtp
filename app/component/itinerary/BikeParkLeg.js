@@ -11,7 +11,7 @@ import ItineraryMapAction from './ItineraryMapAction';
 import Icon from '../Icon';
 
 const BikeParkLeg = (
-  { leg, index, focusAction, bikePark },
+  { leg, index, xtp_leg_icon, focusAction, bikePark },
   { intl, config },
 ) => {
   const distance = displayDistance(
@@ -74,6 +74,17 @@ const BikeParkLeg = (
             {/* </Link> */}
             <div className="place">{bikePark.name}</div>
           </div>
+          <div className="xtp-icon-container">
+            {/*
+              Show XTP Info (cameraicon)
+              NOTE: Use classes like
+              xtp-icon-container
+              itinerary-icon bike_park
+              now, but test custom styles later.*/}
+            {xtp_leg_icon && (
+              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+            )}
+          </div>
           <ItineraryMapAction
             target={leg.from.name || ''}
             focusAction={focusAction}
@@ -107,9 +118,14 @@ BikeParkLeg.contextTypes = {
 
 BikeParkLeg.propTypes = {
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   focusAction: PropTypes.func.isRequired,
   bikePark: parkShape.isRequired,
   leg: legShape.isRequired,
+};
+
+BikeParkLeg.defaultProps = { 
+  xtp_leg_icon: false,
 };
 
 export default BikeParkLeg;

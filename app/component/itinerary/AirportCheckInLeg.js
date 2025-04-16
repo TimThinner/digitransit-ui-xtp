@@ -43,6 +43,17 @@ export default function AirportCheckInLeg(props, { config }) {
             </Link>
             <div className="stop-code-container">{props.children}</div>
           </div>
+          <div className="xtp-icon-container">
+            {/*
+              Show XTP Info (cameraicon)
+              NOTE: Use classes like
+              xtp-icon-container
+              itinerary-icon bike_park
+              now, but test custom styles later.*/}
+            {props.xtp_leg_icon && (
+              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+            )}
+          </div>
           <ItineraryMapAction target={name || ''} focusAction={focusAction} />
         </div>
 
@@ -71,11 +82,13 @@ AirportCheckInLeg.propTypes = {
   start: legTimeShape.isRequired,
   focusAction: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   children: PropTypes.node,
 };
 
 AirportCheckInLeg.defaultProps = {
   children: undefined,
+  xtp_leg_icon: false,
 };
 
 AirportCheckInLeg.contextTypes = {

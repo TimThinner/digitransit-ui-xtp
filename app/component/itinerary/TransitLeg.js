@@ -232,6 +232,7 @@ class TransitLeg extends React.Component {
       children,
       focusAction,
       index,
+      xtp_leg_icon,
       leg,
       mode,
       lang,
@@ -509,6 +510,17 @@ class TransitLeg extends React.Component {
                 />
               </div>
             </div>
+            <div className="xtp-icon-container">
+              {/*
+                Show XTP Info (cameraicon)
+                NOTE: Use classes like
+                xtp-icon-container
+                itinerary-icon bike_park
+                now, but test custom styles later.*/}
+              {xtp_leg_icon && (
+                <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+              )}
+            </div>
             <ItineraryMapAction
               target={leg.from.name || ''}
               focusAction={focusAction}
@@ -684,6 +696,7 @@ TransitLeg.propTypes = {
   leg: legShape.isRequired,
   interliningLegs: PropTypes.arrayOf(legShape),
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   mode: PropTypes.string.isRequired,
   focusAction: PropTypes.func.isRequired,
   children: PropTypes.node,
@@ -695,6 +708,7 @@ TransitLeg.propTypes = {
 };
 
 TransitLeg.defaultProps = {
+  xtp_leg_icon: false,
   omitDivider: false,
   interliningLegs: [],
   changeHash: undefined,

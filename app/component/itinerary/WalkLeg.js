@@ -22,7 +22,7 @@ import { splitStringToAddressAndPlace } from '../../util/otpStrings';
 import VehicleRentalLeg from './VehicleRentalLeg';
 
 function WalkLeg(
-  { children, focusAction, focusToLeg, index, leg, previousLeg, nextLeg },
+  { children, focusAction, focusToLeg, index, xtp_leg_icon, leg, previousLeg, nextLeg },
   { config, intl },
 ) {
   const distance = displayDistance(
@@ -140,6 +140,17 @@ function WalkLeg(
               </div>
               <div className="place">{place}</div>
             </div>
+            <div className="xtp-icon-container">
+              {/*
+                Show XTP Info (cameraicon)
+                NOTE: Use classes like
+                xtp-icon-container
+                itinerary-icon bike_park
+                now, but test custom styles later.*/}
+              {xtp_leg_icon && (
+                <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+              )}
+            </div>
             <ItineraryMapAction
               target={leg[toOrFrom].name || ''}
               focusAction={focusAction}
@@ -231,6 +242,17 @@ function WalkLeg(
                     />
                   )}
                 </div>
+              )}
+            </div>
+            <div className="xtp-icon-container">
+              {/*
+                Show XTP Info (cameraicon)
+                NOTE: Use classes like
+                xtp-icon-container
+                itinerary-icon bike_park
+                now, but test custom styles later.*/}
+              {xtp_leg_icon && (
+                <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
               )}
             </div>
             {!returnNotice && (
@@ -350,6 +372,7 @@ WalkLeg.propTypes = {
   children: PropTypes.node,
   focusAction: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   leg: legShape.isRequired,
   previousLeg: legShape,
   nextLeg: legShape,
@@ -357,6 +380,7 @@ WalkLeg.propTypes = {
 };
 
 WalkLeg.defaultProps = {
+  xtp_leg_icon: false,
   previousLeg: undefined,
   nextLeg: undefined,
   children: undefined,

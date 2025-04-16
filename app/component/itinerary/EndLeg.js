@@ -53,6 +53,17 @@ function EndLeg(props, context) {
             <div className="address">{!stop ? address : addressFromUrl}</div>
             <div className="place">{place || placeFromUrl}</div>
           </div>
+          <div className="xtp-icon-container">
+            {/*
+              Show XTP Info (cameraicon)
+              NOTE: Use classes like
+              xtp-icon-container
+              itinerary-icon bike_park
+              now, but test custom styles later.*/}
+            {props.xtp_leg_icon && (
+              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+            )}
+          </div>
           <ItineraryMapAction
             target={props.to.name}
             focusAction={props.focusAction}
@@ -67,7 +78,12 @@ EndLeg.propTypes = {
   endTime: PropTypes.string.isRequired,
   to: stopShape.isRequired,
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   focusAction: PropTypes.func.isRequired,
+};
+
+EndLeg.defaultProps = {
+  xtp_leg_icon: false,
 };
 
 EndLeg.contextTypes = {

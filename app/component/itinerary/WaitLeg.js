@@ -12,7 +12,7 @@ import { legTimeStr } from '../../util/legUtils';
 
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 function WaitLeg(
-  { children, leg, start, waitTime, focusAction, index, icon },
+  { children, leg, start, waitTime, focusAction, index, xtp_leg_icon, icon },
   { config },
 ) {
   const modeClassName = 'wait';
@@ -64,6 +64,17 @@ function WaitLeg(
             </Link>
             <div className="stop-code-container">{children}</div>
           </div>
+          <div className="xtp-icon-container">
+            {/*
+              Show XTP Info (cameraicon)
+              NOTE: Use classes like
+              xtp-icon-container
+              itinerary-icon bike_park
+              now, but test custom styles later.*/}
+            {xtp_leg_icon && (
+              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+            )}
+          </div>
           <ItineraryMapAction
             target={leg.to.name || ''}
             focusAction={focusAction}
@@ -86,6 +97,7 @@ WaitLeg.propTypes = {
   start: legTimeShape.isRequired,
   focusAction: PropTypes.func.isRequired,
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   children: PropTypes.node,
   waitTime: PropTypes.number.isRequired,
   leg: legShape.isRequired,
@@ -93,6 +105,7 @@ WaitLeg.propTypes = {
 };
 
 WaitLeg.defaultProps = {
+  xtp_leg_icon: false,
   children: undefined,
   icon: undefined,
 };

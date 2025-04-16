@@ -83,6 +83,17 @@ export default function CarLeg(props, { config, intl }) {
             <div className="place">{place}</div>
           </div>
           <div>{props.children}</div>
+          <div className="xtp-icon-container">
+            {/*
+              Show XTP Info (cameraicon)
+              NOTE: Use classes like
+              xtp-icon-container
+              itinerary-icon bike_park
+              now, but test custom styles later.*/}
+            {props.xtp_leg_icon && (
+              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+            )}
+          </div>
           <ItineraryMapAction
             target={props.leg.from.name || ''}
             focusAction={props.focusAction}
@@ -159,13 +170,18 @@ export default function CarLeg(props, { config, intl }) {
 CarLeg.propTypes = {
   leg: legShape.isRequired,
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   focusAction: PropTypes.func.isRequired,
   focusToLeg: PropTypes.func.isRequired,
   children: PropTypes.node,
   carBoardingLeg: legShape,
 };
 
-CarLeg.defaultProps = { children: undefined, carBoardingLeg: undefined };
+CarLeg.defaultProps = { 
+  children: undefined, 
+  carBoardingLeg: undefined,
+  xtp_leg_icon: false,
+};
 
 CarLeg.contextTypes = {
   config: configShape.isRequired,

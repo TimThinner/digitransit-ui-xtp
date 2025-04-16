@@ -6,6 +6,7 @@ import { displayDistance } from '../../util/geo-utils';
 import { durationToString } from '../../util/timeUtils';
 import { legTime, legTimeStr, legDestination } from '../../util/legUtils';
 import ItineraryCircleLineWithIcon from './ItineraryCircleLineWithIcon';
+import Icon from '../Icon';
 import ItineraryMapAction from './ItineraryMapAction';
 import { splitStringToAddressAndPlace } from '../../util/otpStrings';
 
@@ -124,6 +125,17 @@ function ViaLeg(props, { config, intl }) {
             )}
             {props.children}
           </div>
+          <div className="xtp-icon-container">
+            {/*
+              Show XTP Info (cameraicon)
+              NOTE: Use classes like
+              xtp-icon-container
+              itinerary-icon bike_park
+              now, but test custom styles later.*/}
+            {props.xtp_leg_icon && (
+              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+            )}
+          </div>
           <ItineraryMapAction
             target={props.leg.from.name || ''}
             focusAction={props.focusAction}
@@ -142,6 +154,7 @@ ViaLeg.propTypes = {
   arrival: legTimeShape.isRequired,
   leg: legShape.isRequired,
   index: PropTypes.number.isRequired,
+  xtp_leg_icon: PropTypes.bool,
   focusAction: PropTypes.func.isRequired,
   focusToLeg: PropTypes.func.isRequired,
   children: PropTypes.node,
@@ -149,6 +162,7 @@ ViaLeg.propTypes = {
 
 ViaLeg.defaultProps = {
   children: undefined,
+  xtp_leg_icon: false,
 };
 
 ViaLeg.contextTypes = {
