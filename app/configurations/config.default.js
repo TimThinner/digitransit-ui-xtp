@@ -100,6 +100,8 @@ export default {
     },
     WEATHER_DATA:
       'https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature&storedquery_id=fmi::forecast::harmonie::surface::point::simple&timestep=5&parameters=temperature,WindSpeedMS,WeatherSymbol3',
+    XTP_DATA:
+      'https://route-media-server.vtt.fi/api/infos',
     EMBEDDED_SEARCH_GENERATION: '/reittihakuelementti',
   },
 

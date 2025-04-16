@@ -279,6 +279,15 @@ export const locationShape = PropTypes.shape({
   name: PropTypes.string,
 });
 
+export const xtpShape = PropTypes.shape({
+  lat: PropTypes.number,
+  lon: PropTypes.number,
+  edge_index: PropTypes.number,
+  leg_index: PropTypes.number,
+  type: PropTypes.string,
+  url: PropTypes.string,
+});
+
 const StatusPropType = PropTypes.oneOf([
   'no-location',
   'searching-location',

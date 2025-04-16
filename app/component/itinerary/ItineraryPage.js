@@ -22,6 +22,7 @@ import {
 } from '../../store/localStorage';
 import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import { getWeatherData } from '../../util/apiUtils';
+import { getXTPInfoList } from '../../util/apiUtils';
 import { isIOS } from '../../util/browser';
 import { boundWithMinimumArea } from '../../util/geo-utils';
 import {
@@ -168,6 +169,7 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
+  const [xtpInfoState, setXTPInfoState] = useState({ loading: false });
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
   const [naviMode, setNaviMode] = useState(false);
@@ -954,6 +956,48 @@ export default function ItineraryPage(props, context) {
     }
   }, [params.from, query.time]);
 
+  useEffect(() => {
+    setXTPInfoState({ ...xtpInfoState, loading: true });
+    // construct POST data here.
+    const data = {edges:[]};
+    const combinedEdges = getCombinedPlanEdges();
+    combinedEdges.forEach((edge, i) => {
+      const legs = [];
+      edge.node.legs.forEach((leg,j) => {
+        const decoded = polyline.decode(leg.legGeometry.points);
+        legs.push({
+          leg_index: j,
+          from: {
+            lat: leg.from.lat,
+            lon: leg.from.lon,
+            name: leg.from.name
+          },
+          to: {
+            lat: leg.to.lat;
+            lon: leg.to.lon,
+            name: leg.to.name
+          },
+          legGeometry: {
+            points: leg.legGeometry.points,
+            decoded: decoded
+          }
+        });
+      });
+      data.edges.push({edge_index:i,legs:legs});
+    });
+    console.log(['XTP-INFO REQUEST POST data=',data]);
+    const newState = { loading: false, xtpData: undefined };
+    getXTPInfoList(config.URL.XTP_DATA, data).then(res => {
+      console.log(['XTP-INFO RESPONSE=',res]);
+      if (res && res.infos && Array.isArray(res.infos) && res.infos.length > 0) {
+        newState.xtpData = res.infos;
+      }
+      setXTPInfoState(newState);
+    }).catch(() => {
+      setXTPInfoState(newState);
+    });
+  }, [params.from, params.to]); // dependency array, if any of these change => we must trigger this useEffect action.
+
   // merge two separate bike + transit plans into one
   useEffect(() => {
     if (
@@ -1129,7 +1173,7 @@ export default function ItineraryPage(props, context) {
     }, 500);
   };
 
-  function renderMap(from, to, viaPoints, planEdges, activeIndex) {
+  function renderMap(from, to, viaPoints, xtpPoints, planEdges, activeIndex) {
     const mwtProps = {};
     if (mapState.bounds) {
       mwtProps.bounds = mapState.bounds;
@@ -1165,6 +1209,7 @@ export default function ItineraryPage(props, context) {
         from={from}
         to={to}
         viaPoints={viaPoints}
+        xtpPoints={xtpPoints}
         mapLayers={props.mapLayers}
         mapLayerOptions={mapLayerOptions}
         setMWTRef={setMWTRef}
@@ -1224,6 +1269,7 @@ export default function ItineraryPage(props, context) {
   const from = otpToLocation(params.from);
   const to = otpToLocation(params.to);
   const viaPoints = getIntermediatePlaces(query);
+  const xtpPoints = xtpInfoState.xtpData;
 
   const hasItineraries = combinedEdges.length > 0;
   if (hasItineraries && match.routes.some(route => route.printPage)) {
@@ -1249,6 +1295,7 @@ export default function ItineraryPage(props, context) {
           from,
           to,
           viaPoints,
+          xtpPoints,
           combinedEdges,
           selectedIndex,
           detailView,
@@ -1342,6 +1389,7 @@ export default function ItineraryPage(props, context) {
           changeHash={changeHash}
           plan={plan}
           planEdges={combinedEdges}
+          xtpPoints={xtpPoints}
           focusToPoint={focusToPoint}
           focusToLeg={focusToLeg}
           carEmissions={carEmissions}
@@ -1369,6 +1417,7 @@ export default function ItineraryPage(props, context) {
       <ItineraryListContainer
         activeIndex={selectedIndex}
         planEdges={combinedEdges}
+        xtpPoints={xtpPoints}
         params={params}
         bikeParkItineraryCount={bikePublicPlan.bikeParkItineraryCount}
         carDirectItineraryCount={carPublicPlan.carDirectItineraryCount}

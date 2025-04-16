@@ -8,7 +8,7 @@ import {
 import { matchShape, routerShape } from 'found';
 import getContext from 'recompose/getContext';
 import { intlShape, FormattedMessage } from 'react-intl';
-import { configShape, planEdgeShape } from '../../util/shapes';
+import { configShape, planEdgeShape, xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import ItineraryList from './ItineraryList';
 import { getItineraryPagePath, streetHash } from '../../util/path';
@@ -20,6 +20,7 @@ import { transitEdges } from './ItineraryPageUtils';
 function ItineraryListContainer(
   {
     planEdges,
+    xtpPoints,
     activeIndex,
     params,
     focusToHeader,
@@ -169,6 +170,7 @@ function ItineraryListContainer(
       {topNote && <ItineraryNotification bodyId={topNote} />}
       <ItineraryList
         planEdges={planEdges}
+        xtpPoints={xtpPoints}
         activeIndex={activeIndex}
         onSelect={onSelectActive}
         onSelectImmediately={onSelectImmediately}
@@ -189,6 +191,7 @@ function ItineraryListContainer(
 
 ItineraryListContainer.propTypes = {
   planEdges: PropTypes.arrayOf(planEdgeShape).isRequired,
+  xtpPoints: PropTypes.arrayOf(xtpShape),
   activeIndex: PropTypes.number.isRequired,
   params: PropTypes.shape({
     from: PropTypes.string.isRequired,
@@ -205,6 +208,7 @@ ItineraryListContainer.propTypes = {
 };
 
 ItineraryListContainer.defaultProps = {
+  xtpPoints: [],
   settingsNotification: false,
   topNote: undefined,
   bottomNote: undefined,

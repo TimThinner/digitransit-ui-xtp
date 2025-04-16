@@ -7,6 +7,7 @@ import {
   legShape,
   locationShape,
   itineraryShape,
+  xtpShape,
   configShape,
 } from '../../util/shapes';
 import Icon from '../Icon';
@@ -274,6 +275,7 @@ const hasOneTransitLeg = itinerary => {
 const Itinerary = (
   {
     itinerary,
+    xtpPoints,
     breakpoint,
     intermediatePlaces,
     hideSelectionIndicator,
@@ -864,7 +866,10 @@ const Itinerary = (
     co2value !== null &&
     co2value >= 0 &&
     !containsScooterLeg;
-
+  
+  /* Show the "camera" icon if this edge is listed in xtpPoints. */
+  const showXTPInfoIcon = xtpPoints.find((item) => item.edge_index === props.hash);
+  
   const itineraryContainerOverflowRef = createRef();
   const [showOverflowIcon, setShowOverflowIcon] = useState(false);
   useLayoutEffect(() => {
@@ -943,6 +948,17 @@ const Itinerary = (
               )}
               <div className="itinerary-duration">
                 <RelativeDuration duration={duration} />
+              </div>
+              <div className="xtp-icon-container">
+              {/*
+                Show XTP Info (cameraicon) if edge_index === props.hash 
+                NOTE: Use classes like
+                xtp-icon-container
+                itinerary-icon bike_park
+                now, but test custom styles later.*/}
+              {showXTPInfoIcon && (
+                <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+              )}
               </div>
             </div>
             <div
@@ -1031,6 +1047,7 @@ const Itinerary = (
 
 Itinerary.propTypes = {
   itinerary: itineraryShape.isRequired,
+  xtpPoints: PropTypes.arrayOf(xtpShape),
   refTime: PropTypes.number.isRequired,
   passive: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
@@ -1049,6 +1066,7 @@ Itinerary.defaultProps = {
   hideSelectionIndicator: true,
   lowestCo2value: 0,
   viaPoints: [],
+  xtpPoints: [],
 };
 
 Itinerary.contextTypes = {

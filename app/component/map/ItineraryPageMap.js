@@ -7,6 +7,7 @@ import {
   configShape,
   itineraryShape,
   locationShape,
+  xtpShape,
   planEdgeShape,
 } from '../../util/shapes';
 import BackButton from '../BackButton';
@@ -26,6 +27,7 @@ const ItineraryPageMap = (
     from,
     to,
     viaPoints,
+    xtpPoints,
     breakpoint,
     showVehicles,
     topics,
@@ -88,7 +90,7 @@ const ItineraryPageMap = (
       );
     }
   }
-
+  
   if (from.lat && from.lon) {
     leafletObjs.push(
       <LocationMarker key="fromMarker" position={from} type="from" />,
@@ -97,6 +99,25 @@ const ItineraryPageMap = (
   if (to.lat && to.lon) {
     leafletObjs.push(<LocationMarker key="toMarker" position={to} type="to" />);
   }
+  /* XTP:
+  {
+    "infos":[
+      {
+        "edge_index": 2,
+        "leg_index": 3,
+        "type": "photo",
+        "lat": 60.175022,
+        "lon": 24.804236,
+        "url": "https://route-media-server.vtt.fi/photos/4hio3kj3h5hkj2kj22g3.jpg"
+      }
+    ]
+  }
+  */
+  xtpPoints.forEach((xtp, i) => {
+    const pos = {lat:xtp.lat, lon:xtp.lon};
+    leafletObjs.push(<LocationMarker key={`xtp_${i}`} position={pos} type="xtp" xtp={xtp} />);
+  });
+  
   viaPoints.forEach((via, i) => {
     leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);
   });
@@ -152,6 +173,7 @@ ItineraryPageMap.propTypes = {
   showVehicles: PropTypes.bool,
   from: locationShape.isRequired,
   to: locationShape.isRequired,
+  xtpPoints: PropTypes.arrayOf(xtpShape),
   viaPoints: PropTypes.arrayOf(locationShape).isRequired,
   showDurationBubble: PropTypes.bool,
   itinerary: itineraryShape,
@@ -164,6 +186,7 @@ ItineraryPageMap.defaultProps = {
   topics: undefined,
   showActiveOnly: false,
   showVehicles: false,
+  xtpPoints: [],
   showDurationBubble: false,
   itinerary: undefined,
   showBackButton: true,

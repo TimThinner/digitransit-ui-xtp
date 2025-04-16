@@ -24,7 +24,7 @@ import {
   legContainsRentalBike,
 } from '../../util/legUtils';
 import { streetHash } from '../../util/path';
-import { configShape, itineraryShape, relayShape } from '../../util/shapes';
+import { configShape, itineraryShape, relayShape, xtpShape } from '../../util/shapes';
 import {
   getFormattedTimeDate,
   isToday,
@@ -45,6 +45,7 @@ import VehicleRentalDurationInfo from './VehicleRentalDurationInfo';
 class ItineraryDetails extends React.Component {
   static propTypes = {
     itinerary: itineraryShape.isRequired,
+    xtpEdgePoints: PropTypes.arrayOf(xtpShape),
     focusToPoint: PropTypes.func.isRequired,
     focusToLeg: PropTypes.func.isRequired,
     isMobile: PropTypes.bool.isRequired,
@@ -60,6 +61,7 @@ class ItineraryDetails extends React.Component {
   };
 
   static defaultProps = {
+    xtpEdgePoints: [],
     hideTitle: false,
     currentLanguage: 'fi',
     changeHash: () => {},
@@ -350,6 +352,7 @@ class ItineraryDetails extends React.Component {
                   key="itinerarylegs"
                   fares={fares}
                   itinerary={itinerary}
+                  xtpEdgePoints={this.props.xtpEdgePoints}
                   focusToPoint={this.props.focusToPoint}
                   focusToLeg={this.props.focusToLeg}
                   changeHash={this.props.changeHash}

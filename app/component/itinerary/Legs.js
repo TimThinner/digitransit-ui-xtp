@@ -6,6 +6,7 @@ import {
   configShape,
   fareShape,
   itineraryShape,
+  xtpShape,
   relayShape,
 } from '../../util/shapes';
 import TransitLeg from './TransitLeg';
@@ -44,6 +45,7 @@ export default class Legs extends React.Component {
 
   static propTypes = {
     itinerary: itineraryShape.isRequired,
+    xtpEdgePoints: PropTypes.arrayOf(xtpShape),
     fares: PropTypes.arrayOf(fareShape),
     focusToPoint: PropTypes.func.isRequired,
     focusToLeg: PropTypes.func.isRequired,
@@ -90,9 +92,20 @@ export default class Legs extends React.Component {
     this.props.focusToLeg(leg);
   };
 
+  xtp_leg_exist(xtpEdgePoints, j) {
+    let xtp_leg_icon = false;
+    const xtp_leg_points = xtpEdgePoints.filter(p => p.leg_index === j);
+    if (xtp_leg_points.length > 0) {
+      console.log(['FOR leg index=',j,' XTP LEG-ICON is true!']);
+      xtp_leg_icon = true;
+    }
+    return xtp_leg_icon;
+  }
+
   render() {
     const {
       itinerary,
+      xtpEdgePoints,
       fares,
       showBikeBoardingInformation,
       showCarBoardingInformation,
@@ -124,6 +137,9 @@ export default class Legs extends React.Component {
     let nextLeg;
     const legs = [];
     compressedLegs.forEach((leg, j) => {
+      
+      const xtp_leg_icon = xtp_leg_exist(xtpEdgePoints, j);
+      
       nextLeg = j + 1 < numberOfLegs ? compressedLegs[j + 1] : undefined;
       if (j > 0) {
         previousLeg = compressedLegs[j - 1];
@@ -147,12 +163,14 @@ export default class Legs extends React.Component {
       const legProps = {
         leg,
         index: j,
+        xtp_leg_icon: xtp_leg_icon,
         focusAction: this.focus(leg.from),
         focusToLeg: this.focusToLeg(leg),
       };
       const transitLegProps = {
         leg,
         index: j,
+        xtp_leg_icon: xtp_leg_icon,
         interliningLegs,
         focusAction: this.focus(leg.from),
         changeHash: this.props.changeHash,
@@ -180,6 +198,7 @@ export default class Legs extends React.Component {
           waitLeg = (
             <WaitLeg
               index={j}
+              xtp_leg_icon={xtp_leg_icon}
               leg={waitLegProps}
               start={leg.end}
               waitTime={waitTime}
@@ -224,18 +243,22 @@ export default class Legs extends React.Component {
         );
         legs.push(<TransitLeg mode={mode} {...transitLegProps} />);
       } else if (leg.mode === 'AIRPLANE') {
+        /* Is line xtp_leg_icon={xtp_leg_icon} really needed? */
         legs.push(
           <AirportCheckInLeg
             index={j - 0.5}
+            xtp_leg_icon={xtp_leg_icon}
             leg={leg}
             start={startTime}
             focusAction={this.focus(leg.from)}
           />,
         );
         legs.push(<AirplaneLeg {...transitLegProps} />);
+        /* Is line xtp_leg_icon={xtp_leg_icon} really needed? */
         legs.push(
           <AirportCollectLuggageLeg
             index={j + 0.5}
+            xtp_leg_icon={xtp_leg_icon}
             leg={leg}
             focusAction={this.focus(leg.to)}
           />,
@@ -295,6 +318,8 @@ export default class Legs extends React.Component {
         legs.push(waitLeg);
       }
     });
+    // XTP addition to check last leg outside of compressedLegs.forEach -loop.
+    const xtp_last_leg_icon = xtp_leg_exist(xtpEdgePoints, numberOfLegs - 1);
 
     // This solves edge case when itinerary ends at the stop without walking.
     // There should be WalkLeg rendered before EndLeg.
@@ -303,6 +328,7 @@ export default class Legs extends React.Component {
       legs.push(
         <WalkLeg
           index={numberOfLegs}
+          xtp_leg_icon={xtp_last_leg_icon}
           leg={{ ...lastLeg, isViaPoint: false }}
           previousLeg={lastLeg}
           nextLeg={compressedLegs[numberOfLegs]}
@@ -313,10 +339,11 @@ export default class Legs extends React.Component {
         </WalkLeg>,
       );
     }
-
+    /* Is line xtp_leg_icon={xtp_last_leg_icon} really needed? */
     legs.push(
       <EndLeg
         index={numberOfLegs}
+        xtp_leg_icon={xtp_last_leg_icon}
         endTime={itinerary.end}
         focusAction={this.focus(lastLeg.to)}
         to={lastLeg.to}

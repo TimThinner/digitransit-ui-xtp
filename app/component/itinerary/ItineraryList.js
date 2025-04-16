@@ -4,7 +4,7 @@ import { createFragmentContainer, graphql } from 'react-relay';
 import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
 import { matchShape } from 'found';
-import { configShape, planEdgeShape } from '../../util/shapes';
+import { configShape, planEdgeShape, xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import Itinerary from './Itinerary';
 import { isBrowser } from '../../util/browser';
@@ -28,6 +28,7 @@ const spinnerPosition = {
 function ItineraryList(
   {
     planEdges,
+    xtpPoints,
     activeIndex,
     onSelect,
     onSelectImmediately,
@@ -58,6 +59,7 @@ function ItineraryList(
       key={i} // eslint-disable-line react/no-array-index-key
       hash={i}
       itinerary={edge.node}
+      xtpPoints={xtpPoints}
       passive={i !== activeIndex}
       onSelect={onSelect}
       onSelectImmediately={onSelectImmediately}
@@ -234,6 +236,7 @@ ItineraryList.propTypes = {
   activeIndex: PropTypes.number.isRequired,
   searchTime: PropTypes.number.isRequired,
   planEdges: PropTypes.arrayOf(planEdgeShape),
+  xtpPoints: PropTypes.arrayOf(xtpShape),
   onSelect: PropTypes.func.isRequired,
   onSelectImmediately: PropTypes.func.isRequired,
   bikeParkItineraryCount: PropTypes.number,
@@ -249,6 +252,7 @@ ItineraryList.defaultProps = {
   bikeParkItineraryCount: 0,
   carDirectItineraryCount: 0,
   planEdges: [],
+  xtpPoints: [],
   showRelaxedPlanNotifier: false,
   showRentalVehicleNotifier: false,
   separatorPosition: undefined,
