@@ -973,7 +973,7 @@ export default function ItineraryPage(props, context) {
             name: leg.from.name
           },
           to: {
-            lat: leg.to.lat;
+            lat: leg.to.lat,
             lon: leg.to.lon,
             name: leg.to.name
           },
