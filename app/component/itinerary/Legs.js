@@ -138,7 +138,7 @@ export default class Legs extends React.Component {
     const legs = [];
     compressedLegs.forEach((leg, j) => {
       
-      const xtp_leg_icon = xtp_leg_exist(xtpEdgePoints, j);
+      const xtp_leg_icon = this.xtp_leg_exist(xtpEdgePoints, j);
       
       nextLeg = j + 1 < numberOfLegs ? compressedLegs[j + 1] : undefined;
       if (j > 0) {
@@ -319,7 +319,7 @@ export default class Legs extends React.Component {
       }
     });
     // XTP addition to check last leg outside of compressedLegs.forEach -loop.
-    const xtp_last_leg_icon = xtp_leg_exist(xtpEdgePoints, numberOfLegs - 1);
+    const xtp_last_leg_icon = this.xtp_leg_exist(xtpEdgePoints, numberOfLegs - 1);
 
     // This solves edge case when itinerary ends at the stop without walking.
     // There should be WalkLeg rendered before EndLeg.
