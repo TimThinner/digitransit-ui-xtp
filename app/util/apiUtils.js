@@ -89,6 +89,9 @@ data:{
     ...
   ]
 }
+
+https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/transportation.8ed23fdaf3139ecf99537d26e54ae8ad.png
+
 */
 	const mock_data = {infos:[]};
 	if (data && data.edges && Array.isArray(data.edges) && data.edges.length > 0) {
@@ -100,7 +103,7 @@ data:{
 						edge_index: ei,
 						leg_index: leg.leg_index,
 						type: 'photo',
-						url: 'https://picsum.photos/200',
+						url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/transportation.8ed23fdaf3139ecf99537d26e54ae8ad.png',
 						lat:  leg.from.lat,
 						lon: leg.from.lon,
 						name: leg.from.name
