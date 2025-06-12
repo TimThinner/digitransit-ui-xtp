@@ -960,7 +960,7 @@ export default function ItineraryPage(props, context) {
     setXTPInfoState({ ...xtpInfoState, loading: true });
     // construct POST data here.
 
-    console.log('state.plan=',state.plan]);
+    console.log(['state.plan=',state.plan]);
 
     const data = {edges:[]};
     //const combinedEdges = getCombinedPlanEdges();
