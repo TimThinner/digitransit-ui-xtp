@@ -959,10 +959,13 @@ export default function ItineraryPage(props, context) {
   useEffect(() => {
     setXTPInfoState({ ...xtpInfoState, loading: true });
     // construct POST data here.
+
+    console.log('state.plan=',state.plan]);
+
     const data = {edges:[]};
     //const combinedEdges = getCombinedPlanEdges();
-    const plan = mapHashToPlan();
-    const combinedEdges = plan?.edges || [];
+    //const plan = mapHashToPlan();
+    const combinedEdges = state.plan?.edges || [];
     combinedEdges.forEach((edge, i) => {
       const legs = [];
       edge.node.legs.forEach((leg,j) => {
@@ -998,7 +1001,8 @@ export default function ItineraryPage(props, context) {
     }).catch(() => {
       setXTPInfoState(newState);
     });
-  }, [params.from, params.to]); // dependency array, if any of these change => we must trigger this useEffect action.
+  //}, [params.from, params.to]); // dependency array, if any of these change => we must trigger this useEffect action.
+  }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
 
   // merge two separate bike + transit plans into one
   useEffect(() => {
