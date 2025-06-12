@@ -959,9 +959,6 @@ export default function ItineraryPage(props, context) {
   useEffect(() => {
     setXTPInfoState({ ...xtpInfoState, loading: true });
     // construct POST data here.
-
-    console.log(['state.plan=',state.plan]);
-
     const data = {edges:[]};
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
@@ -969,6 +966,7 @@ export default function ItineraryPage(props, context) {
     combinedEdges.forEach((edge, i) => {
       const legs = [];
       edge.node.legs.forEach((leg,j) => {
+        console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
         const decoded = polyline.decode(leg.legGeometry.points);
         legs.push({
           leg_index: j,
