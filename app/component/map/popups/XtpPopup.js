@@ -12,15 +12,15 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      maxWidth={240}
-      maxHeight={240}
+      maxWidth={600}
+      maxHeight={800}
       autoPan={false}
       className="popup single-popup"
     >
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
-            <img src={xtpurl} width="160" height="90" />
+            <img src={xtpurl} width="300" height="400" />
           </div>
         </div>
       </Card>
