@@ -962,8 +962,9 @@ export default function ItineraryPage(props, context) {
     const data = {edges:[]};
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
-    const combinedEdges = state.plan?.edges || [];
-    combinedEdges.forEach((edge, i) => {
+    console.log(['state.plan=',state.plan]);
+    const stateEdges = state.plan?.edges || [];
+    stateEdges.forEach((edge, i) => {
       const legs = [];
       edge.node.legs.forEach((leg,j) => {
         console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
