@@ -103,7 +103,7 @@ https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-t
 						edge_index: ei,
 						leg_index: leg.leg_index,
 						type: 'photo',
-						url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/transportation.8ed23fdaf3139ecf99537d26e54ae8ad.png',
+						url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg',
 						lat:  leg.from.lat,
 						lon: leg.from.lon,
 						name: leg.from.name
