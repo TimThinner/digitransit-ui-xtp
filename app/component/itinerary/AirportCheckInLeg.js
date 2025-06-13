@@ -44,12 +44,7 @@ export default function AirportCheckInLeg(props, { config }) {
             <div className="stop-code-container">{props.children}</div>
           </div>
           <div className="xtp-icon-container">
-            {/*
-              Show XTP Info (cameraicon)
-              NOTE: Use classes like
-              xtp-icon-container
-              itinerary-icon bike_park
-              now, but test custom styles later.*/}
+            {/*Show XTP Info (cameraicon)*/}
             {props.xtp_leg_icon && (
               <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
             )}

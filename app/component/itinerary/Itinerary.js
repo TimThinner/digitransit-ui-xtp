@@ -949,15 +949,10 @@ const Itinerary = (
               <div className="itinerary-duration">
                 <RelativeDuration duration={duration} />
               </div>
-              <div className="xtp-icon-container">
-              {/*
-                Show XTP Info (cameraicon) if edge_index === props.hash 
-                NOTE: Use classes like
-                xtp-icon-container
-                itinerary-icon bike_park
-                now, but test custom styles later.*/}
+              <div className="itinerary-xtp-icon-container">
+              {/*Show XTP Info (cameraicon) if edge_index === props.hash*/}
               {showXTPInfoIcon && (
-                <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+                <Icon img="icon-icon_mapMarker-xtp-map" className="xtp-camera" />
               )}
               </div>
             </div>

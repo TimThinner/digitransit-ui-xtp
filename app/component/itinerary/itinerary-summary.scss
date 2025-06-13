@@ -166,6 +166,33 @@
         letter-spacing: -0.03em;
       }
     }
+
+    .itinerary-xtp-icon-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 2px 4px;
+      gap: 4px;
+      margin-right: 6.38px;
+      min-width: 37px;
+      height: 20px;
+      right: 82.38px;
+      top: 416px;
+      overflow: visible;
+      background: rgba(200, 200, 200, 0.1);
+      border-radius: 4px;
+
+      .icon-container {
+        .icon {
+          &.xtp-camera {
+            width: 24px;
+            height: 24px;
+            margin-left: 4px;
+          }
+        }
+      }
+    }
   }
 
   .itinerary-end-time-and-distance {
