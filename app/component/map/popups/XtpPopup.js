@@ -7,6 +7,11 @@ import { isBrowser } from '../../../util/browser';
 const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
 
 export default function XtpPopup({ lat, lon, xtpurl }) {
+  
+  function handleClick() {
+    console.log('You clicked me!');
+  }
+  
   return (
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
@@ -20,7 +25,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
-            <img src={xtpurl} width="300" height="400" />
+            <img onClick={handleClick} src={xtpurl} width="300" height="400" />
           </div>
         </div>
       </Card>
