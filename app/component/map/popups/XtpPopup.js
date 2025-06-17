@@ -4,32 +4,48 @@ import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
 import { isBrowser } from '../../../util/browser';
 
+import useWindowSize from '../../../hooks/useWindowSize';
+
 const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
 
 export default function XtpPopup({ lat, lon, xtpurl }) {
+  const [imgZoomed, setImgZoomed] = useState(false);
+  const size = useWindowSize();
+  let imgWidth = 300;
+  let imgHeight = 400;
 
   function handleClick() {
     console.log('You clicked image!');
+    if (imgZoomed) {
+      // back to small size
+      setImgZoomed(false);
+      imgWidth = 300;
+      imgHeight = 400;
+    } else {
+      // zoom to full size
+      setImgZoomed(true);
+      imgWidth = size.width;
+      imgHeight = size.height;
+    }
   }
-  function handlePopupClick() {
-    console.log('You clicked Popup!');
-  }
+  
+  // size.width,
+  // size.outer.width
   
   return (
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      maxWidth={600}
-      maxHeight={800}
+      maxWidth={size.width}
+      maxHeight={size.height}
       autoPan={false}
       className="popup single-popup"
-      click={handlePopupClick}
     >
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
-            <img onClick={handleClick} src={xtpurl} width="300" height="400" />
+            <img onClick={handleClick} src={xtpurl} width={imgWidth} height={imgHeight} />
           </div>
         </div>
       </Card>
