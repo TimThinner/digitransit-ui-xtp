@@ -10,6 +10,7 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
 
 export default function XtpPopup({ lat, lon, xtpurl }) {
   const [imgSize, setImgSize] = useState({fullscreen:false, width:300, height:400});
+  const size = useWindowSize();
   
   console.log(['imgSize.width=',imgSize.width, 'imgSize.height=',imgSize.height]);
   
@@ -20,20 +21,20 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       setImgSize({fullscreen:false, width:300, height:400});
     } else {
       // make image fullscreen
-      const size = useWindowSize();
+      
       // Keep aspect ratio 3/4
       const new_w = 300*size.height/400;
       console.log(['XtpPopup size=',size, 'new_w=',new_w]);
       setImgSize({fullscreen:true, width:new_w, height:size.height});
     }
   }
-  
+  // maxWidth={imgSize.width}
   return (
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      maxWidth={imgSize.width}
+      maxWidth="auto"
       maxHeight={imgSize.height}
       autoPan={false}
       className="popup single-popup"
