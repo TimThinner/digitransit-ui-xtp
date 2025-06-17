@@ -675,6 +675,12 @@ div.leaflet-marker-icon.vehicle-icon {
   }
 }
 
+.xtp-single-popup {
+  .leaflet-popup-content {
+    width: auto;
+  }
+}
+
 .narrow-popup {
   .leaflet-popup-content {
     width: 220px;

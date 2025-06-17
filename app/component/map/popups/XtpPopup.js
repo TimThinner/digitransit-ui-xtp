@@ -29,15 +29,28 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
     }
   }
   // maxWidth={imgSize.width}
+  /*
+  in map.scss:
+  .single-popup {
+    .leaflet-popup-content {
+      width: 320px;
+    }
+  }
+  .xtp-single-popup {
+    .leaflet-popup-content {
+      width: auto;
+    }
+  }
+  */
   return (
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      maxWidth="auto"
+      maxWidth={imgSize.width}
       maxHeight={imgSize.height}
       autoPan={false}
-      className="popup single-popup"
+      className="popup xtp-single-popup"
     >
       <Card className="no-margin">
         <div className="location-popup-wrapper">
