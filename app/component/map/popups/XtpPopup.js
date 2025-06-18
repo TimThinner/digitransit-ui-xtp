@@ -22,15 +22,13 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       //const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
       const elems = document.querySelectorAll('div.leaflet-popup-content');
       console.log(['TO NORMAL elems=',elems]);
-      if (elems && Array.isArray(elems) && elems.length > 0) {
-        console.log('elems is an array');
-        elems.forEach(e=>{
-          console.log(['e=',e]);
-          e.setAttribute('style', 'width:320px');
-          //e.style.width = '320px';
-          console.log('TO NORMAL CSS style changed width:320px');
-        });
-      }
+      // https://stackoverflow.com/questions/56990500/javascript-iterate-through-nodelist
+      [...elems].forEach(e=>{
+        console.log(['e=',e]);
+        e.setAttribute('style', 'width:320px');
+        //e.style.width = '320px';
+        console.log('TO NORMAL CSS style changed width:320px');
+      });
     } else {
       // make image fullscreen
       // Keep aspect ratio 3/4
@@ -41,16 +39,13 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       //const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
       const elems = document.querySelectorAll('div.leaflet-popup-content');
       console.log(['TO FULLSCREEN elems=',elems]);
-      if (elems && Array.isArray(elems) && elems.length > 0) {
-        console.log('elems is an array');
-        elems.forEach(e=>{
-          console.log(['e=',e]);
-          const new_css_w = new_w+20;
-          e.setAttribute('style', 'width:'+new_css_w+'px');
-          //e.style.width = new_css_w + 'px';
-          console.log('TO FULLSCREEN CSS style changed width:'+new_css_w+'px');
-        });
-      }
+      [...elems].forEach(e=>{
+        console.log(['e=',e]);
+        const new_css_w = new_w+20;
+        e.setAttribute('style', 'width:'+new_css_w+'px');
+        //e.style.width = new_css_w + 'px';
+        console.log('TO FULLSCREEN CSS style changed width:'+new_css_w+'px');
+      });
     }
   }
   // maxWidth={imgSize.width}
