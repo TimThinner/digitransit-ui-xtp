@@ -19,13 +19,25 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
     if (imgSize.fullscreen) {
       // back to small size
       setImgSize({fullscreen:false, width:300, height:400});
+      const foo = document.getElementsByClassName('xtp-single-popup')[0];
+      if (foo) {
+        foo.style.width = 320;
+        console.log(['CSS Style changed style=',foo.style]);
+      }
     } else {
       // make image fullscreen
       
       // Keep aspect ratio 3/4
+      const new_h = size.height-40;
       const new_w = 300*size.height/400;
       console.log(['XtpPopup size=',size, 'new_w=',new_w]);
       setImgSize({fullscreen:true, width:new_w, height:size.height});
+      const foo = document.getElementsByClassName('xtp-single-popup')[0];
+      if (foo) {
+        const new_css_w = new_w+20;
+        foo.style.width = new_css_w;
+        console.log(['CSS Style changed style=',foo.style]);
+      }
     }
   }
   // maxWidth={imgSize.width}
@@ -38,7 +50,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
   }
   .xtp-single-popup {
     .leaflet-popup-content {
-      width: auto;
+      width: 320px;
     }
   }
   */
