@@ -19,24 +19,26 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
     if (imgSize.fullscreen) {
       // back to small size
       setImgSize({fullscreen:false, width:300, height:400});
-      const foo = document.getElementsByClassName('xtp-single-popup')[0];
-      if (foo) {
-        foo.style.width = 320;
-        console.log(['CSS Style changed style=',foo.style]);
+      const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
+      if (elems && Array.isArray(elems) && elems.length > 0) {
+        elems.forEach(e=>{
+          e.style.width = '320px';
+          console.log(['TO NORMAL CSS Style changed style=',e.style.width]);
+        });
       }
     } else {
       // make image fullscreen
-      
       // Keep aspect ratio 3/4
       const new_h = size.height-40;
-      const new_w = 300*size.height/400;
-      console.log(['XtpPopup size=',size, 'new_w=',new_w]);
-      setImgSize({fullscreen:true, width:new_w, height:size.height});
-      const foo = document.getElementsByClassName('xtp-single-popup')[0];
-      if (foo) {
-        const new_css_w = new_w+20;
-        foo.style.width = new_css_w;
-        console.log(['CSS Style changed style=',foo.style]);
+      const new_w = Math.round(300*size.height/400);
+      setImgSize({fullscreen:true, width:new_w, height:new_h});
+      const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
+      if (elems && Array.isArray(elems) && elems.length > 0) {
+        elems.forEach(e=>{
+          const new_css_w = new_w+20;
+          e.style.width = new_css_w + 'px';
+          console.log(['TO FULLSCREEN CSS Style changed style=',e.style.width]);
+        });
       }
     }
   }
