@@ -674,10 +674,14 @@ div.leaflet-marker-icon.vehicle-icon {
     width: 320px;
   }
 }
-
 .xtp-single-popup {
   .leaflet-popup-content {
     width: 320px;
+  }
+}
+.zoomed-xtp-single-popup {
+  .leaflet-popup-content {
+    width: 640px;
   }
 }
 

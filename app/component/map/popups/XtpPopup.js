@@ -4,52 +4,10 @@ import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
 import { isBrowser } from '../../../util/browser';
 
-import useWindowSize from '../../../hooks/useWindowSize';
+//import useWindowSize from '../../../hooks/useWindowSize';
 
 const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
-
-export default function XtpPopup({ lat, lon, xtpurl }) {
-  const [imgSize, setImgSize] = useState({fullscreen:false, width:300, height:400});
-  const size = useWindowSize();
-  
-  console.log(['imgSize.width=',imgSize.width, 'imgSize.height=',imgSize.height]);
-  
-  function handleClick() {
-    console.log('You clicked image!');
-    if (imgSize.fullscreen) {
-      // back to small size
-      setImgSize({fullscreen:false, width:300, height:400});
-      //const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
-      const elems = document.querySelectorAll('div.leaflet-popup-content');
-      console.log(['TO NORMAL elems=',elems]);
-      // https://stackoverflow.com/questions/56990500/javascript-iterate-through-nodelist
-      [...elems].forEach(e=>{
-        console.log(['e=',e]);
-        e.setAttribute('style', 'width:320px');
-        //e.style.width = '320px';
-        console.log('TO NORMAL CSS style changed width:320px');
-      });
-    } else {
-      // make image fullscreen
-      // Keep aspect ratio 3/4
-      const new_h = size.height-40;
-      const new_w = Math.round(300*size.height/400);
-      
-      setImgSize({fullscreen:true, width:new_w, height:new_h});
-      //const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
-      const elems = document.querySelectorAll('div.leaflet-popup-content');
-      console.log(['TO FULLSCREEN elems=',elems]);
-      [...elems].forEach(e=>{
-        console.log(['e=',e]);
-        const new_css_w = new_w+20;
-        e.setAttribute('style', 'width:'+new_css_w+'px');
-        //e.style.width = new_css_w + 'px';
-        console.log('TO FULLSCREEN CSS style changed width:'+new_css_w+'px');
-      });
-    }
-  }
-  // maxWidth={imgSize.width}
-  /*CSS2Properties { width → "301px" }
+/*
   in map.scss:
   .single-popup {
     .leaflet-popup-content {
@@ -61,7 +19,36 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       width: 320px;
     }
   }
-  */
+  .zoomed-xtp-single-popup {
+    .leaflet-popup-content {
+      width: 640px;
+    }
+  }
+*/
+export default function XtpPopup({ lat, lon, xtpurl }) {
+  const [imgSize, setImgSize] = useState({fullscreen:false, width:300, height:400});
+  //const size = useWindowSize();
+  
+  console.log(['imgSize.width=',imgSize.width, 'imgSize.height=',imgSize.height]);
+  
+  let classNames = "popup xtp-single-popup";
+  
+  function handleClick() {
+    console.log('You clicked image!');
+    if (imgSize.fullscreen) {
+      // back to small size
+      setImgSize({fullscreen:false, width:300, height:400});
+      classNames = "popup xtp-single-popup";
+    } else {
+      // make image fullscreen
+      // Keep aspect ratio 3/4
+      //const new_h = size.height-40;
+      //const new_w = Math.round(300*size.height/400);
+      //setImgSize({fullscreen:true, width:new_w, height:new_h});
+      setImgSize({fullscreen:true, width:600, height:800});
+      classNames = "popup zoomed-xtp-single-popup";
+    }
+  }
   return (
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
@@ -70,7 +57,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       maxWidth={imgSize.width}
       maxHeight={imgSize.height}
       autoPan={false}
-      className="popup xtp-single-popup"
+      className={classNames}
     >
       <Card className="no-margin">
         <div className="location-popup-wrapper">
