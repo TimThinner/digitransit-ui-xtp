@@ -23,9 +23,12 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       const elems = document.querySelectorAll('div.leaflet-popup-content');
       console.log(['TO NORMAL elems=',elems]);
       if (elems && Array.isArray(elems) && elems.length > 0) {
+        console.log('elems is an array');
         elems.forEach(e=>{
-          e.style.width = '320px';
-          console.log(['TO NORMAL CSS Style changed style=',e.style.width]);
+          console.log(['e=',e]);
+          e.setAttribute('style', 'width:320px');
+          //e.style.width = '320px';
+          console.log('TO NORMAL CSS style changed width:320px');
         });
       }
     } else {
@@ -33,25 +36,25 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       // Keep aspect ratio 3/4
       const new_h = size.height-40;
       const new_w = Math.round(300*size.height/400);
+      
       setImgSize({fullscreen:true, width:new_w, height:new_h});
       //const elems = document.querySelectorAll('.xtp-single-popup .leaflet-popup-content');
       const elems = document.querySelectorAll('div.leaflet-popup-content');
       console.log(['TO FULLSCREEN elems=',elems]);
       if (elems && Array.isArray(elems) && elems.length > 0) {
+        console.log('elems is an array');
         elems.forEach(e=>{
+          console.log(['e=',e]);
           const new_css_w = new_w+20;
-          e.style.width = new_css_w + 'px';
-          console.log(['TO FULLSCREEN CSS Style changed style=',e.style.width]);
+          e.setAttribute('style', 'width:'+new_css_w+'px');
+          //e.style.width = new_css_w + 'px';
+          console.log('TO FULLSCREEN CSS style changed width:'+new_css_w+'px');
         });
       }
     }
   }
-  
-  function handlePopupContentClick(e) {
-    console.log(['You clicked content e=',e]);
-  }
   // maxWidth={imgSize.width}
-  /*
+  /*CSS2Properties { width → "301px" }
   in map.scss:
   .single-popup {
     .leaflet-popup-content {
@@ -73,8 +76,6 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       maxHeight={imgSize.height}
       autoPan={false}
       className="popup xtp-single-popup"
-      onClick={handlePopupContentClick}
-      interactive={true}
     >
       <Card className="no-margin">
         <div className="location-popup-wrapper">
