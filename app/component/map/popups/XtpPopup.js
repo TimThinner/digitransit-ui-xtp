@@ -52,7 +52,6 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
   }
   
   return (
-    {console.log('RENDER OR NOT!?');}
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
