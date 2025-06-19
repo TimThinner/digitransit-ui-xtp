@@ -26,43 +26,46 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
   }
 */
 export default function XtpPopup({ lat, lon, xtpurl }) {
-  const [imgSize, setImgSize] = useState({fullscreen:false, width:300, height:400});
+  const [xtpState, setXtpState] = useState({
+    fullscreen:false,
+    width:300,
+    height:400,
+    classNames:"popup xtp-single-popup"
+  });
   //const size = useWindowSize();
   
-  console.log(['imgSize.width=',imgSize.width, 'imgSize.height=',imgSize.height]);
-  
-  let classNames = "popup xtp-single-popup";
+  console.log(['xtpState=',xtpState]);
   
   function handleClick() {
     console.log('You clicked image!');
-    if (imgSize.fullscreen) {
+    if (xtpState.fullscreen) {
       // back to small size
-      setImgSize({fullscreen:false, width:300, height:400});
-      classNames = "popup xtp-single-popup";
+      setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup"});
     } else {
       // make image fullscreen
       // Keep aspect ratio 3/4
       //const new_h = size.height-40;
       //const new_w = Math.round(300*size.height/400);
       //setImgSize({fullscreen:true, width:new_w, height:new_h});
-      setImgSize({fullscreen:true, width:600, height:800});
-      classNames = "popup zoomed-xtp-single-popup";
+      setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup"});
     }
   }
+  
   return (
+    {console.log('RENDER OR NOT!?');}
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      maxWidth={imgSize.width}
-      maxHeight={imgSize.height}
+      maxWidth={xtpState.width}
+      maxHeight={xtpState.height}
       autoPan={false}
-      className={classNames}
+      className={xtpState.classNames}
     >
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
-            <img onClick={handleClick} src={xtpurl} width={imgSize.width} height={imgSize.height} />
+            <img onClick={handleClick} src={xtpurl} width={xtpState.width} height={xtpState.height} />
           </div>
         </div>
       </Card>
