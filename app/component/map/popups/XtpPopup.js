@@ -37,6 +37,26 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
   
   console.log(['xtpState=',xtpState]);
   
+  function processStyles() {
+    if (xtpState.width === 300) {
+      const elems = document.querySelectorAll('div.leaflet-popup-content');
+      console.log(['NORMAL elems=',elems]);
+      [...elems].forEach(e=>{
+        console.log(['e=',e]);
+        e.setAttribute('style', 'width:320px');
+        console.log('NORMAL CSS style width:320px');
+      });
+    } else {
+      const elems = document.querySelectorAll('div.leaflet-popup-content');
+      console.log(['ZOOMED elems=',elems]);
+      [...elems].forEach(e=>{
+        console.log(['e=',e]);
+        e.setAttribute('style', 'width:640px');
+        console.log('ZOOMED CSS style width:640px');
+      });
+    }
+  }
+  
   function handleClick() {
     console.log('You clicked image!');
     if (xtpState.fullscreen) {
@@ -77,25 +97,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
         </div>
       </Card>
     </Popup>
-    { /*HACK: AFTER the Popup is created change the div.leaflet-popup-content style */
-      if (xtpState.width === 300) {
-        const elems = document.querySelectorAll('div.leaflet-popup-content');
-        console.log(['NORMAL elems=',elems]);
-        [...elems].forEach(e=>{
-          console.log(['e=',e]);
-          e.setAttribute('style', 'width:320px');
-          console.log('NORMAL CSS style width:320px');
-        });
-      } else {
-        const elems = document.querySelectorAll('div.leaflet-popup-content');
-        console.log(['ZOOMED elems=',elems]);
-        [...elems].forEach(e=>{
-          console.log(['e=',e]);
-          e.setAttribute('style', 'width:640px');
-          console.log('ZOOMED CSS style width:640px');
-        });
-      }
-    }
+    {processStyles()}
     </>
   );
 }
