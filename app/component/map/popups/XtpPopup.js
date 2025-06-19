@@ -52,6 +52,8 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
   }
   
   return (
+    {console.log('Return the Popup!')}
+    {console.log(['xtpState.classNames=',xtpState.classNames])}
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
@@ -61,6 +63,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       autoPan={false}
       className={xtpState.classNames}
     >
+      {console.log('Create the Card!')}
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
