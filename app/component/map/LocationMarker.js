@@ -71,6 +71,7 @@ export default function LocationMarker({
     >
       {validType === 'xtp' && (
         <XtpPopup
+          pid={key}
           lat={xtp.lat}
           lon={xtp.lon}
           xtpurl={xtp.url}

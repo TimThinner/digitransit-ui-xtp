@@ -34,7 +34,7 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
     }, 500);
   
 */
-export default function XtpPopup({ id, lat, lon, xtpurl }) {
+export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   
   const [xtpState, setXtpState] = useState({
     fullscreen:false,
@@ -55,13 +55,13 @@ export default function XtpPopup({ id, lat, lon, xtpurl }) {
   }
   
   function openPopup() {
-    const elems = document.querySelectorAll('#'+id);
+    const elems = document.querySelectorAll('#'+pid);
     console.log(['openPopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();
     });
   }
-  
+  /*
   function processStyles() {
     if (xtpState.width === 300) {
       const elems = document.querySelectorAll('div.leaflet-popup-content');
@@ -81,13 +81,18 @@ export default function XtpPopup({ id, lat, lon, xtpurl }) {
       });
     }
   }
-  
+  */
   function handleClick() {
     console.log('You clicked image!');
     if (xtpState.fullscreen) {
       // back to small size
       setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup"});
-      closePopup();
+      setTimeout(() => {
+        closePopup();
+        setTimeout(() => {
+          openPopup();
+        }, 100);
+      }, 100);
     } else {
       // make image fullscreen
       // Keep aspect ratio 3/4
@@ -95,13 +100,18 @@ export default function XtpPopup({ id, lat, lon, xtpurl }) {
       //const new_w = Math.round(300*size.height/400);
       //setImgSize({fullscreen:true, width:new_w, height:new_h});
       setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup"});
-      closePopup();
+      setTimeout(() => {
+        closePopup();
+        setTimeout(() => {
+          openPopup();
+        }, 100);
+      }, 100);
     }
   }
   
   return (
     <>
-    {console.log(['Create Popup xtpState.classNames=',xtpState.classNames,'id=',id])}
+    {console.log(['Create Popup xtpState.classNames=',xtpState.classNames,'pid=',pid])}
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
@@ -111,8 +121,6 @@ export default function XtpPopup({ id, lat, lon, xtpurl }) {
       }}
       onOpen={() => {
         console.log('onOpen...do nothing');
-        //console.log('process styles...');
-        //processStyles();
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
@@ -133,7 +141,7 @@ export default function XtpPopup({ id, lat, lon, xtpurl }) {
 }
 
 XtpPopup.propTypes = {
-  id: PropTypes.string.isRequired,
+  pid: PropTypes.string.isRequired,
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
   xtpurl: PropTypes.string.isRequired,
