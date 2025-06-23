@@ -10,6 +10,7 @@ import ViaPointPopup from './popups/ViaPointPopup';
 import XtpPopup from './popups/XtpPopup';
 
 export default function LocationMarker({
+  key, // 'xtp_0', 'xtp_1', etc.
   position,
   xtp,
   className,
@@ -52,6 +53,7 @@ export default function LocationMarker({
   const sideLength = isLarge ? 30 : 24;
   return (
     <IconMarker
+      id={key}
       position={position}
       className={cx(validType, className)}
       icon={{
@@ -87,6 +89,7 @@ export default function LocationMarker({
 }
 
 LocationMarker.propTypes = {
+  key: PropTypes.string, // 'xtp_0', 'xtp_1', etc.
   position: IconMarker.propTypes.position,
   xtp: xtpShape,
   className: PropTypes.string,
@@ -96,6 +99,7 @@ LocationMarker.propTypes = {
 };
 
 LocationMarker.defaultProps = {
+  key: undefined,
   position: undefined,
   xtp: undefined,
   className: undefined,

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+//import React, { useRef, useState } from 'react';
 import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
 import { isBrowser } from '../../../util/browser';
@@ -24,8 +25,17 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
       width: 640px;
     }
   }
+  
+  id = 'xtp_0', 'xtp_1', etc.
+    setTimeout(() => {
+      if (headerRef.current) {
+        headerRef.current.focus();
+      }
+    }, 500);
+  
 */
-export default function XtpPopup({ lat, lon, xtpurl }) {
+export default function XtpPopup({ id, lat, lon, xtpurl }) {
+  
   const [xtpState, setXtpState] = useState({
     fullscreen:false,
     width:300,
@@ -39,6 +49,14 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
     console.log(['closePopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
+  }
+  
+  function openPopup() {
+    const elems = document.querySelectorAll('#'+id);
+    console.log(['openPopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();
     });
@@ -83,7 +101,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
   
   return (
     <>
-    {console.log(['Create Popup xtpState.classNames=',xtpState.classNames])}
+    {console.log(['Create Popup xtpState.classNames=',xtpState.classNames,'id=',id])}
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
@@ -115,6 +133,7 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
 }
 
 XtpPopup.propTypes = {
+  id: PropTypes.string.isRequired,
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
   xtpurl: PropTypes.string.isRequired,
