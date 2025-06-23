@@ -82,6 +82,10 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       onClose={() => { 
         setXtpState({...xtpState, title:'small'});
       }}
+      onOpen={() => {
+        console.log('process styles...');
+        processStyles();
+      }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
       autoPan={false}
@@ -97,7 +101,6 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
         </div>
       </Card>
     </Popup>
-    {processStyles()}
     </>
   );
 }
