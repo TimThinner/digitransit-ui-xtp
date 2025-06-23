@@ -30,12 +30,19 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
     fullscreen:false,
     width:300,
     height:400,
-    classNames:"popup xtp-single-popup",
-    title:'small'
+    classNames:"popup xtp-single-popup"
   });
   //const size = useWindowSize();
   
   console.log(['xtpState=',xtpState]);
+  
+  function closePopup() {
+    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
+    console.log(['closePopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
+  }
   
   function processStyles() {
     if (xtpState.width === 300) {
@@ -61,14 +68,14 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
     console.log('You clicked image!');
     if (xtpState.fullscreen) {
       // back to small size
-      setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup", title:'small'});
+      setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup"},() => closePopup());
     } else {
       // make image fullscreen
       // Keep aspect ratio 3/4
       //const new_h = size.height-40;
       //const new_w = Math.round(300*size.height/400);
       //setImgSize({fullscreen:true, width:new_w, height:new_h});
-      setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup", title:'large'});
+      setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup"},() => closePopup());
     }
   }
   
@@ -79,12 +86,16 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      onClose={() => { 
-        setXtpState({...xtpState, title:'small'});
-      }}
-      onOpen={() => {
-        console.log('process styles...');
-        processStyles();
+      eventHandlers={{
+        popupopen: () => {
+          console.log('Popup eventhandler popupopen');
+        },
+        popupclose: () => {
+          console.log('Popup eventhandler popupclose');
+        },
+        click: () => {
+          console.log('Popup eventhandler click');
+        },
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
@@ -95,7 +106,6 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
-            <p>{xtpState.title}</p>
             <img onClick={handleClick} src={xtpurl} width={xtpState.width} height={xtpState.height} />
           </div>
         </div>
