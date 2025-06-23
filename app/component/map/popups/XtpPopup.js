@@ -68,14 +68,16 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
     console.log('You clicked image!');
     if (xtpState.fullscreen) {
       // back to small size
-      setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup"},() => closePopup());
+      setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup"});
+      closePopup();
     } else {
       // make image fullscreen
       // Keep aspect ratio 3/4
       //const new_h = size.height-40;
       //const new_w = Math.round(300*size.height/400);
       //setImgSize({fullscreen:true, width:new_w, height:new_h});
-      setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup"},() => closePopup());
+      setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup"});
+      closePopup();
     }
   }
   
@@ -86,16 +88,13 @@ export default function XtpPopup({ lat, lon, xtpurl }) {
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
-      eventHandlers={{
-        popupopen: () => {
-          console.log('Popup eventhandler popupopen');
-        },
-        popupclose: () => {
-          console.log('Popup eventhandler popupclose');
-        },
-        click: () => {
-          console.log('Popup eventhandler click');
-        },
+      onClose={() => {
+        console.log('onClose...do nothing');
+      }}
+      onOpen={() => {
+        console.log('onOpen...do nothing');
+        //console.log('process styles...');
+        //processStyles();
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
