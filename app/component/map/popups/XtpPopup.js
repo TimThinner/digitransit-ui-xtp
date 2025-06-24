@@ -31,7 +31,6 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     width: 300,
     height: 400
   });
-  const [xtpAutoClose, setXtpAutoClose] = useState(false);
   //const size = useWindowSize();
   
   console.log(['xtpState=',xtpState]);
@@ -111,10 +110,6 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   const new_h = size.height-40;
   const new_w = Math.round(300*size.height/400);
   setImgSize({fullscreen:true, width:new_w, height:new_h});
-  
-  NOTE: Set xtpAutoClose to true before programmatically closing Popup.
-  and back to false after Popup => onOpen.
-  
   */
   function handleClick() {
     console.log('TOGGLE image!');
@@ -123,7 +118,6 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     } else { // make image fullscreen
       setXtpState({fullscreen:true, width:600, height:800});
     }
-    setXtpAutoClose(true);
     setTimeout(() => {
       closePopup();
       setTimeout(() => {
@@ -140,19 +134,14 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
       onClose={() => {
-        if (xtpAutoClose) {
-          console.log('onClose AUTO CLOSE... do nothing.');
-        } else {
-          console.log('onClose... RESET.');
-          resetStyles();
-          resetPopupLeft();
-        }
+        console.log('onClose... RESET.');
+        resetStyles();
+        resetPopupLeft();
       }}
       onOpen={() => {
         console.log('onOpen... process.');
         processStyles();
         processPopupLeft();
-        setXtpAutoClose(false);
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
