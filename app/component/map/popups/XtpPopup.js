@@ -53,32 +53,57 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   
   function resetStyles() {
     const elems = document.querySelectorAll('div.leaflet-popup-content');
-    console.log(['NORMAL elems=',elems]);
+    console.log(['RESET STYLES elems=',elems]);
     [...elems].forEach(e=>{
-      console.log(['e=',e]);
-      e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
+      //console.log(['e=',e]);
+      //e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
+      e.style.width = "320px";
+      e.style.height = "420px";
+      e.style.padding = "10px";
       console.log('NORMAL CSS style');
     });
   }
   
+  function resetPopupLeft() {
+    const elems = document.querySelectorAll('div.single-popup');
+    console.log(['RESET Popup Left elems=',elems]);
+    [...elems].forEach(e=>{
+      e.style.left = "-150px";
+    });
+  }
+  
   function processStyles() {
-    if (xtpState.width === 300) {
-      const elems = document.querySelectorAll('div.leaflet-popup-content');
-      console.log(['NORMAL elems=',elems]);
-      [...elems].forEach(e=>{
-        console.log(['e=',e]);
-        e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
-        console.log('NORMAL CSS style');
-      });
-    } else {
-      const elems = document.querySelectorAll('div.leaflet-popup-content');
-      console.log(['ZOOMED elems=',elems]);
-      [...elems].forEach(e=>{
-        console.log(['e=',e]);
-        e.setAttribute('style', 'width:620px; height:820px; padding:10px;');
+    const elems = document.querySelectorAll('div.leaflet-popup-content');
+    console.log(['PROCESS STYLES elems=',elems]);
+    [...elems].forEach(e=>{
+      //console.log(['e=',e]);
+      if (xtpState.fullscreen) {
+        //e.setAttribute('style', 'width:620px; height:820px; padding:10px;');
+        e.style.width = "620px";
+        e.style.height = "820px";
+        e.style.padding = "10px";
         console.log('ZOOMED CSS style');
-      });
-    }
+      } else {
+        //e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
+        e.style.width = "320px";
+        e.style.height = "420px";
+        e.style.padding = "10px";
+        console.log('NORMAL CSS style');
+      }
+    });
+  }
+  
+  function processPopupLeft() {
+    const elems = document.querySelectorAll('div.single-popup');
+    console.log(['PROCESS Popup Left elems=',elems]);
+    [...elems].forEach(e=>{
+      //console.log(['e=',e]);
+      if (xtpState.fullscreen) {
+        e.style.left = "-300px";
+      } else {
+        e.style.left = "-150px";
+      }
+    });
   }
   
   function handleClick() {
@@ -116,12 +141,14 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
       onClose={() => {
-        console.log('onClose... resetStyles.');
+        console.log('onClose... reset.');
         resetStyles();
+        resetPopupLeft();
       }}
       onOpen={() => {
-        console.log('onOpen... processStyles.');
+        console.log('onOpen... process.');
         processStyles();
+        processPopupLeft();
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
