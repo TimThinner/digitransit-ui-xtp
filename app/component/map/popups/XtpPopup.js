@@ -27,10 +27,11 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
 export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   
   const [xtpState, setXtpState] = useState({
-    fullscreen:false,
-    width:300,
-    height:400
+    fullscreen: false,
+    width: 300,
+    height: 400
   });
+  const [xtpAutoClose, setXtpAutoClose] = useState(false);
   //const size = useWindowSize();
   
   console.log(['xtpState=',xtpState]);
@@ -105,32 +106,30 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       }
     });
   }
+  /*
+  Keep aspect ratio 3/4
+  const new_h = size.height-40;
+  const new_w = Math.round(300*size.height/400);
+  setImgSize({fullscreen:true, width:new_w, height:new_h});
   
+  NOTE: Set xtpAutoClose to true before programmatically closing Popup.
+  and back to false after Popup => onOpen.
+  
+  */
   function handleClick() {
-    console.log('You clicked image!');
-    if (xtpState.fullscreen) {
-      // back to small size
+    console.log('TOGGLE image!');
+    if (xtpState.fullscreen) { // back to small size
       setXtpState({fullscreen:false, width:300, height:400});
-      setTimeout(() => {
-        closePopup();
-        setTimeout(() => {
-          openPopup();
-        }, 100);
-      }, 100);
-    } else {
-      // make image fullscreen
-      // Keep aspect ratio 3/4
-      //const new_h = size.height-40;
-      //const new_w = Math.round(300*size.height/400);
-      //setImgSize({fullscreen:true, width:new_w, height:new_h});
+    } else { // make image fullscreen
       setXtpState({fullscreen:true, width:600, height:800});
-      setTimeout(() => {
-        closePopup();
-        setTimeout(() => {
-          openPopup();
-        }, 100);
-      }, 100);
     }
+    setXtpAutoClose(true);
+    setTimeout(() => {
+      closePopup();
+      setTimeout(() => {
+        openPopup();
+      }, 100);
+    }, 100);
   }
   
   return (
@@ -141,18 +140,23 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
       onClose={() => {
-        console.log('onClose... reset.');
-        resetStyles();
-        resetPopupLeft();
+        if (xtpAutoClose) {
+          console.log('onClose AUTO CLOSE... do nothing.');
+        } else {
+          console.log('onClose... RESET.');
+          resetStyles();
+          resetPopupLeft();
+        }
       }}
       onOpen={() => {
         console.log('onOpen... process.');
         processStyles();
         processPopupLeft();
+        setXtpAutoClose(false);
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
-      autoPan={false}
+      autoPan={true}
       className="popup single-popup"
     >
       {console.log('Create Card')}
