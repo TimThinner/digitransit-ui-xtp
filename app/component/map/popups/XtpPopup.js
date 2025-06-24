@@ -55,7 +55,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   }
   
   function openPopup() {
-    const elems = document.querySelectorAll('#'+pid);
+    const elems = document.querySelectorAll('.'+pid);
     console.log(['openPopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();

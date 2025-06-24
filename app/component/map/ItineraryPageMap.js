@@ -115,7 +115,8 @@ const ItineraryPageMap = (
   */
   xtpPoints.forEach((xtp, i) => {
     const pos = {lat:xtp.lat, lon:xtp.lon};
-    leafletObjs.push(<LocationMarker key={`xtp_${i}`} position={pos} type="xtp" xtp={xtp} />);
+    const pid = 'xtp_'+i;
+    leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} pid={pid}/>);
   });
   
   viaPoints.forEach((via, i) => {

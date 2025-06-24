@@ -10,9 +10,9 @@ import ViaPointPopup from './popups/ViaPointPopup';
 import XtpPopup from './popups/XtpPopup';
 
 export default function LocationMarker({
-  key, // 'xtp_0', 'xtp_1', etc.
   position,
   xtp,
+  pid,
   className,
   isLarge,
   type,
@@ -47,15 +47,17 @@ export default function LocationMarker({
   <circle fill="none" stroke="#b40" stroke-width="2" cx="20" cy="23" r="8"/>
   <circle fill="none" stroke="#b40" stroke-width="2" cx="33" cy="15" r="1"/>
   </symbol>
+  
+  
+  New: Add pid ('xtp_0', 'xtp_1', etc.) to IconMarker classes.
   */
   const validType = getValidType(type);
   const validTypeXtp = validType === 'xtp' ? '-xtp' : '';
   const sideLength = isLarge ? 30 : 24;
   return (
     <IconMarker
-      id={key}
       position={position}
-      className={cx(validType, className)}
+      className={cx(validType, className, pid)}
       icon={{
         className: cx(validType, className),
         element: (
@@ -71,7 +73,7 @@ export default function LocationMarker({
     >
       {validType === 'xtp' && (
         <XtpPopup
-          pid={key}
+          pid={pid}
           lat={xtp.lat}
           lon={xtp.lon}
           xtpurl={xtp.url}
@@ -90,9 +92,9 @@ export default function LocationMarker({
 }
 
 LocationMarker.propTypes = {
-  key: PropTypes.string, // 'xtp_0', 'xtp_1', etc.
   position: IconMarker.propTypes.position,
   xtp: xtpShape,
+  pid: PropTypes.string,
   className: PropTypes.string,
   isLarge: PropTypes.bool,
   type: PropTypes.oneOf(['from', 'via', 'to', 'favourite']),
@@ -100,9 +102,9 @@ LocationMarker.propTypes = {
 };
 
 LocationMarker.defaultProps = {
-  key: undefined,
   position: undefined,
   xtp: undefined,
+  pid: undefined,
   className: undefined,
   isLarge: false,
   type: 'via',
