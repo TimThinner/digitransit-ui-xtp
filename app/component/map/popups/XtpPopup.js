@@ -26,11 +26,8 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
 */
 export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   
-  const [xtpState, setXtpState] = useState({
-    fullscreen: false,
-    width: 300,
-    height: 400
-  });
+  const [xtpState, setXtpState] = useState({fullscreen:false, width:300, height:400});
+  const [xtpAutoClose, setXtpAutoClose] = useState(false);
   //const size = useWindowSize();
   
   console.log(['xtpState=',xtpState]);
@@ -118,6 +115,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     } else { // make image fullscreen
       setXtpState({fullscreen:true, width:600, height:800});
     }
+    setXtpAutoClose(true);
     setTimeout(() => {
       closePopup();
       setTimeout(() => {
@@ -134,9 +132,15 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
       onClose={() => {
-        console.log('onClose... RESET.');
-        resetStyles();
-        resetPopupLeft();
+        if (xtpAutoClose) {
+          console.log('onClose AUTO CLOSE... do nothing.');
+          setXtpAutoClose(false);
+        } else {
+          console.log('onClose... RESET.');
+          setXtpState({fullscreen:false, width:300, height:400});
+          resetStyles();
+          resetPopupLeft();
+        }
       }}
       onOpen={() => {
         console.log('onOpen... process.');
@@ -145,7 +149,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
-      autoPan={true}
+      autoPan={false}
       className="popup single-popup"
     >
       {console.log('Create Card')}
