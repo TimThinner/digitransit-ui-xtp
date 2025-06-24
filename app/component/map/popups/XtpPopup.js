@@ -15,18 +15,8 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
       width: 320px;
     }
   }
-  .xtp-single-popup {
-    .leaflet-popup-content {
-      width: 320px;
-    }
-  }
-  .zoomed-xtp-single-popup {
-    .leaflet-popup-content {
-      width: 640px;
-    }
-  }
   
-  id = 'xtp_0', 'xtp_1', etc.
+  pid = 'xtp_0', 'xtp_1', etc.
     setTimeout(() => {
       if (headerRef.current) {
         headerRef.current.focus();
@@ -39,8 +29,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   const [xtpState, setXtpState] = useState({
     fullscreen:false,
     width:300,
-    height:400,
-    classNames:"popup xtp-single-popup"
+    height:400
   });
   //const size = useWindowSize();
   
@@ -62,6 +51,16 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     });
   }
   
+  function resetStyles() {
+    const elems = document.querySelectorAll('div.leaflet-popup-content');
+    console.log(['NORMAL elems=',elems]);
+    [...elems].forEach(e=>{
+      console.log(['e=',e]);
+      e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
+      console.log('NORMAL CSS style');
+    });
+  }
+  
   function processStyles() {
     if (xtpState.width === 300) {
       const elems = document.querySelectorAll('div.leaflet-popup-content');
@@ -76,7 +75,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       console.log(['ZOOMED elems=',elems]);
       [...elems].forEach(e=>{
         console.log(['e=',e]);
-        e.setAttribute('style', 'width:640px; height:840px; padding:20px;');
+        e.setAttribute('style', 'width:620px; height:820px; padding:10px;');
         console.log('ZOOMED CSS style');
       });
     }
@@ -86,7 +85,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     console.log('You clicked image!');
     if (xtpState.fullscreen) {
       // back to small size
-      setXtpState({fullscreen:false, width:300, height:400, classNames:"popup xtp-single-popup"});
+      setXtpState({fullscreen:false, width:300, height:400});
       setTimeout(() => {
         closePopup();
         setTimeout(() => {
@@ -99,7 +98,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       //const new_h = size.height-40;
       //const new_w = Math.round(300*size.height/400);
       //setImgSize({fullscreen:true, width:new_w, height:new_h});
-      setXtpState({fullscreen:true, width:600, height:800, classNames:"popup zoomed-xtp-single-popup"});
+      setXtpState({fullscreen:true, width:600, height:800});
       setTimeout(() => {
         closePopup();
         setTimeout(() => {
@@ -111,22 +110,23 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   
   return (
     <>
-    {console.log(['Create Popup xtpState.classNames=',xtpState.classNames,'pid=',pid])}
+    {console.log(['Create Popup pid=',pid])}
     <Popup
       position={{ lat: lat+0.0001, lng: lon }}
       offset={[0, 0]}
       autoPanPaddingTopLeft={[5, 125]}
       onClose={() => {
-        console.log('onClose...do nothing');
+        console.log('onClose... resetStyles.');
+        resetStyles();
       }}
       onOpen={() => {
-        console.log('onOpen...processStyles.');
+        console.log('onOpen... processStyles.');
         processStyles();
       }}
       maxWidth={xtpState.width}
       maxHeight={xtpState.height}
       autoPan={false}
-      className={xtpState.classNames}
+      className="popup single-popup"
     >
       {console.log('Create Card')}
       <Card className="no-margin">
