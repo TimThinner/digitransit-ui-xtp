@@ -61,7 +61,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       e.click();
     });
   }
-  /*
+  
   function processStyles() {
     if (xtpState.width === 300) {
       const elems = document.querySelectorAll('div.leaflet-popup-content');
@@ -81,7 +81,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       });
     }
   }
-  */
+  
   function handleClick() {
     console.log('You clicked image!');
     if (xtpState.fullscreen) {
@@ -91,6 +91,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
         closePopup();
         setTimeout(() => {
           openPopup();
+          processStyles();
         }, 100);
       }, 100);
     } else {
@@ -104,6 +105,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
         closePopup();
         setTimeout(() => {
           openPopup();
+          processStyles();
         }, 100);
       }, 100);
     }
