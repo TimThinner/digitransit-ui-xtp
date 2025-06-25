@@ -15,28 +15,16 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
       width: 320px;
     }
   }
-  
   pid = 'xtp_0', 'xtp_1', etc.
-    setTimeout(() => {
-      if (headerRef.current) {
-        headerRef.current.focus();
-      }
-    }, 500);
-  
 */
 export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   
-  const [xtpState, setXtpState] = useState({fullscreen:false, width:300, height:400});
-  //const [xtpAutoClose, setXtpAutoClose] = useState(false);
+  const [xtpState, setXtpState] = useState(false);
   //const size = useWindowSize();
-  
+  const xtpFullScreen = useRef(false);
+  const xtpPopupWidth = useRef(300);
+  const xtpPopupHeight = useRef(400);
   const xtpAutoClose = useRef(false);
-  
-  const setXtpAutoClose = (b) => {
-    xtpAutoClose.current = b;
-  };
-  
-  console.log(['xtpState=',xtpState]);
   
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
@@ -80,7 +68,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     console.log(['PROCESS STYLES elems=',elems]);
     [...elems].forEach(e=>{
       //console.log(['e=',e]);
-      if (xtpState.fullscreen) {
+      if (xtpFullScreen.current) {
         //e.setAttribute('style', 'width:620px; height:820px; padding:10px;');
         e.style.width = "620px";
         e.style.height = "820px";
@@ -101,7 +89,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
     console.log(['PROCESS Popup Left elems=',elems]);
     [...elems].forEach(e=>{
       //console.log(['e=',e]);
-      if (xtpState.fullscreen) {
+      if (xtpFullScreen.current) {
         e.style.left = "-300px";
       } else {
         e.style.left = "-150px";
@@ -116,14 +104,22 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
   */
   function handleClick() {
     console.log('TOGGLE image!');
-    if (xtpState.fullscreen) { // back to small size
-      setXtpState({fullscreen:false, width:300, height:400});
+    if (xtpFullScreen.current) { // back to small size
+      xtpFullScreen.current = false;
+      xtpPopupWidth.current =  300;
+      xtpPopupHeight.current = 400;
     } else { // make image fullscreen
-      setXtpState({fullscreen:true, width:600, height:800});
+      xtpFullScreen.current = true;
+      xtpPopupWidth.current =  600;
+      xtpPopupHeight.current = 800;
     }
-    
-    setXtpAutoClose(true);
-    
+    // Toggle the state to re-render component
+    if (xtpState) {
+      setXtpState(false);
+    } else {
+      setXtpState(true);
+    }
+    xtpAutoClose.current = true;
     setTimeout(() => {
       closePopup();
       setTimeout(() => {
@@ -142,10 +138,12 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       onClose={() => {
         if (xtpAutoClose.current) {
           console.log('onClose AUTO CLOSE... do nothing.');
-          setXtpAutoClose(false);
+          xtpAutoClose.current = false;
         } else {
           console.log('onClose... RESET.');
-          setXtpState({fullscreen:false, width:300, height:400});
+          xtpFullScreen.current = false;
+          xtpPopupWidth.current =  300;
+          xtpPopupHeight.current = 400;
           resetStyles();
           resetPopupLeft();
         }
@@ -155,8 +153,8 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
         processStyles();
         processPopupLeft();
       }}
-      maxWidth={xtpState.width}
-      maxHeight={xtpState.height}
+      maxWidth={xtpPopupWidth.current}
+      maxHeight={xtpPopupHeight.current}
       autoPan={false}
       className="popup single-popup"
     >
@@ -164,7 +162,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       <Card className="no-margin">
         <div className="location-popup-wrapper">
           <div className="location-thumbnail-image">
-            <img onClick={handleClick} src={xtpurl} width={xtpState.width} height={xtpState.height} />
+            <img onClick={handleClick} src={xtpurl} width={xtpPopupWidth.current} height={xtpPopupHeight.current} />
           </div>
         </div>
       </Card>
