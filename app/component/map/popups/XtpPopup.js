@@ -155,7 +155,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       }}
       maxWidth={xtpPopupWidth.current}
       maxHeight={xtpPopupHeight.current}
-      autoPan={false}
+      autoPan={true}
       className="popup single-popup"
     >
       {console.log('Create Card')}
