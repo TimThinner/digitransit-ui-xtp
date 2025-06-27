@@ -7,7 +7,7 @@ import { xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import IconMarker from './IconMarker';
 import ViaPointPopup from './popups/ViaPointPopup';
-import XtpPopupWithLeaflet from './popups/XtpPopup';
+import XtpPopup from './popups/XtpPopup';
 
 export default function LocationMarker({
   position,
@@ -76,7 +76,7 @@ export default function LocationMarker({
       zIndexOffset={12000}
     >
       {validType === 'xtp' && (
-        <XtpPopupWithLeaflet
+        <XtpPopup
           pid={pid}
           lat={xtp.lat}
           lon={xtp.lon}
