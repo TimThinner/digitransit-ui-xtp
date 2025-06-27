@@ -9,6 +9,7 @@ import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet acces
 //import useWindowSize from '../../../hooks/useWindowSize';
 
 const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
+//import Popup from 'react-leaflet/es/Popup';
 /*
   in map.scss:
   .single-popup {
@@ -29,12 +30,12 @@ class XtpPopup extends React.Component {
   static propTypes = {
     leaflet: PropTypes.shape({
       map: PropTypes.shape({
+        closePopup: PropTypes.func.isRequired,
         getZoom: PropTypes.func.isRequired,
         on: PropTypes.func.isRequired,
         off: PropTypes.func.isRequired,
       }).isRequired,
     }).isRequired,
-    
     pid: PropTypes.string.isRequired,
     lat: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
@@ -42,10 +43,11 @@ class XtpPopup extends React.Component {
   };
   
   constructor(props) {
+    console.log(['constructor props=',props]);
     super(props);
     this.state = {
-      clicked: false,
-      zoomend: false,
+      clicked: false, // toggles false / true
+      zoom: this.props.leaflet.map.getZoom(),
     };
     this.fullScreen = false;
     this.popupWidth = 300;
@@ -57,28 +59,30 @@ class XtpPopup extends React.Component {
   
   onMapZoom = () => {
     // Toggle the state to re-render component
-    console.log(['onMapZoom this.state.zoomend=',this.state.zoomend]);
-    if (this.state.zoomend) {
-      this.setState({zoomend: false});
-    } else {
-      this.setState({zoomend: true});
-    }
+    const zoom = this.props.leaflet.map.getZoom();
+    console.log(['onMapZoom zoom=',zoom]);
+    this.setState({zoom:zoom});
   }
   
   componentDidMount() {
+    console.log('componentDidMount on zoomend');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
   }
 
   componentWillUnmount() {
+    console.log('componentWillUnmount off zoomend');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
   }
 
   closePopup = () => {
+    this.props.leaflet.map.closePopup();
+    /*
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
     console.log(['closePopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();
     });
+    */
   }
 
   openPopup = () => {
@@ -94,10 +98,10 @@ class XtpPopup extends React.Component {
     console.log(['RESET STYLES elems=',elems]);
     [...elems].forEach(e=>{
       //console.log(['e=',e]);
-      //e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
-      e.style.width = "320px";
-      e.style.height = "420px";
-      e.style.padding = "10px";
+      //e.setAttribute('style', 'width:310px; height:410px; padding:5px;');
+      e.style.width = "310px";
+      e.style.height = "410px";
+      e.style.padding = "5px";
       console.log('NORMAL CSS style');
     });
   }
@@ -116,16 +120,16 @@ class XtpPopup extends React.Component {
     [...elems].forEach(e=>{
       //console.log(['e=',e]);
       if (this.fullScreen) {
-        //e.setAttribute('style', 'width:620px; height:820px; padding:10px;');
-        e.style.width = "620px";
-        e.style.height = "820px";
-        e.style.padding = "10px";
+        //e.setAttribute('style', 'width:610px; height:810px; padding:5px;');
+        e.style.width = "610px";
+        e.style.height = "810px";
+        e.style.padding = "5px";
         console.log('ZOOMED CSS style');
       } else {
-        //e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
-        e.style.width = "320px";
-        e.style.height = "420px";
-        e.style.padding = "10px";
+        //e.setAttribute('style', 'width:310px; height:410px; padding:5px;');
+        e.style.width = "310px";
+        e.style.height = "410px";
+        e.style.padding = "5px";
         console.log('NORMAL CSS style');
       }
     });
@@ -176,48 +180,46 @@ class XtpPopup extends React.Component {
   };
   
   render() {
-  
-  return (
-    <>
-    {console.log(['Create Popup this.props.pid=',this.props.pid])}
-    <Popup
-      position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
-      offset={[0, 0]}
-      autoPanPaddingTopLeft={[5, 125]}
-      onClose={() => {
-        if (this.autoClose) {
-          console.log('onClose AUTO CLOSE... do nothing.');
-          this.autoClose = false;
-        } else {
-          console.log('onClose... RESET.');
-          this.fullScreen = false;
-          this.popupWidth =  300;
-          this.popupHeight = 400;
-          this.resetStyles();
-          this.resetPopupLeft();
-        }
-      }}
-      onOpen={() => {
-        console.log('onOpen... process.');
-        this.processStyles();
-        this.processPopupLeft();
-      }}
-      maxWidth={this.popupWidth}
-      maxHeight={this.popupHeight}
-      autoPan={true}
-      className="popup single-popup"
-    >
-      {console.log('Create Card')}
-      <Card className="no-margin">
-        <div className="location-popup-wrapper">
-          <div className="location-thumbnail-image">
-            <img onClick={this.handleClick} src={this.props.xtpurl} width={this.popupWidth} height={this.popupHeight} />
+    console.log(['Create Popup this.props.pid=',this.props.pid]);
+    const popup = (
+      <Popup
+        position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
+        offset={[0, 0]}
+        autoPanPaddingTopLeft={[5, 125]}
+        onClose={() => {
+          if (this.autoClose) {
+            console.log('onClose AUTO CLOSE... do nothing.');
+            this.autoClose = false;
+          } else {
+            console.log('onClose... RESET.');
+            this.fullScreen = false;
+            this.popupWidth =  300;
+            this.popupHeight = 400;
+            this.resetStyles();
+            this.resetPopupLeft();
+          }
+        }}
+        onOpen={() => {
+          console.log('onOpen... process.');
+          this.processStyles();
+          this.processPopupLeft();
+        }}
+        maxWidth={this.popupWidth}
+        maxHeight={this.popupHeight}
+        autoPan={true}
+        className="popup single-popup"
+      >
+        {console.log('Create Card')}
+        <Card className="no-margin">
+          <div className="location-popup-wrapper">
+            <div className="location-thumbnail-image">
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.popupWidth} height={this.popupHeight} />
+            </div>
           </div>
-        </div>
-      </Card>
-    </Popup>
-    </>
-  );
+        </Card>
+      </Popup>
+    );
+    return popup;
   }
 }
 
