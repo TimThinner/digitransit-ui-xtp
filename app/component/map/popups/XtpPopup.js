@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 //import React, { useState } from 'react';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
 import { isBrowser } from '../../../util/browser';
+import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
 
 //import useWindowSize from '../../../hooks/useWindowSize';
 
@@ -17,15 +18,55 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
   }
   pid = 'xtp_0', 'xtp_1', etc.
 */
-export default function XtpPopup({ pid, lat, lon, xtpurl }) {
+//export default function XtpPopup({ pid, lat, lon, xtpurl }) {
+
+// See similar example at function SelectStopRow  !!!!!
+
+function XtpPopup({ pid, lat, lon, xtpurl }) {
   
-  const [xtpState, setXtpState] = useState(false);
+  const [xtpState, setXtpState] = useState(false); // Toggle state always when Popup pic is clicked
+  const [xtpZoomend, setXtpZoomend] = useState(false); // Toggle state always when zoom ends
   //const size = useWindowSize();
   const xtpFullScreen = useRef(false);
   const xtpPopupWidth = useRef(300);
   const xtpPopupHeight = useRef(400);
   const xtpAutoClose = useRef(false);
   
+  /*componentDidMount() {
+    this.props.leaflet.map.on('zoomend', this.onMapZoom);
+  }*/
+
+  /*componentWillUnmount() {
+    this.props.leaflet.map.off('zoomend', this.onMapZoom);
+  }*/
+  function onMapZoom() {
+    // Toggle the state to re-render component
+    
+    const zoom = this.props.leaflet.map.getZoom();
+    console.log(['onMapZoom xtpZoomend=',xtpZoomend,'zoom=',zoom]);
+    
+    if (xtpZoomend) {
+      setXtpZoomend(false);
+    } else {
+      setXtpZoomend(true);
+    }
+  }
+
+  // For componentDidMount
+  useEffect(() => {
+    console.log('XtpPopup componentDidMount');
+    this.props.leaflet.map.on('zoomend', onMapZoom);
+  }, []);
+
+  // For componentWillUnmount
+  useEffect(() => {
+    // componentWillUnmount
+    return () => {
+      console.log('XtpPopup componentWillUnmount');
+      this.props.leaflet.map.off('zoomend', onMapZoom);
+    }
+  }, [xtpZoomend]);
+
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
     console.log(['closePopup elems=',elems]);
@@ -33,7 +74,7 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
       e.click();
     });
   }
-  
+
   function openPopup() {
     const elems = document.querySelectorAll('.'+pid);
     console.log(['openPopup elems=',elems]);
@@ -172,6 +213,15 @@ export default function XtpPopup({ pid, lat, lon, xtpurl }) {
 }
 
 XtpPopup.propTypes = {
+  // New prop: Leaflet
+  leaflet: PropTypes.shape({
+    map: PropTypes.shape({
+      getZoom: PropTypes.func.isRequired,
+      on: PropTypes.func.isRequired,
+      off: PropTypes.func.isRequired,
+    }).isRequired,
+  }).isRequired,
+  
   pid: PropTypes.string.isRequired,
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
@@ -179,3 +229,7 @@ XtpPopup.propTypes = {
 };
 
 XtpPopup.displayName = 'XtpPopup';
+
+const XtpPopupWithLeaflet = withLeaflet(XtpPopup);
+
+export default XtpPopupWithLeaflet;
