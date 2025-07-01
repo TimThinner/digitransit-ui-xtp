@@ -118,8 +118,8 @@ class XtpPopup extends React.Component {
     const dim = {w:0,h:0};
     const elems = document.querySelectorAll('div.leaflet-container');
     [...elems].forEach(e=>{
-      dim.w = e.width;
-      dim.h = e.height;
+      dim.w = e.clientWidth;
+      dim.h = e.clientHeight;
     });
     console.log(['GET MAP DIMENSIONS elems=',elems,'dim=',dim]);
     return dim;
