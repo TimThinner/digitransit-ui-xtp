@@ -125,6 +125,18 @@ class XtpPopup extends React.Component {
     return dim;
   }
   
+  getMapLayers = () => {
+    this.props.leaflet.map.eachLayer(function (layer) {
+      console.log(['layer=',layer]);
+      if (layer instanceof L.Marker){
+        console.log(['MARKER layer=',layer]);
+      }
+    });
+    /*if (layer.options.name === 'XXXXX') {
+      layer.setLatLng([newLat,newLon])
+    }*/ 
+  }
+  
   processStyles = () => {
     const elems = document.querySelectorAll('div.leaflet-popup-content');
     if (this.fullScreen) {
@@ -161,6 +173,7 @@ class XtpPopup extends React.Component {
     } else { // make image fullscreen
       this.fullScreen = true;
       this.getMapDimensions(); // Test this!
+      this.getMapLayers(); // Test this!
       this.setZoomedDimensions();
     }
     // Toggle the state to re-render component
