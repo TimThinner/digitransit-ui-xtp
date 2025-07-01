@@ -50,12 +50,33 @@ class XtpPopup extends React.Component {
       zoom: this.props.leaflet.map.getZoom(),
     };
     this.fullScreen = false;
-    this.popupWidth = 300;
-    this.popupHeight = 400;
+    this.dimensions = {picW:300, picH:400, popupW:300, popupH:400};
     this.autoClose = false;
   }
   
+  setDefaultDimensions = () => {
+    this.dimensions.picW = 300;
+    this.dimensions.picH = 400;
+    this.dimensions.popupW = 300;
+    this.dimensions.popupH = 400;
+  }
+  
+  setZoomedDimensions = () => {
+    this.dimensions.picW = 600;
+    this.dimensions.picH = 800;
+    this.dimensions.popupW = 600;
+    this.dimensions.popupH = 800;
+  }
+  
   //const size = useWindowSize();
+  //const sizeH = Math.round(size.height/2);
+  //const sizeW = Math.round(size.width/2);
+  /*
+  Keep aspect ratio 3/4
+  const new_h = size.height-40;
+  const new_w = Math.round(300*size.height/400);
+  setImgSize({fullscreen:true, width:new_w, height:new_h});
+  */
   
   onMapZoom = () => {
     // Toggle the state to re-render component
@@ -92,77 +113,55 @@ class XtpPopup extends React.Component {
       e.click();
     });
   }
-  
-  resetStyles = () => {
-    const elems = document.querySelectorAll('div.leaflet-popup-content');
-    console.log(['RESET STYLES elems=',elems]);
+  //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
+  getMapDimensions = () => {
+    const dim = {w:0,h:0};
+    const elems = document.querySelectorAll('div.leaflet-container');
     [...elems].forEach(e=>{
-      //console.log(['e=',e]);
-      //e.setAttribute('style', 'width:310px; height:410px; padding:5px;');
-      e.style.width = "310px";
-      e.style.height = "410px";
-      e.style.padding = "5px";
-      console.log('NORMAL CSS style');
+      dim.w = e.width;
+      dim.h = e.height;
     });
-  }
-  
-  resetPopupLeft = () => {
-    const elems = document.querySelectorAll('div.single-popup');
-    console.log(['RESET Popup Left elems=',elems]);
-    [...elems].forEach(e=>{
-      e.style.left = "-150px";
-    });
+    console.log(['GET MAP DIMENSIONS elems=',elems,'dim=',dim]);
+    return dim;
   }
   
   processStyles = () => {
     const elems = document.querySelectorAll('div.leaflet-popup-content');
-    console.log(['PROCESS STYLES elems=',elems]);
+    if (this.fullScreen) {
+      console.log(['PROCESS STYLES FULLSCREEN elems=',elems]);
+    } else {
+      console.log(['PROCESS STYLES NORMAL elems=',elems]);
+    }
     [...elems].forEach(e=>{
-      //console.log(['e=',e]);
-      if (this.fullScreen) {
-        //e.setAttribute('style', 'width:610px; height:810px; padding:5px;');
-        e.style.width = "610px";
-        e.style.height = "810px";
-        e.style.padding = "5px";
-        console.log('ZOOMED CSS style');
-      } else {
-        //e.setAttribute('style', 'width:310px; height:410px; padding:5px;');
-        e.style.width = "310px";
-        e.style.height = "410px";
-        e.style.padding = "5px";
-        console.log('NORMAL CSS style');
-      }
+      //e.setAttribute('style', 'width:610px; height:810px; padding:5px;');
+      e.style.width = this.dimensions.popupW+"px";
+      e.style.height = this.dimensions.popupH+"px";
+      //e.style.padding = "5px";
     });
   }
   
   processPopupLeft = () => {
+    const left = -Math.round(this.dimensions.popupW/2);
     const elems = document.querySelectorAll('div.single-popup');
-    console.log(['PROCESS Popup Left elems=',elems]);
+    if (this.fullScreen) {
+      console.log(['PROCESS Popup Left FULLSCREEN elems=',elems,'left=',left]);
+    } else {
+      console.log(['PROCESS Popup Left NORMAL elems=',elems,'left=',left]);
+    }
     [...elems].forEach(e=>{
-      //console.log(['e=',e]);
-      if (this.fullScreen) {
-        e.style.left = "-300px";
-      } else {
-        e.style.left = "-150px";
-      }
+      e.style.left = left+"px";
     });
   }
-  /*
-  Keep aspect ratio 3/4
-  const new_h = size.height-40;
-  const new_w = Math.round(300*size.height/400);
-  setImgSize({fullscreen:true, width:new_w, height:new_h});
-  */
+  
   handleClick = () => {
     console.log('TOGGLE image!');
     if (this.fullScreen) { // back to small size
       this.fullScreen = false;
-      this.popupWidth =  300;
-      this.popupHeight = 400;
+      this.setDefaultDimensions();
     } else { // make image fullscreen
       this.fullScreen = true;
-      this.popupWidth =  600;
-      this.popupHeight = 800;
+      this.getMapDimensions(); // Test this!
+      this.setZoomedDimensions();
     }
     // Toggle the state to re-render component
     if (this.state.clicked) {
@@ -193,10 +192,9 @@ class XtpPopup extends React.Component {
           } else {
             console.log('onClose... RESET.');
             this.fullScreen = false;
-            this.popupWidth =  300;
-            this.popupHeight = 400;
-            this.resetStyles();
-            this.resetPopupLeft();
+            this.setDefaultDimensions();
+            this.processStyles();
+            this.processPopupLeft();
           }
         }}
         onOpen={() => {
@@ -204,8 +202,8 @@ class XtpPopup extends React.Component {
           this.processStyles();
           this.processPopupLeft();
         }}
-        maxWidth={this.popupWidth}
-        maxHeight={this.popupHeight}
+        maxWidth={this.dimensions.popupW}
+        maxHeight={this.dimensions.popupH}
         autoPan={true}
         className="popup single-popup"
       >
@@ -213,7 +211,7 @@ class XtpPopup extends React.Component {
         <Card className="no-margin">
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.popupWidth} height={this.popupHeight} />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} />
             </div>
           </div>
         </Card>
