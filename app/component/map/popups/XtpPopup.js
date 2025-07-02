@@ -37,6 +37,7 @@ class XtpPopup extends React.Component {
       }).isRequired,
     }).isRequired,
     pid: PropTypes.string.isRequired,
+    xtp_last_index: PropTypes.number.isRequired,
     lat: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
     xtpurl: PropTypes.string.isRequired,
@@ -52,7 +53,6 @@ class XtpPopup extends React.Component {
     this.fullScreen = false;
     this.dimensions = {picW:300, picH:400, popupW:300, popupH:400};
     this.autoClose = false;
-    this.markers = [];
   }
   
   setDefaultDimensions = () => {
@@ -88,6 +88,7 @@ class XtpPopup extends React.Component {
   /*
   this.props.pid is the "key" to the Marker behind this Popup.
   */
+  /*
   getMapLayers = () => {
     //const pid = this.props.pid;
     const markers = [];
@@ -107,17 +108,13 @@ class XtpPopup extends React.Component {
         }
       }
     });
-    /*if (layer.options.name === 'XXXXX') {
-      layer.setLatLng([newLat,newLon])
-    }*/ 
     console.log(['markers=',markers]);
     return markers;
-  }
+  }*/
   
   componentDidMount() {
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
-    this.markers = this.getMapLayers(); // Test this!
   }
 
   componentWillUnmount() {
@@ -186,43 +183,23 @@ class XtpPopup extends React.Component {
   
   handlePrev = () => {
     console.log('HANDLE previous!');
-    // Find yourself (=this.props.pid) from the list and get previous.
-    // If no previous exist (pid === 'xtp_0') => do nothing.
-    if (this.props.pid !== 'xtp_0') {
-      let prev_id = null;
-      this.markers.every((m,i)=>{ // xtp_0, xtp_1, ... , xtp_n-1
-        if (m === this.props.pid) {
-          prev_id = this.markers[i-1];
-          return false; // break out from the every-loop.
-        }
-        return true; // continue with next item.
-      });
-      if (prev_id) {
-        console.log(['OPEN POPUP id=',prev_id]);
-        this.openPopup(prev_id);
-      }
+    const c_index = parseInt(this.props.pid.slice(4));
+    if (c_index > 0) {
+      const prev_index = c_index-1;
+      const prev_id = 'xtp_'+prev_index;
+      console.log(['OPEN POPUP id=',prev_id]);
+      this.openPopup(prev_id);
     }
   }
 
   handleNext = () => {
     console.log('HANDLE next!');
-    // Find yourself (=this.props.pid) from the list and get next.
-    // If no next exist (pid === 'xtp_n-1') => do nothing.
-    const last_index = this.markers.length-1;
-    const last_item = 'xtp_'+last_index;
-    if (this.props.pid !== last_item) {
-      let next_id = null;
-      this.markers.every((m,i)=>{ // xtp_0, xtp_1, ... , xtp_n-1
-        if (m === this.props.pid) {
-          next_id = this.markers[i+1];
-          return false; // break out from the every-loop.
-        }
-        return true; // continue with next item.
-      });
-      if (next_id) {
-        console.log(['OPEN POPUP id=',next_id]);
-        this.openPopup(next_id);
-      }
+    const c_index = parseInt(this.props.pid.slice(4));
+    if (c_index < this.props.xtp_last_index) {
+      const next_index = c_index+1;
+      const next_id = 'xtp_'+next_index;
+      console.log(['OPEN POPUP id=',next_id]);
+      this.openPopup(next_id);
     }
   }
   

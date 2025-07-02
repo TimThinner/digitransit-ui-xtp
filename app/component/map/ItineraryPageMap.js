@@ -42,6 +42,7 @@ const ItineraryPageMap = (
 ) => {
   const { hash } = match.params;
   const leafletObjs = [];
+  const xtp_last_index = xtpPoints.length-1;
 
   if (showVehicles) {
     leafletObjs.push(
@@ -116,7 +117,7 @@ const ItineraryPageMap = (
   xtpPoints.forEach((xtp, i) => {
     const pos = {lat:xtp.lat, lon:xtp.lon};
     const pid = 'xtp_'+i;
-    leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} pid={pid}/>);
+    leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} xtp_last_index={xtp_last_index} pid={pid} />);
   });
   
   viaPoints.forEach((via, i) => {

@@ -12,6 +12,7 @@ import XtpPopup from './popups/XtpPopup';
 export default function LocationMarker({
   position,
   xtp,
+  xtp_last_index,
   pid,
   className,
   isLarge,
@@ -78,6 +79,7 @@ export default function LocationMarker({
       {validType === 'xtp' && (
         <XtpPopup
           pid={pid}
+          xtp_last_index={xtp_last_index}
           lat={xtp.lat}
           lon={xtp.lon}
           xtpurl={xtp.url}
