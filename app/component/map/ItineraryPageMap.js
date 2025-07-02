@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import { matchShape, routerShape } from 'found';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useRef } from 'react';
 import { onLocationPopup } from '../../util/queryUtils';
 import {
   configShape,
@@ -42,7 +42,13 @@ const ItineraryPageMap = (
 ) => {
   const { hash } = match.params;
   const leafletObjs = [];
-  const xtp_last_index = xtpPoints.length-1;
+  const xtpLastIndex = useRef(-1);
+  
+  xtpPoints.forEach(xtp => {
+    if (active === xtp.edge_index) {
+      xtpLastIndex.current++;
+    }
+  });
 
   if (showVehicles) {
     leafletObjs.push(
@@ -113,11 +119,20 @@ const ItineraryPageMap = (
       }
     ]
   }
+  
+  NEW:
+  active is the active edge => when we show camera-icons, we must show only those 
+  where active === edge_index
+  
   */
-  xtpPoints.forEach((xtp, i) => {
-    const pos = {lat:xtp.lat, lon:xtp.lon};
-    const pid = 'xtp_'+i;
-    leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} xtp_last_index={xtp_last_index} pid={pid} />);
+  xtpPoints.forEach(xtp => {
+    let i=-1;
+    if (active === xtp.edge_index) {
+      i++;
+      const pos = {lat:xtp.lat, lon:xtp.lon};
+      const pid = 'xtp_'+i;
+      leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} xtp_last_index={xtpLastIndex.current} pid={pid} />);
+    }
   });
   
   viaPoints.forEach((via, i) => {

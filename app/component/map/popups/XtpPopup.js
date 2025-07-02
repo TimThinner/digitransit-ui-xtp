@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 //import React, { useState } from 'react';
-import React, { useRef, useState, useEffect } from 'react';
+//import React, { useRef, useState, useEffect } from 'react';
+import React from 'react';
 //import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
 import { isBrowser } from '../../../util/browser';
