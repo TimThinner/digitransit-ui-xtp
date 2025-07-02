@@ -43,6 +43,7 @@ const ItineraryPageMap = (
   const { hash } = match.params;
   const leafletObjs = [];
   const xtpLastIndex = useRef(-1);
+  const xtpIndex = useRef(-1);
   
   xtpPoints.forEach(xtp => {
     if (active === xtp.edge_index) {
@@ -126,11 +127,10 @@ const ItineraryPageMap = (
   
   */
   xtpPoints.forEach(xtp => {
-    let i=-1;
     if (active === xtp.edge_index) {
-      i++;
+      xtpIndex.current++;
       const pos = {lat:xtp.lat, lon:xtp.lon};
-      const pid = 'xtp_'+i;
+      const pid = 'xtp_'+xtpIndex.current;
       leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} xtp_last_index={xtpLastIndex.current} pid={pid} />);
     }
   });
