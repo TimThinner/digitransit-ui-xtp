@@ -45,12 +45,17 @@ const ItineraryPageMap = (
   const xtpLastIndex = useRef(-1);
   const xtpIndex = useRef(-1);
   
+  xtpLastIndex.current = -1;
+  xtpIndex.current = -1;
+  
   xtpPoints.forEach(xtp => {
     if (active === xtp.edge_index) {
       xtpLastIndex.current++;
     }
   });
-
+  
+  console.log(['xtpLastIndex.current=',xtpLastIndex.current]);
+  
   if (showVehicles) {
     leafletObjs.push(
       <VehicleMarkerContainer key="vehicles" useLargeIcon topics={topics} />,
