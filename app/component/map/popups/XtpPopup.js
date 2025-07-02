@@ -85,14 +85,42 @@ class XtpPopup extends React.Component {
     console.log(['onMapZoom zoom=',zoom]);
     this.setState({zoom:zoom});
   }
+  /*
+  this.props.pid is the "key" to the Marker behind this Popup.
+  */
+  getMapLayers = () => {
+    //const pid = this.props.pid;
+    this.markers = [];
+    this.props.leaflet.map.eachLayer(function (layer) {
+      //console.log(['layer=',layer]);
+      if (layer instanceof L.Marker){
+        //console.log(['MARKER layer=',layer]);
+        if (layer.options && layer.options.className) {
+          // className: "xtp xtp_0"
+          const classes = layer.options.className.split(" ");
+          classes.forEach(c=>{
+            const index = c.indexOf('xtp_');
+            if (index === 0) {
+              this.markers.push(c); // xtp_0, xtp_1, ... , xtp_n-1
+            }
+          });
+        }
+      }
+    });
+    /*if (layer.options.name === 'XXXXX') {
+      layer.setLatLng([newLat,newLon])
+    }*/ 
+    console.log(['this.markers=',this.markers]);
+  }
   
   componentDidMount() {
-    console.log('componentDidMount on zoomend');
+    console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
+    this.getMapLayers(); // Test this!
   }
 
   componentWillUnmount() {
-    console.log('componentWillUnmount off zoomend');
+    console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
   }
 
@@ -125,34 +153,6 @@ class XtpPopup extends React.Component {
     });
     console.log(['GET MAP DIMENSIONS elems=',elems,'dim=',dim]);
     return dim;
-  }
-  /*
-  
-  this.props.pid is the "key" to the Marker behind this Popup.
-  
-  */
-  getMapLayers = () => {
-    //const pid = this.props.pid;
-    this.markers = [];
-    this.props.leaflet.map.eachLayer(function (layer) {
-      //console.log(['layer=',layer]);
-      if (layer instanceof L.Marker){
-        //console.log(['MARKER layer=',layer]);
-        if (layer.options && layer.options.className) {
-          // className: "xtp xtp_0"
-          const classes = layer.options.className.split(" ");
-          classes.forEach(c=>{
-            const index = c.indexOf('xtp_');
-            if (index === 0) {
-              this.markers.push(c); // xtp_0, xtp_1, ... , xtp_n-1
-            }
-          });
-        }
-      }
-    });
-    /*if (layer.options.name === 'XXXXX') {
-      layer.setLatLng([newLat,newLon])
-    }*/ 
   }
   
   processStyles = () => {
@@ -203,7 +203,7 @@ class XtpPopup extends React.Component {
     }
   }
 
-  handleNext() {
+  handleNext = () => {
     console.log('HANDLE next!');
     // Find yourself (=this.props.pid) from the list and get next.
     // If no next exist (pid === 'xtp_n-1') => do nothing.
@@ -233,7 +233,6 @@ class XtpPopup extends React.Component {
     } else { // make image fullscreen
       this.fullScreen = true;
       this.getMapDimensions(); // Test this!
-      this.getMapLayers(); // Test this!
       this.setZoomedDimensions();
     }
     // Toggle the state to re-render component
