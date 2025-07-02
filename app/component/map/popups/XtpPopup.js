@@ -90,7 +90,7 @@ class XtpPopup extends React.Component {
   */
   getMapLayers = () => {
     //const pid = this.props.pid;
-    this.markers = [];
+    const markers = [];
     this.props.leaflet.map.eachLayer(function (layer) {
       //console.log(['layer=',layer]);
       if (layer instanceof L.Marker){
@@ -101,7 +101,7 @@ class XtpPopup extends React.Component {
           classes.forEach(c=>{
             const index = c.indexOf('xtp_');
             if (index === 0) {
-              this.markers.push(c); // xtp_0, xtp_1, ... , xtp_n-1
+              markers.push(c); // xtp_0, xtp_1, ... , xtp_n-1
             }
           });
         }
@@ -110,13 +110,14 @@ class XtpPopup extends React.Component {
     /*if (layer.options.name === 'XXXXX') {
       layer.setLatLng([newLat,newLon])
     }*/ 
-    console.log(['this.markers=',this.markers]);
+    console.log(['markers=',markers]);
+    return markers;
   }
   
   componentDidMount() {
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
-    this.getMapLayers(); // Test this!
+    this.markers = this.getMapLayers(); // Test this!
   }
 
   componentWillUnmount() {
