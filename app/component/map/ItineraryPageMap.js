@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import { matchShape, routerShape } from 'found';
 import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { onLocationPopup } from '../../util/queryUtils';
 import {
   configShape,
@@ -45,8 +45,10 @@ const ItineraryPageMap = (
   const xtpLastIndex = useRef(-1);
   const xtpIndex = useRef(-1);
   
-  xtpLastIndex.current = -1;
-  xtpIndex.current = -1;
+  useEffect(() => {
+    xtpLastIndex.current = -1;
+    xtpIndex.current = -1;
+  }, [active]);
   
   xtpPoints.forEach(xtp => {
     if (active === xtp.edge_index) {
