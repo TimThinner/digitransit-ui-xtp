@@ -52,6 +52,7 @@ class XtpPopup extends React.Component {
     this.fullScreen = false;
     this.dimensions = {picW:300, picH:400, popupW:300, popupH:400};
     this.autoClose = false;
+    this.markers = [];
   }
   
   setDefaultDimensions = () => {
@@ -106,13 +107,14 @@ class XtpPopup extends React.Component {
     */
   }
 
-  openPopup = () => {
-    const elems = document.querySelectorAll('.'+this.props.pid);
+  openPopup = (pid) => {
+    const elems = document.querySelectorAll('.'+pid);
     console.log(['openPopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();
     });
   }
+  
   //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
   getMapDimensions = () => {
     const dim = {w:0,h:0};
@@ -124,12 +126,28 @@ class XtpPopup extends React.Component {
     console.log(['GET MAP DIMENSIONS elems=',elems,'dim=',dim]);
     return dim;
   }
+  /*
   
+  this.props.pid is the "key" to the Marker behind this Popup.
+  
+  */
   getMapLayers = () => {
+    //const pid = this.props.pid;
+    this.markers = [];
     this.props.leaflet.map.eachLayer(function (layer) {
-      console.log(['layer=',layer]);
+      //console.log(['layer=',layer]);
       if (layer instanceof L.Marker){
-        console.log(['MARKER layer=',layer]);
+        //console.log(['MARKER layer=',layer]);
+        if (layer.options && layer.options.className) {
+          // className: "xtp xtp_0"
+          const classes = layer.options.className.split(" ");
+          classes.forEach(c=>{
+            const index = c.indexOf('xtp_');
+            if (index === 0) {
+              this.markers.push(c); // xtp_0, xtp_1, ... , xtp_n-1
+            }
+          });
+        }
       }
     });
     /*if (layer.options.name === 'XXXXX') {
@@ -165,6 +183,48 @@ class XtpPopup extends React.Component {
     });
   }
   
+  handlePrev = () => {
+    console.log('HANDLE previous!');
+    // Find yourself (=this.props.pid) from the list and get previous.
+    // If no previous exist (pid === 'xtp_0') => do nothing.
+    if (this.props.pid !== 'xtp_0') {
+      let prev_id = null;
+      this.markers.every((m,i)=>{ // xtp_0, xtp_1, ... , xtp_n-1
+        if (m === this.props.pid) {
+          prev_id = this.markers[i-1];
+          return false; // break out from the every-loop.
+        }
+        return true; // continue with next item.
+      });
+      if (prev_id) {
+        console.log(['OPEN POPUP id=',prev_id]);
+        this.openPopup(prev_id);
+      }
+    }
+  }
+
+  handleNext() {
+    console.log('HANDLE next!');
+    // Find yourself (=this.props.pid) from the list and get next.
+    // If no next exist (pid === 'xtp_n-1') => do nothing.
+    const last_index = this.markers.length-1;
+    const last_item = 'xtp_'+last_index;
+    if (this.props.pid !== last_item) {
+      let next_id = null;
+      this.markers.every((m,i)=>{ // xtp_0, xtp_1, ... , xtp_n-1
+        if (m === this.props.pid) {
+          next_id = this.markers[i+1];
+          return false; // break out from the every-loop.
+        }
+        return true; // continue with next item.
+      });
+      if (next_id) {
+        console.log(['OPEN POPUP id=',next_id]);
+        this.openPopup(next_id);
+      }
+    }
+  }
+  
   handleClick = () => {
     console.log('TOGGLE image!');
     if (this.fullScreen) { // back to small size
@@ -186,7 +246,7 @@ class XtpPopup extends React.Component {
     setTimeout(() => {
       this.closePopup();
       setTimeout(() => {
-        this.openPopup();
+        this.openPopup(this.props.pid);
       }, 100);
     }, 100);
   };
@@ -224,7 +284,8 @@ class XtpPopup extends React.Component {
         <Card className="no-margin">
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} /><br/>
+              <button onClick={this.handlePrev}>Previous</button>&nbsp;&nbsp;&nbsp;<button onClick={this.handleNext}>Next</button>
             </div>
           </div>
         </Card>
