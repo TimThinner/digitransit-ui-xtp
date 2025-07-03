@@ -135,8 +135,8 @@ class XtpPopup extends React.Component {
     [...elems].forEach(e=>{
       e.click();
     });
-    */
   }
+  */
   /*
   openPopup = (pid) => {
     this.props.leaflet.map.openPopup(pid);
