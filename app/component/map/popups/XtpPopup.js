@@ -129,7 +129,7 @@ class XtpPopup extends React.Component {
   /*
   closePopup = () => {
     this.props.leaflet.map.closePopup();
-    /*
+    
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
     console.log(['closePopup elems=',elems]);
     [...elems].forEach(e=>{

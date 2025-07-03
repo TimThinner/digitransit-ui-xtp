@@ -69,6 +69,9 @@ const ItineraryPageMap = (
   
   const xtpHandleClick = () => {
     console.log('HANDLE CLICK');
+    leafletObjs.forEach(o=>{
+      console.log(['LEAFLET OBJECT o=',o]);
+    });
   };
   
   if (showVehicles) {
