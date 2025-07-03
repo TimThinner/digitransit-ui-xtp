@@ -183,8 +183,8 @@ class XtpPopup extends React.Component {
   }
   
   handlePrev = () => {
-    console.log('HANDLE previous!');
     const c_index = parseInt(this.props.pid.slice(4));
+    console.log(['HANDLE previous! c_index=',c_index]);
     if (c_index > 0) {
       const prev_index = c_index-1;
       const prev_id = 'xtp_'+prev_index;
@@ -194,8 +194,8 @@ class XtpPopup extends React.Component {
   }
 
   handleNext = () => {
-    console.log('HANDLE next!');
     const c_index = parseInt(this.props.pid.slice(4));
+    console.log(['HANDLE next! c_index=',c_index,'last_index=',this.props.xtp_last_index]);
     if (c_index < this.props.xtp_last_index) {
       const next_index = c_index+1;
       const next_id = 'xtp_'+next_index;

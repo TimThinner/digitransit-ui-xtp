@@ -46,6 +46,7 @@ const ItineraryPageMap = (
   const xtpIndex = useRef(-1);
   
   useEffect(() => {
+    console.log('ItineraryPageMap useEffect!!!');
     xtpLastIndex.current = -1;
     xtpIndex.current = -1;
   }, [active]);
