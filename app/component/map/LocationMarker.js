@@ -12,8 +12,10 @@ import XtpPopup from './popups/XtpPopup';
 export default function LocationMarker({
   position,
   xtp,
-  xtp_last_index,
-  pid,
+  xtp_handle_next,
+  xtp_handle_prev,
+  xtp_add_popup,
+  xtp_handle_click,
   className,
   isLarge,
   type,
@@ -51,20 +53,22 @@ export default function LocationMarker({
   
   
   New: Add pid ('xtp_0', 'xtp_1', etc.) to IconMarker classes.
+  
+  
   */
   const validType = getValidType(type);
   const validTypeXtp = validType === 'xtp' ? '-xtp' : '';
   const sideLength = isLarge ? 30 : 24;
   
-  const test_classes = cx(validType, className, pid);
+  const test_classes = cx(validType, className);
   console.log(['LocationMarker test_classes=',test_classes]);
   
   return (
     <IconMarker
       position={position}
-      className={cx(validType, className, pid)}
+      className={cx(validType, className)}
       icon={{
-        className: cx(validType, className, pid),
+        className: cx(validType, className),
         element: (
           <Icon
             img={`icon-icon_mapMarker${validTypeXtp}-map`}
@@ -78,11 +82,13 @@ export default function LocationMarker({
     >
       {validType === 'xtp' && (
         <XtpPopup
-          pid={pid}
-          xtp_last_index={xtp_last_index}
           lat={xtp.lat}
           lon={xtp.lon}
           xtpurl={xtp.url}
+          xtp_handle_next={xtp_handle_next}
+          xtp_handle_prev={xtp_handle_prev}
+          xtp_add_popup={xtp_add_popup}
+          xtp_handle_click={xtp_handle_click}
           key={`${xtp.lat}${xtp.lon}`}
         />
       )}
@@ -100,7 +106,10 @@ export default function LocationMarker({
 LocationMarker.propTypes = {
   position: IconMarker.propTypes.position,
   xtp: xtpShape,
-  pid: PropTypes.string,
+  xtp_handle_next: PropTypes.func,
+  xtp_handle_prev: PropTypes.func,
+  xtp_add_popup: PropTypes.func,
+  xtp_handle_click: PropTypes.func,
   className: PropTypes.string,
   isLarge: PropTypes.bool,
   type: PropTypes.oneOf(['from', 'via', 'to', 'favourite']),
@@ -110,7 +119,10 @@ LocationMarker.propTypes = {
 LocationMarker.defaultProps = {
   position: undefined,
   xtp: undefined,
-  pid: undefined,
+  xtp_handle_next: undefined,
+  xtp_handle_prev: undefined,
+  xtp_add_popup: undefined,
+  xtp_handle_click: undefined,
   className: undefined,
   isLarge: false,
   type: 'via',

@@ -42,22 +42,34 @@ const ItineraryPageMap = (
 ) => {
   const { hash } = match.params;
   const leafletObjs = [];
-  const xtpLastIndex = useRef(-1);
-  const xtpIndex = useRef(-1);
   
+  
+  const xtpPopups = []; //useRef([]);
+  const xtpActiveMarkers = [];
+  /*
   useEffect(() => {
     console.log('ItineraryPageMap useEffect!!!');
-    xtpLastIndex.current = -1;
-    xtpIndex.current = -1;
+    xtpPopups.current = [];
+    
+    
   }, [active]);
+  */
+  const xtpAddPopup = popup => {
+    console.log(['ADD POPUP popup=',popup]);
+    xtpPopups.push(popup);
+  };
   
-  xtpPoints.forEach(xtp => {
-    if (active === xtp.edge_index) {
-      xtpLastIndex.current++;
-    }
-  });
+  const xtpHandleNext = () => {
+    console.log('HANDLE NEXT');
+  };
   
-  console.log(['xtpLastIndex.current=',xtpLastIndex.current]);
+  const xtpHandlePrev = () => {
+    console.log('HANDLE PREV');
+  };
+  
+  const xtpHandleClick = () => {
+    console.log('HANDLE CLICK');
+  };
   
   if (showVehicles) {
     leafletObjs.push(
@@ -133,14 +145,31 @@ const ItineraryPageMap = (
   active is the active edge => when we show camera-icons, we must show only those 
   where active === edge_index
   
+  xtp_handle_next,
+  xtp_handle_prev,
+  xtp_add_popup,
+  xtp_handle_click,
   */
-  xtpPoints.forEach(xtp => {
+  xtpPoints.forEach((xtp) => {
     if (active === xtp.edge_index) {
-      xtpIndex.current++;
-      const pos = {lat:xtp.lat, lon:xtp.lon};
-      const pid = 'xtp_'+xtpIndex.current;
-      leafletObjs.push(<LocationMarker key={pid} position={pos} type="xtp" xtp={xtp} xtp_last_index={xtpLastIndex.current} pid={pid} />);
+      xtpActiveMarkers.push(xtp);
     }
+  });
+  
+  xtpActiveMarkers.forEach((xtp, i) => {
+    const pos = {lat:xtp.lat, lon:xtp.lon};
+    leafletObjs.push(
+      <LocationMarker
+        key={`xtp_${i}`}
+        position={pos}
+        type="xtp"
+        xtp={xtp}
+        xtp_handle_next={xtpHandleNext}
+        xtp_handle_prev={xtpHandlePrev}
+        xtp_add_popup={xtpAddPopup}
+        xtp_handle_click={xtpHandleClick}
+      />
+    );
   });
   
   viaPoints.forEach((via, i) => {
