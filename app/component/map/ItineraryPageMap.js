@@ -45,7 +45,6 @@ const ItineraryPageMap = (
   
   
   const xtpPopups = []; //useRef([]);
-  const xtpMarkers = []; //useRef([]);
   const xtpActiveMarkers = [];
   /*
   useEffect(() => {
@@ -58,11 +57,6 @@ const ItineraryPageMap = (
   const xtpAddPopup = popup => {
     console.log(['ADD POPUP popup=',popup]);
     xtpPopups.push(popup);
-  };
-  
-  const xtpAddMarker = marker => {
-    console.log(['ADD MARKER marker=',marker]);
-    xtpMarkers.push(marker);
   };
   
   const xtpHandleNext = () => {
@@ -185,7 +179,6 @@ const ItineraryPageMap = (
         xtp_handle_next={xtpHandleNext}
         xtp_handle_prev={xtpHandlePrev}
         xtp_add_popup={xtpAddPopup}
-        xtp_last_index={xtp_last_index}
         pid={pid}
       />
     );

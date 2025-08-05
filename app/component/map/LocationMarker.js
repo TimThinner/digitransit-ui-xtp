@@ -19,7 +19,6 @@ export default function LocationMarker({
   xtp_handle_next,
   xtp_handle_prev,
   xtp_add_popup,
-  xtp_last_index,
   pid,
 }) {
   const getValidType = markertype => {
@@ -94,6 +93,7 @@ export default function LocationMarker({
           xtp_handle_prev={xtp_handle_prev}
           xtp_add_popup={xtp_add_popup}
           key={`${xtp.lat}${xtp.lon}`}
+          pid={pid}
         />
       )}
       {validType === 'via' && (
@@ -116,7 +116,6 @@ xtp
 xtp_handle_next
 xtp_handle_prev
 xtp_add_popup
-xtp_last_index
 pid
 */
 LocationMarker.propTypes = {
@@ -131,7 +130,6 @@ LocationMarker.propTypes = {
   xtp_handle_next: PropTypes.func,
   xtp_handle_prev: PropTypes.func,
   xtp_add_popup: PropTypes.func,
-  xtp_last_index: PropTypes.number,
   pid: PropTypes.string,
 };
 
@@ -147,6 +145,5 @@ LocationMarker.defaultProps = {
   xtp_handle_next: undefined,
   xtp_handle_prev: undefined,
   xtp_add_popup: undefined,
-  xtp_last_index: undefined,
   pid: undefined,
 };
