@@ -11,15 +11,16 @@ import XtpPopup from './popups/XtpPopup';
 
 export default function LocationMarker({
   position,
+  type,
+  className,
+  isLarge,
+  disabled,
   xtp,
   xtp_handle_next,
   xtp_handle_prev,
   xtp_add_popup,
-  xtp_handle_click,
-  className,
-  isLarge,
-  type,
-  disabled,
+  xtp_last_index,
+  pid,
 }) {
   const getValidType = markertype => {
     switch (markertype) {
@@ -56,6 +57,10 @@ export default function LocationMarker({
   
   
   */
+  //const xtp_marker_next = () => {
+    //console.log('xtp_marker_next');
+  //}
+  
   const validType = getValidType(type);
   const validTypeXtp = validType === 'xtp' ? '-xtp' : '';
   const sideLength = isLarge ? 30 : 24;
@@ -63,7 +68,7 @@ export default function LocationMarker({
   const test_classes = cx(validType, className);
   console.log(['LocationMarker test_classes=',test_classes]);
   
-  return (
+  const marker = (
     <IconMarker
       position={position}
       className={cx(validType, className)}
@@ -88,7 +93,6 @@ export default function LocationMarker({
           xtp_handle_next={xtp_handle_next}
           xtp_handle_prev={xtp_handle_prev}
           xtp_add_popup={xtp_add_popup}
-          xtp_handle_click={xtp_handle_click}
           key={`${xtp.lat}${xtp.lon}`}
         />
       )}
@@ -101,30 +105,48 @@ export default function LocationMarker({
       )}
     </IconMarker>
   );
+  return marker;
 }
+/*
+key
+position
+type
 
+xtp
+xtp_handle_next
+xtp_handle_prev
+xtp_add_popup
+xtp_last_index
+pid
+*/
 LocationMarker.propTypes = {
   position: IconMarker.propTypes.position,
+  type: PropTypes.oneOf(['from', 'via', 'to', 'xtp', 'favourite']),
+  
+  className: PropTypes.string,
+  isLarge: PropTypes.bool,
+  disabled: PropTypes.bool,
+  
   xtp: xtpShape,
   xtp_handle_next: PropTypes.func,
   xtp_handle_prev: PropTypes.func,
   xtp_add_popup: PropTypes.func,
-  xtp_handle_click: PropTypes.func,
-  className: PropTypes.string,
-  isLarge: PropTypes.bool,
-  type: PropTypes.oneOf(['from', 'via', 'to', 'favourite']),
-  disabled: PropTypes.bool,
+  xtp_last_index: PropTypes.number,
+  pid: PropTypes.string,
 };
 
 LocationMarker.defaultProps = {
   position: undefined,
+  type: 'via',
+  
+  className: undefined,
+  isLarge: false,
+  disabled: false,
+  
   xtp: undefined,
   xtp_handle_next: undefined,
   xtp_handle_prev: undefined,
   xtp_add_popup: undefined,
-  xtp_handle_click: undefined,
-  className: undefined,
-  isLarge: false,
-  type: 'via',
-  disabled: false,
+  xtp_last_index: undefined,
+  pid: undefined,
 };

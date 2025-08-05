@@ -32,17 +32,16 @@ class XtpPopup extends React.Component {
     leaflet: PropTypes.shape({
       map: PropTypes.shape({
         //openPopup: PropTypes.func.isRequired,
-        //closePopup: PropTypes.func.isRequired,
+        closePopup: PropTypes.func.isRequired,
         getZoom: PropTypes.func.isRequired,
         on: PropTypes.func.isRequired,
         off: PropTypes.func.isRequired,
       }).isRequired,
     }).isRequired,
-    //pid: PropTypes.string.isRequired,
+    pid: PropTypes.string.isRequired,
     xtp_handle_next: PropTypes.func.isRequired,
     xtp_handle_prev: PropTypes.func.isRequired,
     xtp_add_popup: PropTypes.func.isRequired,
-    xtp_handle_click: PropTypes.func.isRequired,
     lat: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
     xtpurl: PropTypes.string.isRequired,
@@ -126,29 +125,26 @@ class XtpPopup extends React.Component {
     console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
   }
-  /*
+  
   closePopup = () => {
     this.props.leaflet.map.closePopup();
-    
+    /*
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
     console.log(['closePopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();
-    });
+    });*/
   }
-  */
-  /*
+  
   openPopup = (pid) => {
-    this.props.leaflet.map.openPopup(pid);
-    
+    //this.props.leaflet.map.openPopup(pid);
     const elems = document.querySelectorAll('.'+pid);
     console.log(['openPopup elems=',elems]);
     [...elems].forEach(e=>{
       e.click();
     });
-    
   }
-  */
+  
   //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
   getMapDimensions = () => {
     const dim = {w:0,h:0};
@@ -188,6 +184,15 @@ class XtpPopup extends React.Component {
       e.style.left = left+"px";
     });
   }
+  
+  
+  handlePrev = () => {
+    this.props.xtp_handle_prev();
+  }
+  handleNext = () => {
+    this.props.xtp_handle_next();
+  }
+  
   /*
   handlePrev = () => {
     const c_index = parseInt(this.props.pid.slice(4));
@@ -212,7 +217,7 @@ class XtpPopup extends React.Component {
     }
   }
   */
-  /*
+  
   handleClick = () => {
     console.log('TOGGLE image!');
     if (this.fullScreen) { // back to small size
@@ -237,10 +242,10 @@ class XtpPopup extends React.Component {
       }, 100);
     }, 100);
   };
-  */
+  
   render() {
-    //console.log(['Create Popup this.props.pid=',this.props.pid]);
-    console.log('Create Popup');
+    console.log(['Create Popup this.props.pid=',this.props.pid]);
+    //console.log('Create Popup');
     const popup = (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -272,8 +277,8 @@ class XtpPopup extends React.Component {
         <Card className="no-margin">
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
-              <img onClick={this.props.xtp_handle_click} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} /><br/>
-              <button onClick={this.props.xtp_handle_prev}>Previous</button>&nbsp;&nbsp;&nbsp;<button onClick={this.props.xtp_handle_next}>Next</button>
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} /><br/>
+              <button onClick={this.handlePrev}>Previous</button>&nbsp;&nbsp;&nbsp;<button onClick={this.handleNext}>Next</button>
             </div>
           </div>
         </Card>

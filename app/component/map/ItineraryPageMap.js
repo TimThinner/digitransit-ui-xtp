@@ -45,6 +45,7 @@ const ItineraryPageMap = (
   
   
   const xtpPopups = []; //useRef([]);
+  const xtpMarkers = []; //useRef([]);
   const xtpActiveMarkers = [];
   /*
   useEffect(() => {
@@ -57,6 +58,11 @@ const ItineraryPageMap = (
   const xtpAddPopup = popup => {
     console.log(['ADD POPUP popup=',popup]);
     xtpPopups.push(popup);
+  };
+  
+  const xtpAddMarker = marker => {
+    console.log(['ADD MARKER marker=',marker]);
+    xtpMarkers.push(marker);
   };
   
   const xtpHandleNext = () => {
@@ -158,8 +164,17 @@ const ItineraryPageMap = (
       xtpActiveMarkers.push(xtp);
     }
   });
-  
+  const xtp_last_index = xtpActiveMarkers.length-1;
   xtpActiveMarkers.forEach((xtp, i) => {
+    // Todo: add "pid" and "xtp_last_index" to handle "next" and "prev" popup.
+    // UNDER CONSTRUCTION!
+    
+    // Add changes to:
+    //   LocationMarker .js
+    //   XtpPopup.js
+    
+    // See commit: https://github.com/TimThinner/digitransit-ui-xtp/commit/0501930135741f70992626692d3a78369a030794
+    const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
     leafletObjs.push(
       <LocationMarker
@@ -170,7 +185,8 @@ const ItineraryPageMap = (
         xtp_handle_next={xtpHandleNext}
         xtp_handle_prev={xtpHandlePrev}
         xtp_add_popup={xtpAddPopup}
-        xtp_handle_click={xtpHandleClick}
+        xtp_last_index={xtp_last_index}
+        pid={pid}
       />
     );
   });
