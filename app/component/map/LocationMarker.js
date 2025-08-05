@@ -16,9 +16,7 @@ export default function LocationMarker({
   isLarge,
   disabled,
   xtp,
-  xtp_handle_next,
-  xtp_handle_prev,
-  xtp_add_popup,
+  xtp_last_index,
   pid,
 }) {
   const getValidType = markertype => {
@@ -89,10 +87,8 @@ export default function LocationMarker({
           lat={xtp.lat}
           lon={xtp.lon}
           xtpurl={xtp.url}
-          xtp_handle_next={xtp_handle_next}
-          xtp_handle_prev={xtp_handle_prev}
-          xtp_add_popup={xtp_add_popup}
           key={`${xtp.lat}${xtp.lon}`}
+          xtp_last_index={xtp_last_index}
           pid={pid}
         />
       )}
@@ -113,9 +109,7 @@ position
 type
 
 xtp
-xtp_handle_next
-xtp_handle_prev
-xtp_add_popup
+xtp_last_index
 pid
 */
 LocationMarker.propTypes = {
@@ -127,9 +121,7 @@ LocationMarker.propTypes = {
   disabled: PropTypes.bool,
   
   xtp: xtpShape,
-  xtp_handle_next: PropTypes.func,
-  xtp_handle_prev: PropTypes.func,
-  xtp_add_popup: PropTypes.func,
+  xtp_last_index: PropTypes.number,
   pid: PropTypes.string,
 };
 
@@ -142,8 +134,6 @@ LocationMarker.defaultProps = {
   disabled: false,
   
   xtp: undefined,
-  xtp_handle_next: undefined,
-  xtp_handle_prev: undefined,
-  xtp_add_popup: undefined,
+  xtp_last_index: undefined,
   pid: undefined,
 };

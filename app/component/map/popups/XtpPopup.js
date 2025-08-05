@@ -39,9 +39,7 @@ class XtpPopup extends React.Component {
       }).isRequired,
     }).isRequired,
     pid: PropTypes.string.isRequired,
-    xtp_handle_next: PropTypes.func.isRequired,
-    xtp_handle_prev: PropTypes.func.isRequired,
-    xtp_add_popup: PropTypes.func.isRequired,
+    xtp_last_index: PropTypes.number.isRequired,
     lat: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
     xtpurl: PropTypes.string.isRequired,
@@ -185,15 +183,14 @@ class XtpPopup extends React.Component {
     });
   }
   
-  
+  /*
   handlePrev = () => {
     this.props.xtp_handle_prev();
   }
   handleNext = () => {
     this.props.xtp_handle_next();
-  }
+  }*/
   
-  /*
   handlePrev = () => {
     const c_index = parseInt(this.props.pid.slice(4));
     console.log(['HANDLE previous! c_index=',c_index]);
@@ -204,8 +201,7 @@ class XtpPopup extends React.Component {
       this.openPopup(prev_id);
     }
   }
-  */
-  /*
+  
   handleNext = () => {
     const c_index = parseInt(this.props.pid.slice(4));
     console.log(['HANDLE next! c_index=',c_index,'last_index=',this.props.xtp_last_index]);
@@ -216,7 +212,6 @@ class XtpPopup extends React.Component {
       this.openPopup(next_id);
     }
   }
-  */
   
   handleClick = () => {
     console.log('TOGGLE image!');

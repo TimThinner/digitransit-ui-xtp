@@ -44,7 +44,7 @@ const ItineraryPageMap = (
   const leafletObjs = [];
   
   
-  const xtpPopups = []; //useRef([]);
+  //const xtpPopups = []; //useRef([]);
   const xtpActiveMarkers = [];
   /*
   useEffect(() => {
@@ -54,6 +54,7 @@ const ItineraryPageMap = (
     
   }, [active]);
   */
+  /*
   const xtpAddPopup = popup => {
     console.log(['ADD POPUP popup=',popup]);
     xtpPopups.push(popup);
@@ -72,7 +73,7 @@ const ItineraryPageMap = (
     leafletObjs.forEach(o=>{
       console.log(['LEAFLET OBJECT o=',o]);
     });
-  };
+  };*/
   
   if (showVehicles) {
     leafletObjs.push(
@@ -176,9 +177,7 @@ const ItineraryPageMap = (
         position={pos}
         type="xtp"
         xtp={xtp}
-        xtp_handle_next={xtpHandleNext}
-        xtp_handle_prev={xtpHandlePrev}
-        xtp_add_popup={xtpAddPopup}
+        xtp_last_index={xtp_last_index}
         pid={pid}
       />
     );
