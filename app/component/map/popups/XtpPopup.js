@@ -279,7 +279,6 @@ class XtpPopup extends React.Component {
         </Card>
       </Popup>
     );
-    this.props.xtp_add_popup(popup);
     return popup;
   }
 }
