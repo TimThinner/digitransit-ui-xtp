@@ -241,6 +241,9 @@ class XtpPopup extends React.Component {
   render() {
     console.log(['Create Popup this.props.pid=',this.props.pid]);
     //console.log('Create Popup');
+    const c_index = parseInt(this.props.pid.slice(4));
+    const prev_state = c_index ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
+    const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty
     const popup = (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -273,7 +276,8 @@ class XtpPopup extends React.Component {
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} /><br/>
-              <button onClick={this.handlePrev}>Previous</button>&nbsp;&nbsp;&nbsp;<button onClick={this.handleNext}>Next</button>
+              <div style="float:left"><button disabled={!prev_state} onClick={this.handlePrev}>Previous</button></div>
+              <div style="float:right"><button disabled={!next_state} onClick={this.handleNext}>Next</button></div>
             </div>
           </div>
         </Card>
