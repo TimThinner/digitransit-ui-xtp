@@ -276,10 +276,8 @@ class XtpPopup extends React.Component {
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} /><br/>
-              <div style={{display: 'flex'; justifyContent: 'space-between'}}>
-                <button disabled={!prev_state} onClick={this.handlePrev}>Previous</button>
-                <button disabled={!next_state} onClick={this.handleNext}>Next</button>
-              </div>
+              <button disabled={!prev_state} onClick={this.handlePrev}>Previous</button>
+              <button disabled={!next_state} onClick={this.handleNext}>Next</button>
             </div>
           </div>
         </Card>
