@@ -64,15 +64,15 @@ export default function LocationMarker({
   const validTypeXtp = validType === 'xtp' ? '-xtp' : '';
   const sideLength = isLarge ? 30 : 24;
   
-  const test_classes = cx(validType, className);
+  const test_classes = cx(validType, className, pid);
   console.log(['LocationMarker test_classes=',test_classes]);
   
   const marker = (
     <IconMarker
       position={position}
-      className={cx(validType, className)}
+      className={cx(validType, className, pid)}
       icon={{
-        className: cx(validType, className),
+        className: cx(validType, className, pid),
         element: (
           <Icon
             img={`icon-icon_mapMarker${validTypeXtp}-map`}
