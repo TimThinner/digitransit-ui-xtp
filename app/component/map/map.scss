@@ -1621,3 +1621,26 @@ div.leaflet-control-scale-line {
     margin-left: -27px;
   }
 }
+
+.xtp-popup-button-container {
+  display: flex;
+}
+.xtp-popup-button-item {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 50%;
+  padding: 0 10px;
+}
+.xtp-popup-button-item > button{
+  width: 100%;
+}
+.xtp-popup-button {
+  background-color: #fff;
+  color: #000;
+  cursor: pointer;
+}
+.xtp-popup-button[disabled] {
+  background-color: #fff;
+  color: #ccc;
+  cursor: default;
+}
