@@ -1635,12 +1635,13 @@ div.leaflet-control-scale-line {
   width: 100%;
   background-color: #fff;
   line-height: 2em;
-}
-.xtp-map-popup-button {
   color: #000;
   cursor: pointer;
 }
-.xtp-map-popup-button[disabled] {
+.xtp-map-popup-button-wrapper > button[disabled] {
+  width: 100%;
+  background-color: #fff;
+  line-height: 2em;
   color: #ccc;
   cursor: default;
 }
