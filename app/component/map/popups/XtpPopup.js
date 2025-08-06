@@ -277,9 +277,9 @@ class XtpPopup extends React.Component {
             <div className="location-thumbnail-image">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.dimensions.picW} height={this.dimensions.picH} />
             </div>
-            <div className="xtp-popup-button-container">
-              <div className="xtp-popup-button-item"><button disabled={!prev_state} onClick={this.handlePrev}>Previous</button></div>
-              <div className="xtp-popup-button-item"><button disabled={!next_state} onClick={this.handleNext}>Next</button></div>
+            <div className="xtp-map-popup-button-container">
+              <div className="xtp-map-popup-button-wrapper"><button className="xtp-map-popup-button" disabled={!prev_state} onClick={this.handlePrev}>Previous</button></div>
+              <div className="xtp-map-popup-button-wrapper"><button className="xtp-map-popup-button" disabled={!next_state} onClick={this.handleNext}>Next</button></div>
             </div>
           </div>
         </Card>
