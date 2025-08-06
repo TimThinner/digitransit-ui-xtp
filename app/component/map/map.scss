@@ -1638,7 +1638,8 @@ div.leaflet-control-scale-line {
   color: #000;
   cursor: pointer;
 }
-.xtp-map-popup-button-wrapper > button[disabled] {
+.xtp-map-popup-button-wrapper > button[disabled], 
+.xtp-map-popup-button-wrapper > button[disabled]:hover {
   width: 100%;
   background-color: #fff;
   line-height: 2em;
