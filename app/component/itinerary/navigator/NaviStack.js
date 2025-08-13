@@ -5,7 +5,11 @@ import NaviMessage from './NaviMessage';
 
 const NaviStack = ({ messages, handleRemove, cardAnimation }) => {
   return (
-    <div className={cx('info-stack', cardAnimation)}>
+    <div
+      className={cx('info-stack', cardAnimation)}
+      aria-live="polite"
+      role="status"
+    >
       {messages.map((notification, index) => (
         <NaviMessage
           key={notification.id}
@@ -15,7 +19,10 @@ const NaviStack = ({ messages, handleRemove, cardAnimation }) => {
           hideClose={notification.hideClose}
           cardAnimation={cardAnimation}
         >
-          {notification.content}
+          <div className="navi-info-content">
+            <span className="notification-header">{notification.title}</span>
+            {notification.jsxBody || notification.body}
+          </div>
         </NaviMessage>
       ))}
     </div>

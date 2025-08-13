@@ -1,10 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {
-  graphql,
-  createFragmentContainer,
-  ReactRelayContext,
-} from 'react-relay';
+import { useFragment, ReactRelayContext } from 'react-relay';
 import { matchShape, routerShape } from 'found';
 import getContext from 'recompose/getContext';
 import { intlShape, FormattedMessage } from 'react-intl';
@@ -16,10 +12,18 @@ import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import { isIOS, isSafari } from '../../util/browser';
 import ItineraryNotification from './ItineraryNotification';
 import { transitEdges } from './ItineraryPageUtils';
+import { ItineraryListContainerPlanEdges } from './queries/ItineraryListContainerPlanEdges';
 
 function ItineraryListContainer(
   {
+/*
+<<<<<<< HEAD
     planEdges,
+    xtpPoints,
+=======
+*/
+    planEdges: planEdgesRef,
+//>>>>>>> upstream/v3
     xtpPoints,
     activeIndex,
     params,
@@ -33,6 +37,8 @@ function ItineraryListContainer(
   },
   { router, match, intl },
 ) {
+  const planEdges = useFragment(ItineraryListContainerPlanEdges, planEdgesRef);
+
   function getSubPath(fallback) {
     const modesWithSubpath = [
       streetHash.bikeAndVehicle,
@@ -63,7 +69,10 @@ function ItineraryListContainer(
     });
     const newLocation = {
       ...match.location,
-      state: { selectedItineraryIndex: index },
+      state: {
+        ...match.location.state,
+        selectedItineraryIndex: index,
+      },
     };
     const basePath = `${getItineraryPagePath(
       params.from,
@@ -84,7 +93,10 @@ function ItineraryListContainer(
     } else {
       router.replace({
         ...match.location,
-        state: { selectedItineraryIndex: index },
+        state: {
+          ...match.location.state,
+          selectedItineraryIndex: index,
+        },
       });
 
       addAnalyticsEvent({
@@ -230,17 +242,4 @@ const withConfig = getContext({
   </ReactRelayContext.Consumer>
 ));
 
-const connectedContainer = createFragmentContainer(withConfig, {
-  planEdges: graphql`
-    fragment ItineraryListContainer_planEdges on PlanEdge @relay(plural: true) {
-      ...ItineraryList_planEdges
-      node {
-        legs {
-          mode
-        }
-      }
-    }
-  `,
-});
-
-export { connectedContainer as default, ItineraryListContainer as Component };
+export { withConfig as default, ItineraryListContainer as Component };

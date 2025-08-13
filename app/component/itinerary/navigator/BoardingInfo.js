@@ -6,7 +6,7 @@ import RouteNumberContainer from '../../RouteNumberContainer';
 import { routeShape } from '../../../util/shapes';
 import Icon from '../../Icon';
 
-const NaviBoardingInfo = ({
+const BoardingInfo = ({
   route,
   mode,
   headsign,
@@ -21,6 +21,8 @@ const NaviBoardingInfo = ({
         'compact-boarding': compact,
         'with-icon': withExpandIcon,
       })}
+      aria-live="polite"
+      role="status"
     >
       <div className="route-info">
         {withExpandIcon && (
@@ -37,11 +39,14 @@ const NaviBoardingInfo = ({
         />
         {!compact && <div className="headsign">{headsign}</div>}
       </div>
+      <FormattedMessage id="leaves">
+        {msg => <span className="sr-only">{msg}</span>}
+      </FormattedMessage>
       {!withExpandIcon && (
         <div className="wait-duration">
           <FormattedMessage
             id="navileg-departing-at"
-            defaultMessage="{duration} min päästä klo {legTime}"
+            defaultMessage="{duration} päästä klo {legTime}"
             values={translationValues}
           />
         </div>
@@ -50,7 +55,7 @@ const NaviBoardingInfo = ({
   );
 };
 
-NaviBoardingInfo.propTypes = {
+BoardingInfo.propTypes = {
   route: routeShape.isRequired,
   mode: PropTypes.string.isRequired,
   headsign: PropTypes.string.isRequired,
@@ -59,9 +64,9 @@ NaviBoardingInfo.propTypes = {
   withExpandIcon: PropTypes.bool,
   compact: PropTypes.bool,
 };
-NaviBoardingInfo.defaultProps = {
+BoardingInfo.defaultProps = {
   withExpandIcon: false,
   compact: false,
 };
 
-export default NaviBoardingInfo;
+export default BoardingInfo;

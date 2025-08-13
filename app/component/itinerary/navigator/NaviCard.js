@@ -20,6 +20,8 @@ const iconMap = {
   SUBWAY: 'icon-icon_subway',
   TRAM: 'icon-icon_tram',
   FERRY: 'icon-icon_ferry',
+  'FERRY-EXTERNAL': 'icon-icon_ferry-external',
+  CALL: 'icon-icon_call',
   'BUS-EXPRESS': 'icon-icon_bus-express',
   'BUS-LOCAL': 'icon-icon_bus-local',
   SPEEDTRAM: 'icon-icon_speedtram',
@@ -91,6 +93,8 @@ export default function NaviCard(
       type="button"
       className={`navi-top-card ${cardAnimation}`}
       onClick={handleClick}
+      aria-expanded={cardExpanded}
+      aria-controls={`navi-card-content-${leg?.legId}`}
     >
       <div className="main-card">
         <div className="content">
@@ -114,11 +118,13 @@ export default function NaviCard(
           </div>
         </div>
         <div
+          id={`navi-card-content-${leg?.legId}`}
           className="extension"
           style={{
             maxHeight,
           }}
           ref={contentRef}
+          aria-hidden={!cardExpanded}
         >
           <NaviCardExtension
             legType={legType}

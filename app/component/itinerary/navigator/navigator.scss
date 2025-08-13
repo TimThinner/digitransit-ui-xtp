@@ -429,6 +429,10 @@
           color: $speedtram-color;
         }
 
+        &.replacement-bus {
+          color: $replacement-bus-color;
+        }
+
         &.tram-stop {
           color: $tram-color;
         }
@@ -443,6 +447,10 @@
 
         &.ferry-stop {
           color: $ferry-color;
+        }
+
+        &.ferry-external-stop {
+          color: $external-feed-color;
         }
 
         &.funicular-stop {
@@ -719,7 +727,7 @@
   margin: var(--space-m) var(--space-l);
 
   &.ticket-link {
-    margin: var(--space-l) var(--space-m);
+    margin: var(--space-m) var(--space-m);
 
     .navi-time {
       align-items: inherit;

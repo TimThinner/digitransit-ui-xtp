@@ -1,6 +1,7 @@
 /* eslint-disable prefer-template */
 import safeJsonParse from '../util/safeJsonParser';
 import { BIKEAVL_WITHMAX } from '../util/vehicleRentalUtils';
+import realtime from './realtimeUtils';
 
 const CONFIG = process.env.CONFIG || 'default';
 const API_URL = process.env.API_URL || 'https://dev-api.digitransit.fi';
@@ -13,21 +14,24 @@ const OTP_URL = process.env.OTP_URL || `${API_URL}/routing/v2/finland/`;
 const HSL_TIMETABLES_URL =
   process.env.HSL_TIMETABLES_URL || 'https://dev.kartat.hsl.fi';
 const APP_PATH = process.env.APP_CONTEXT || '';
+const API_SUBSCRIPTION_QUERY_PARAMETER_NAME =
+  process.env.API_SUBSCRIPTION_QUERY_PARAMETER_NAME ||
+  'digitransit-subscription-key';
+const API_SUBSCRIPTION_HEADER_NAME =
+  process.env.API_SUBSCRIPTION_HEADER_NAME || 'digitransit-subscription-key';
+const API_SUBSCRIPTION_TOKEN =
+  process.env.API_SUBSCRIPTION_TOKEN || 'c65af0cd2d0a401a9599894970a2b29c';
+
 const {
   // AXE,
   NODE_ENV,
-  API_SUBSCRIPTION_QUERY_PARAMETER_NAME,
-  API_SUBSCRIPTION_HEADER_NAME,
-  API_SUBSCRIPTION_TOKEN,
   RUN_ENV,
 } = process.env;
-const hasAPISubscriptionQueryParameter =
-  API_SUBSCRIPTION_QUERY_PARAMETER_NAME && API_SUBSCRIPTION_TOKEN;
+const hasAPISubscriptionQueryParameter = true;
 const PORT = process.env.PORT || 8080;
 const APP_DESCRIPTION = 'Digitransit journey planning UI';
 const OTP_TIMEOUT = process.env.OTP_TIMEOUT || 12000;
 const YEAR = 1900 + new Date().getYear();
-const realtime = require('./realtimeUtils').default;
 
 const REALTIME_PATCH = safeJsonParse(process.env.REALTIME_PATCH) || {};
 
@@ -50,6 +54,10 @@ export default {
     STOP_MAP: {
       default: `${POI_MAP_PREFIX}/fi/stops,stations/`,
       sv: `${POI_MAP_PREFIX}/sv/stops,stations/`,
+    },
+    REALTIME_STOP_MAP: {
+      default: `${POI_MAP_PREFIX}/fi/realtimeStops,stations/`,
+      sv: `${POI_MAP_PREFIX}/sv/realtimeStops,stations/`,
     },
     RENTAL_STATION_MAP: {
       default: `${POI_MAP_PREFIX}/fi/rentalStations/`,
@@ -193,6 +201,7 @@ export default {
     includeParkAndRideSuggestions: false,
     includeCarSuggestions: false,
     showBikeAndParkItineraries: false,
+    includeTaxiSuggestions: false,
   },
 
   /**
@@ -231,9 +240,6 @@ export default {
     'pl',
   ],
   defaultLanguage: 'en',
-  // This timezone data will expire in 2037
-  timezoneData:
-    'Europe/Helsinki|EET EEST|-20 -30|0101010101010101010101010101010101010|22k10 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00|12e5',
   timeZone: 'Europe/Helsinki',
   allowLogin: false,
   allowFavouritesFromLocalstorage: true,
@@ -380,6 +386,8 @@ export default {
       'mode-ferry': '#247C7B',
       'mode-citybike': '#f2b62d',
       'mode-scooter': '#C5CAD2',
+      'mode-taxi': '#647693',
+      'mode-replacement-bus': '#DC0451',
     },
   },
   iconModeSet: 'digitransit',
@@ -469,15 +477,10 @@ export default {
       availableForSelection: false,
       defaultValue: false, // always false
     },
-  },
 
-  moment: {
-    relativeTimeThreshold: {
-      seconds: 55,
-      minutes: 59,
-      hours: 23,
-      days: 26,
-      months: 11,
+    taxi: {
+      availableForSelection: false,
+      defaultValue: false, // always false
     },
   },
 
@@ -852,4 +855,8 @@ export default {
   navigation: false,
   sendAnalyticsCustomEventGoals: false,
   shortenLongTextThreshold: 10, // for route number in itinerary summary
+  allowFlexJourneys: false,
+  allowDirectFlexJourneys: false,
+  allowedFlexRouteTypes: [1501],
+  showRouteDescNotification: false,
 };

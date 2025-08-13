@@ -1,10 +1,12 @@
+import prUtils from '../util/ParkAndRideUtils';
+
+const HSLParkAndRideUtils = prUtils.HSL;
 const API_URL = process.env.API_URL || 'https://dev-api.digitransit.fi';
 const OTP_URL = process.env.OTP_URL || `${API_URL}/routing/v2/waltti/`;
 const MAP_URL = process.env.MAP_URL || 'https://dev-cdn.digitransit.fi';
 const POI_MAP_PREFIX = `${MAP_URL}/map/v3/waltti`;
 const APP_DESCRIPTION = 'Digitransit-reittiopas';
 const YEAR = 1900 + new Date().getYear();
-const HSLParkAndRideUtils = require('../util/ParkAndRideUtils').default.HSL;
 
 export default {
   YEAR,
@@ -13,6 +15,10 @@ export default {
     STOP_MAP: {
       default: `${POI_MAP_PREFIX}/fi/stops,stations/`,
       sv: `${POI_MAP_PREFIX}/sv/stops,stations/`,
+    },
+    REALTIME_STOP_MAP: {
+      default: `${POI_MAP_PREFIX}/fi/realtimeStops,stations/`,
+      sv: `${POI_MAP_PREFIX}/sv/realtimeStops,stations/`,
     },
     RENTAL_STATION_MAP: {
       default: `${POI_MAP_PREFIX}/fi/rentalStations/`,
@@ -131,8 +137,14 @@ export default {
       availableForSelection: false,
       defaultValue: false,
     },
+
+    taxi: {
+      availableForSelection: true, // experimental feature
+      defaultValue: false,
+    },
   },
 
+  nearYouModes: ['bus'],
   nearbyModeSet: 'waltti',
 
   maxNearbyStopDistance: {
@@ -274,7 +286,6 @@ export default {
   carBoardingModes: {
     FERRY: { showNotification: true },
   },
-  navigation: false,
 
   ticketPurchaseLink: function purchaseTicketLink(
     fare,
@@ -305,11 +316,43 @@ export default {
   analyticsClass: 'plausible-event-name=Ticket+Purchase+Link',
 
   viaPointsEnabled: false,
+  hideNaviTickets: true, // TODO: temporary force switch
+  navigation: true,
+
+  externalFeedIds: ['02Taksi'],
 
   // features that should not be deployed to production
   experimental: {
-    navigation:
+    allowFlexJourneys:
       process.env.RUN_ENV === 'development' ||
       process.env.NODE_ENV !== 'production',
+    allowDirectFlexJourneys:
+      process.env.RUN_ENV === 'development' ||
+      process.env.NODE_ENV !== 'production',
+  },
+
+  replacementBusNotification: {
+    header: {
+      fi: 'Korvaava bussi',
+      en: 'Replacement bus',
+      sv: 'Ersättande buss',
+    },
+    content: {
+      fi: [
+        'Voit nousta kyytiin myös bussin keskiovista.',
+        'Pysäkit on merkitty punaisilla tunnuksilla.',
+        'Linja käyttää valikoituja pysäkkejä, eli bussi ei pysähdy kaikilla pysäkeillä.',
+      ],
+      en: [
+        'You can also board the bus through the middle doors.',
+        'The stops are marked with red signs.',
+        'The bus stops only at designated stops and does not serve all stops.',
+      ],
+      sv: [
+        'Du kan också stiga på bussen genom mittdörren.',
+        'Hållplatserna är markerade med röda punkter.',
+        'Linjen stannar endast vid vissa hållplatser, dvs. bussen stannar inte vid alla hållplatser.',
+      ],
+    },
   },
 };

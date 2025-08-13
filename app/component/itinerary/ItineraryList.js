@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { createFragmentContainer, graphql } from 'react-relay';
+import { useFragment } from 'react-relay';
 import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
 import { matchShape } from 'found';
 import { configShape, planEdgeShape, xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import Itinerary from './Itinerary';
-import { isBrowser } from '../../util/browser';
 import {
   getExtendedMode,
   showBikeBoardingNote,
@@ -19,6 +18,7 @@ import Loading from '../Loading';
 import FeedbackPrompt from './FeedbackPrompt';
 import { streetHash } from '../../util/path';
 import { getIntermediatePlaces } from '../../util/otpStrings';
+import { ItineraryListPlanEdges } from './queries/ItineraryListPlanEdges';
 
 const spinnerPosition = {
   top: 'top',
@@ -27,8 +27,15 @@ const spinnerPosition = {
 
 function ItineraryList(
   {
+/*
+<<<<<<< HEAD
     planEdges,
     xtpPoints,
+=======
+*/
+    planEdges: planEdgesRef,
+    xtpPoints,
+//>>>>>>> upstream/v3
     activeIndex,
     onSelect,
     onSelectImmediately,
@@ -36,7 +43,7 @@ function ItineraryList(
     bikeParkItineraryCount,
     carDirectItineraryCount,
     showRelaxedPlanNotifier,
-    showRentalVehicleNotifier,
+    rentalVehicleNotifierId,
     separatorPosition,
     loadingMore,
     routingFeedbackPosition,
@@ -47,6 +54,8 @@ function ItineraryList(
   const { config } = context;
   const { location } = context.match;
   const { hash } = context.match.params;
+
+  const planEdges = useFragment(ItineraryListPlanEdges, planEdgesRef);
 
   const co2s = planEdges
     .filter(e => e.node.emissionsPerPerson?.co2 >= 0)
@@ -181,7 +190,7 @@ function ItineraryList(
           </div>
         </div>
       )}
-      {showRentalVehicleNotifier && (
+      {rentalVehicleNotifierId?.length && (
         <div
           className={cx(
             'flex-horizontal',
@@ -196,9 +205,13 @@ function ItineraryList(
             </div>
             <div className="alternative-vehicle-info-content">
               <FormattedMessage
-                id="e-scooter-alternative"
+                id={`${rentalVehicleNotifierId}-alternative`}
                 values={{
-                  paymentInfo: <FormattedMessage id="payment-info-e-scooter" />,
+                  paymentInfo: (
+                    <FormattedMessage
+                      id={`payment-info-${rentalVehicleNotifierId}`}
+                    />
+                  ),
                 }}
               />
             </div>
@@ -210,16 +223,13 @@ function ItineraryList(
           <Loading />
         </div>
       )}
-      {isBrowser && (
-        <div
-          className={cx('summary-list-items', {
-            'summary-list-items-loading-top':
-              loadingMore === spinnerPosition.top,
-          })}
-        >
-          {summaries}
-        </div>
-      )}
+      <div
+        className={cx('summary-list-items', {
+          'summary-list-items-loading-top': loadingMore === spinnerPosition.top,
+        })}
+      >
+        {summaries}
+      </div>
       {loadingMore === spinnerPosition.bottom && (
         <div className="summary-list-spinner-container">
           <Loading />
@@ -242,7 +252,7 @@ ItineraryList.propTypes = {
   bikeParkItineraryCount: PropTypes.number,
   carDirectItineraryCount: PropTypes.number,
   showRelaxedPlanNotifier: PropTypes.bool,
-  showRentalVehicleNotifier: PropTypes.bool,
+  rentalVehicleNotifierId: PropTypes.string,
   separatorPosition: PropTypes.number,
   loadingMore: PropTypes.string,
   routingFeedbackPosition: PropTypes.number,
@@ -254,7 +264,7 @@ ItineraryList.defaultProps = {
   planEdges: [],
   xtpPoints: [],
   showRelaxedPlanNotifier: false,
-  showRentalVehicleNotifier: false,
+  rentalVehicleNotifierId: undefined,
   separatorPosition: undefined,
   loadingMore: undefined,
   routingFeedbackPosition: undefined,
@@ -265,29 +275,4 @@ ItineraryList.contextTypes = {
   match: matchShape.isRequired,
 };
 
-const containerComponent = createFragmentContainer(ItineraryList, {
-  planEdges: graphql`
-    fragment ItineraryList_planEdges on PlanEdge @relay(plural: true) {
-      node {
-        ...Itinerary_itinerary
-        emissionsPerPerson {
-          co2
-        }
-        legs {
-          transitLeg
-          mode
-          route {
-            mode
-            type
-          }
-        }
-      }
-    }
-  `,
-});
-
-export {
-  containerComponent as default,
-  ItineraryList as Component,
-  spinnerPosition,
-};
+export { ItineraryList as default, spinnerPosition };

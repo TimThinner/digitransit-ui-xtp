@@ -363,7 +363,7 @@ class TransitLeg extends React.Component {
     const createNotificationWithLink = notification => {
       return (
         <a
-          href={`https://www.${notification.link[lang]}`}
+          href={`https://www.${notification.link?.[lang]}`}
           className="disruption-link"
           target="_blank"
           rel="noreferrer"
@@ -398,6 +398,7 @@ class TransitLeg extends React.Component {
             <div
               className={cx('disruption', {
                 'no-header': !notification.header,
+                'no-link': !notification.link,
               })}
               key={`note-${index}`}
             >

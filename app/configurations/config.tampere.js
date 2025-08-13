@@ -1,12 +1,12 @@
-/* eslint-disable prefer-template */
 import configMerger from '../util/configMerger';
 import { BIKEAVL_WITHMAX } from '../util/vehicleRentalUtils';
+import walttiConfig from './config.waltti';
+import ttConfig from './timetableConfigUtils';
 
+const tampereTimetables = ttConfig.tampere;
 const CONFIG = 'tampere';
 const APP_TITLE = 'Nyssen reittiopas';
 const APP_DESCRIPTION = 'Nyssen reittiopas';
-const walttiConfig = require('./config.waltti').default;
-const tampereTimetables = require('./timetableConfigUtils').default.tampere;
 
 const IS_DEV =
   process.env.RUN_ENV === 'development' ||
@@ -14,7 +14,7 @@ const IS_DEV =
 
 const virtualMonitorBaseUrl = IS_DEV
   ? 'https://dev-tremonitori.digitransit.fi'
-  : 'https://tremonitori.digitransit.fi.fi';
+  : 'https://tremonitori.digitransit.fi';
 
 export default configMerger(walttiConfig, {
   CONFIG,
@@ -52,7 +52,7 @@ export default configMerger(walttiConfig, {
           sv: 'Zoner',
           en: 'Zones',
         },
-        url: '/assets/geojson/tre_zone_lines_20240108.geojson',
+        url: '/assets/geojson/tre_zone_lines_20250606.geojson',
         isOffByDefault: true,
       },
       {
@@ -80,7 +80,9 @@ export default configMerger(walttiConfig, {
   showTicketInformation: true,
   primaryAgencyName: 'Tampereen seudun joukkoliikenne',
 
-  ticketLink: 'https://www.nysse.fi/liput-ja-hinnat.html',
+  ticketLink: {
+    fi: 'https://www.nysse.fi/liput-ja-hinnat.html',
+  },
 
   callAgencyInfo: {
     fi: {
@@ -298,6 +300,8 @@ export default configMerger(walttiConfig, {
       availableForSelection: true,
     },
   },
+
+  nearYouModes: ['bus', 'tram', 'rail', 'citybike'],
 
   bikeBoardingModes: {
     RAIL: { showNotification: true },

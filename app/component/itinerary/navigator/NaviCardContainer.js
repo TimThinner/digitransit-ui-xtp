@@ -9,7 +9,6 @@ import { getTopics, updateClient } from '../ItineraryPageUtils';
 import NaviCard from './NaviCard';
 import NaviStack from './NaviStack';
 import {
-  DESTINATION_RADIUS,
   getAdditionalMessages,
   getItineraryAlerts,
   getTransitLegState,
@@ -17,23 +16,11 @@ import {
   LEGTYPE,
 } from './NaviUtils';
 import usePrevious from './hooks/usePrevious';
+import { usePushNotification } from './hooks/usePushNotification';
 
-const COUNT_AT_LEG_END = 2; // update cycles within DESTINATION_RADIUS from leg.to
 const HIDE_TOPCARD_DURATION = 2000; // milliseconds
 
-function addMessages(incomingMessages, newMessages) {
-  newMessages.forEach(m => {
-    incomingMessages.set(m.id, m);
-  });
-}
-
-const getLegType = (
-  leg,
-  firstLeg,
-  time,
-  countAtLegEnd,
-  interlineWithPreviousLeg,
-) => {
+const getLegType = (leg, firstLeg, time, interlineWithPreviousLeg) => {
   let legType;
   if (time < legTime(firstLeg.start)) {
     if (!firstLeg.forceStart) {
@@ -42,15 +29,7 @@ const getLegType = (
       legType = LEGTYPE.WAIT;
     }
   } else if (leg) {
-    if (!leg.transitLeg) {
-      if (countAtLegEnd >= COUNT_AT_LEG_END) {
-        legType = LEGTYPE.WAIT;
-      } else {
-        legType = LEGTYPE.MOVE;
-      }
-    } else {
-      legType = LEGTYPE.TRANSIT;
-    }
+    legType = leg.transitLeg ? LEGTYPE.TRANSIT : LEGTYPE.MOVE;
   } else {
     legType = interlineWithPreviousLeg ? LEGTYPE.WAIT_IN_VEHICLE : LEGTYPE.WAIT;
   }
@@ -80,26 +59,35 @@ function NaviCardContainer(
   // notifications that are shown to the user.
   const [activeMessages, setActiveMessages] = useState([]);
   const [legChanging, setLegChanging] = useState(false);
-
   const { isEqual: legChanged } = usePrevious(currentLeg, (prev, current) =>
     isAnyLegPropertyIdentical(prev, current, ['legId', 'mode']),
   );
   const focusRef = useRef(false);
-  // Destination counter. How long user has been at the destination. * 10 seconds
-  const legEndRef = useRef(0);
 
   const { intl, config, match, router } = context;
-
+  const { createNotification, notificationConsent } =
+    usePushNotification(config);
   const handleRemove = index => {
     const msg = messages.get(activeMessages[index].id);
     msg.closed = true; // remember closing action
     setActiveMessages(activeMessages.filter((_, i) => i !== index));
   };
 
+  function addMessages(incomingMessages, newMessages) {
+    newMessages.forEach(m => {
+      if (!messages.get(m.id)) {
+        createNotification(m.title, m.body);
+      }
+      incomingMessages.set(m.id, m);
+    });
+  }
+
   // track only relevant vehicles for the journey.
+  // addd 20 s buffer so that vehicle location is available
+  // for leg validation long enough
   const getNaviTopics = () =>
     getTopics(
-      legs.filter(leg => legTime(leg.end) >= time),
+      legs.filter(leg => legTime(leg.end) >= time - 20000),
       config,
     );
 
@@ -142,30 +130,6 @@ function NaviCardContainer(
       ),
     );
 
-    if (
-      match.location.query?.debug !== undefined &&
-      position &&
-      !messages.get('debug')?.closed
-    ) {
-      const info1 = `lat: ${position.lat} lon: ${position.lon}`;
-      const info2 = `status: ${position.status}`;
-      const info3 = `locations: ${position.locationCount} watchId: ${position.watchId}`;
-
-      addMessages(incomingMessages, [
-        {
-          severity: 'INFO',
-          content: (
-            <div className="navi-info-content">
-              <span>{info1}</span>
-              <span>{info2}</span>
-              <span>{info3}</span>
-            </div>
-          ),
-          id: 'debug',
-        },
-      ]);
-    }
-
     if (nextLeg?.transitLeg) {
       // Messages for NaviStack.
       addMessages(incomingMessages, [
@@ -177,6 +141,8 @@ function NaviCardContainer(
           time,
           config,
           messages,
+          intl,
+          legs,
         ),
       ]);
     }
@@ -190,7 +156,6 @@ function NaviCardContainer(
       if (currentLeg) {
         focusToLeg?.(currentLeg);
       }
-      legEndRef.current = 0;
     }
 
     // Update messages if there are changes
@@ -222,16 +187,6 @@ function NaviCardContainer(
       focusRef.current = true;
     }
 
-    // User position and distance from currentleg endpoint.
-    if (
-      position &&
-      currentLeg &&
-      nextLeg && // itinerary end has its own logic
-      tailLength <= DESTINATION_RADIUS
-    ) {
-      legEndRef.current += 1;
-    }
-
     return () => clearTimeout(timeoutId);
   }, [time, firstLeg]);
 
@@ -241,7 +196,6 @@ function NaviCardContainer(
     l,
     firstLeg,
     time,
-    legEndRef.current,
     nextLeg?.interlineWithPreviousLeg,
   );
 
@@ -252,9 +206,14 @@ function NaviCardContainer(
     className = 'show-card';
   }
   return (
+    // TODO Create proper button for asking notification permissions.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className={`navi-card-container ${className}`}
       style={{ top: containerTopPosition }}
+      aria-live={legChanging ? undefined : 'polite'}
+      aria-hidden={legChanging ? 'true' : 'false'}
+      onClick={() => notificationConsent()}
     >
       <NaviCard
         leg={l}
