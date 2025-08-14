@@ -587,6 +587,7 @@ ItineraryDetails.propTypes = {
   bikePublicItineraryCount: PropTypes.number,
   carPublicItineraryCount: PropTypes.number,
   relayEnvironment: relayShape,
+  xtpEdgePoints: PropTypes.arrayOf(xtpShape),
 };
 
 ItineraryDetails.defaultProps = {
@@ -598,6 +599,7 @@ ItineraryDetails.defaultProps = {
   carEmissions: undefined,
   relayEnvironment: undefined,
   startNavigation: undefined,
+  xtpEdgePoints: [],
 };
 
 ItineraryDetails.contextTypes = {
