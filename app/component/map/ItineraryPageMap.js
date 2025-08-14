@@ -44,38 +44,7 @@ const ItineraryPageMap = (
 ) => {
   const { hash } = match.params;
   const leafletObjs = [];
-  
-  
-  //const xtpPopups = []; //useRef([]);
   const xtpActiveMarkers = [];
-  /*
-  useEffect(() => {
-    console.log('ItineraryPageMap useEffect!!!');
-    xtpPopups.current = [];
-    
-    
-  }, [active]);
-  */
-  /*
-  const xtpAddPopup = popup => {
-    console.log(['ADD POPUP popup=',popup]);
-    xtpPopups.push(popup);
-  };
-  
-  const xtpHandleNext = () => {
-    console.log('HANDLE NEXT');
-  };
-  
-  const xtpHandlePrev = () => {
-    console.log('HANDLE PREV');
-  };
-  
-  const xtpHandleClick = () => {
-    console.log('HANDLE CLICK');
-    leafletObjs.forEach(o=>{
-      console.log(['LEAFLET OBJECT o=',o]);
-    });
-  };*/
   
   if (showVehicles) {
     leafletObjs.push(
@@ -177,23 +146,16 @@ const ItineraryPageMap = (
   xtp_add_popup,
   xtp_handle_click,
   */
+  
   xtpPoints.forEach((xtp) => {
     if (active === xtp.edge_index) {
       xtpActiveMarkers.push(xtp);
     }
-  });
-  xtpActiveMarkers.forEach((xtp, i) => {
-    console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
   });
   
-  /* TEST WITHOUT XTP-MARKERS
-  xtpPoints.forEach((xtp) => {
-    if (active === xtp.edge_index) {
-      xtpActiveMarkers.push(xtp);
-    }
-  });
   const xtp_last_index = xtpActiveMarkers.length-1;
   xtpActiveMarkers.forEach((xtp, i) => {
+    console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
     // Todo: add "pid" and "xtp_last_index" to handle "next" and "prev" popup.
     // UNDER CONSTRUCTION!
     
@@ -215,7 +177,6 @@ const ItineraryPageMap = (
       />
     );
   });
-  */
   
   viaPoints.forEach((via, i) => {
     leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);

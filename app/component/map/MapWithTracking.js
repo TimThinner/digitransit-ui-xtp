@@ -112,6 +112,8 @@ class MapWithTrackingStateHandler extends React.Component {
 
   constructor(props) {
     super(props);
+    console.log(['MapWithTracking constructor props=',props]);
+    
     this.state = {
       mapTracking: props.mapTracking,
       settingsOpen: false,
@@ -271,6 +273,8 @@ class MapWithTrackingStateHandler extends React.Component {
     }
     // eslint-disable-next-line no-underscore-dangle
     const currentZoom = this.mapElement?.leafletElement?._zoom || zoom || 16;
+
+    console.log(['MapWithTracking render children=',children]);
 
     if (this.state.mapTracking && position.hasLocation) {
       this.naviProps.lat = position.lat;

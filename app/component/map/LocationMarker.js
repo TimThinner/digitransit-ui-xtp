@@ -107,7 +107,6 @@ export default function LocationMarker({
 key
 position
 type
-
 xtp
 xtp_last_index
 pid
@@ -115,11 +114,9 @@ pid
 LocationMarker.propTypes = {
   position: IconMarker.propTypes.position,
   type: PropTypes.oneOf(['from', 'via', 'to', 'xtp', 'favourite']),
-  
   className: PropTypes.string,
   isLarge: PropTypes.bool,
   disabled: PropTypes.bool,
-  
   xtp: xtpShape,
   xtp_last_index: PropTypes.number,
   pid: PropTypes.string,
@@ -128,11 +125,9 @@ LocationMarker.propTypes = {
 LocationMarker.defaultProps = {
   position: undefined,
   type: 'via',
-  
   className: undefined,
   isLarge: false,
   disabled: false,
-  
   xtp: undefined,
   xtp_last_index: undefined,
   pid: undefined,
