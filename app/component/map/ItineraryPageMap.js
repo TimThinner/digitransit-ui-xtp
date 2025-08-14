@@ -146,13 +146,12 @@ const ItineraryPageMap = (
   xtp_add_popup,
   xtp_handle_click,
   */
-  
+  /*
   xtpPoints.forEach((xtp) => {
     if (active === xtp.edge_index) {
       xtpActiveMarkers.push(xtp);
     }
   });
-  
   const xtp_last_index = xtpActiveMarkers.length-1;
   xtpActiveMarkers.forEach((xtp, i) => {
     console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
@@ -160,7 +159,7 @@ const ItineraryPageMap = (
     // UNDER CONSTRUCTION!
     
     // Add changes to:
-    //   LocationMarker .js
+    //   LocationMarker.js
     //   XtpPopup.js
     
     // See commit: https://github.com/TimThinner/digitransit-ui-xtp/commit/0501930135741f70992626692d3a78369a030794
@@ -177,7 +176,7 @@ const ItineraryPageMap = (
       />
     );
   });
-  
+  */
   viaPoints.forEach((via, i) => {
     leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);
   });
