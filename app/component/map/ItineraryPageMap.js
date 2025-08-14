@@ -146,7 +146,7 @@ const ItineraryPageMap = (
   xtp_add_popup,
   xtp_handle_click,
   */
-  /*
+  
   xtpPoints.forEach((xtp) => {
     if (active === xtp.edge_index) {
       xtpActiveMarkers.push(xtp);
@@ -176,7 +176,7 @@ const ItineraryPageMap = (
       />
     );
   });
-  */
+  
   viaPoints.forEach((via, i) => {
     leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);
   });
