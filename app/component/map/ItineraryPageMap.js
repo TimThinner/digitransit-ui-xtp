@@ -163,6 +163,7 @@ const ItineraryPageMap = (
     //   XtpPopup.js
     
     // See commit: https://github.com/TimThinner/digitransit-ui-xtp/commit/0501930135741f70992626692d3a78369a030794
+    /*
     const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
     leafletObjs.push(
@@ -175,6 +176,7 @@ const ItineraryPageMap = (
         pid={pid}
       />
     );
+    */
   });
   
   viaPoints.forEach((via, i) => {
