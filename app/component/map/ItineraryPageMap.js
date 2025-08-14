@@ -177,6 +177,14 @@ const ItineraryPageMap = (
   xtp_add_popup,
   xtp_handle_click,
   */
+  xtpPoints.forEach((xtp) => {
+    if (active === xtp.edge_index) {
+      xtpActiveMarkers.push(xtp);
+    }
+  });
+  xtpActiveMarkers.forEach((xtp, i) => {
+    console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
+  });
   
   /* TEST WITHOUT XTP-MARKERS
   xtpPoints.forEach((xtp) => {
