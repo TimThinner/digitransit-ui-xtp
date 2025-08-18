@@ -84,7 +84,7 @@ export default function LocationMarker({
       zIndexOffset={12000}
     >
       {validType === 'xtp' && (
-        <XtpPopup
+        <XtpTestPopup
           lat={xtp.lat}
           lon={xtp.lon}
           xtpurl={xtp.url}
