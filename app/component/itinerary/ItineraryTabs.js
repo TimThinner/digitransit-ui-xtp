@@ -11,6 +11,7 @@ function ItineraryTabs({ planEdges, xtpPoints, tabIndex, isMobile, changeHash, .
   const itineraryTabs = planEdges.map((edge, i) => {
     // From xtpPoints extract only those "infos" where edge_index equals i
     const xtp_edge_points = xtpPoints.filter(p => p.edge_index === i);
+    console.log(["ItineraryTabs index=",i,"xtp_edge_points=",xtp_edge_points]);
     return (
       <div
         className={`swipeable-tab ${tabIndex !== i && 'inactive'}`}
