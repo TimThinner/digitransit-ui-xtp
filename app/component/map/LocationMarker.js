@@ -83,7 +83,6 @@ export default function LocationMarker({
       }}
       zIndexOffset={12000}
     >
-      {if (validType === 'xtp') { console.log('Ignore XtpTestPopup!') }}
       {validType === 'via' && (
         <ViaPointPopup
           lat={position.lat}
