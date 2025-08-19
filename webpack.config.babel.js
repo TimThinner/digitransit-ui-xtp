@@ -242,16 +242,6 @@ module.exports = {
       : productionPlugins),
   ],
   optimization: {
-    minimizer: [
-      new TerserJsPlugin({
-        cache: true,
-        parallel: true,
-        keep_classnames: true,
-        keep_fnames: true,
-        sourceMap: !isProduction,
-      }),
-      new OptimizeCSSAssetsPlugin({}),
-    ],
     moduleIds: 'named',
     chunkIds: 'named',
     splitChunks: {
