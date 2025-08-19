@@ -1286,6 +1286,9 @@ export default function ItineraryPage(props, context) {
   };
 
   function renderMap(from, to, viaPoints, xtpPoints, planEdges, activeIndex) {
+    
+    console.log(["!!!renderMap from=",from,"to=",to,"viaPoints=",viaPoints,"xtpPoints=",xtpPoints,"planEdges=",planEdges,"activeIndex=",activeIndex]);
+    
     const mwtProps = {};
     if (mapState.bounds) {
       mwtProps.bounds = mapState.bounds;
