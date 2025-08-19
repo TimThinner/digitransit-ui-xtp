@@ -1,16 +1,13 @@
 import PropTypes from 'prop-types';
 //import React, { useState } from 'react';
-//import React, { useRef, useState, useEffect } from 'react';
-import React from 'react';
-//import { configShape } from '../../../util/shapes';
+import React, { useRef, useState } from 'react';
+import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
 import { isBrowser } from '../../../util/browser';
-import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
 
 //import useWindowSize from '../../../hooks/useWindowSize';
 
 const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
-//import Popup from 'react-leaflet/es/Popup';
 /*
   in map.scss:
   .single-popup {
@@ -20,88 +17,165 @@ const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // e
   }
   pid = 'xtp_0', 'xtp_1', etc.
 */
-//export default function XtpPopup({ pid, lat, lon, xtpurl }) {
-
-// See similar example at function SelectStopRow  !!!!!
-
-class XtpTestPopup extends React.Component {
+export default function XtpTestPopup({ pid, lat, lon, xtpurl }) {
   
-  static displayName = 'XtpTestPopup';
-
-  static propTypes = {
-    leaflet: PropTypes.shape({
-      map: PropTypes.shape({
-        //openPopup: PropTypes.func.isRequired,
-        closePopup: PropTypes.func.isRequired,
-        getZoom: PropTypes.func.isRequired,
-        on: PropTypes.func.isRequired,
-        off: PropTypes.func.isRequired,
-      }).isRequired,
-    }).isRequired,
-    pid: PropTypes.string.isRequired,
-    xtp_last_index: PropTypes.number.isRequired,
-    lat: PropTypes.number.isRequired,
-    lon: PropTypes.number.isRequired,
-    xtpurl: PropTypes.string.isRequired,
-  };
+  const [xtpState, setXtpState] = useState(false);
+  //const size = useWindowSize();
+  const xtpFullScreen = useRef(false);
+  const xtpPopupWidth = useRef(300);
+  const xtpPopupHeight = useRef(400);
+  const xtpAutoClose = useRef(false);
   
-  constructor(props) {
-    console.log(['constructor props=',props]);
-    super(props);
-    this.state = {
-      clicked: false, // toggles false / true
-      zoom: this.props.leaflet.map.getZoom(),
-    };
-    this.dimensions = {picW:300, picH:400, popupW:300, popupH:400};
+  function closePopup() {
+    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
+    console.log(['closePopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
   }
   
-  onMapZoom = () => {
-    // Toggle the state to re-render component
-    const zoom = this.props.leaflet.map.getZoom();
-    console.log(['onMapZoom zoom=',zoom]);
-    this.setState({zoom:zoom});
+  function openPopup() {
+    const elems = document.querySelectorAll('.'+pid);
+    console.log(['openPopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
+  }
+  
+  function resetStyles() {
+    const elems = document.querySelectorAll('div.leaflet-popup-content');
+    console.log(['RESET STYLES elems=',elems]);
+    [...elems].forEach(e=>{
+      //console.log(['e=',e]);
+      //e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
+      e.style.width = "320px";
+      e.style.height = "420px";
+      e.style.padding = "10px";
+      console.log('NORMAL CSS style');
+    });
+  }
+  
+  function resetPopupLeft() {
+    const elems = document.querySelectorAll('div.single-popup');
+    console.log(['RESET Popup Left elems=',elems]);
+    [...elems].forEach(e=>{
+      e.style.left = "-150px";
+    });
+  }
+  
+  function processStyles() {
+    const elems = document.querySelectorAll('div.leaflet-popup-content');
+    console.log(['PROCESS STYLES elems=',elems]);
+    [...elems].forEach(e=>{
+      //console.log(['e=',e]);
+      if (xtpFullScreen.current) {
+        //e.setAttribute('style', 'width:620px; height:820px; padding:10px;');
+        e.style.width = "620px";
+        e.style.height = "820px";
+        e.style.padding = "10px";
+        console.log('ZOOMED CSS style');
+      } else {
+        //e.setAttribute('style', 'width:320px; height:420px; padding:10px;');
+        e.style.width = "320px";
+        e.style.height = "420px";
+        e.style.padding = "10px";
+        console.log('NORMAL CSS style');
+      }
+    });
+  }
+  
+  function processPopupLeft() {
+    const elems = document.querySelectorAll('div.single-popup');
+    console.log(['PROCESS Popup Left elems=',elems]);
+    [...elems].forEach(e=>{
+      //console.log(['e=',e]);
+      if (xtpFullScreen.current) {
+        e.style.left = "-300px";
+      } else {
+        e.style.left = "-150px";
+      }
+    });
   }
   /*
-  this.props.pid is the "key" to the Marker behind this Popup.
+  Keep aspect ratio 3/4
+  const new_h = size.height-40;
+  const new_w = Math.round(300*size.height/400);
+  setImgSize({fullscreen:true, width:new_w, height:new_h});
   */
-  
-  componentDidMount() {
-    console.log('componentDidMount');
-    this.props.leaflet.map.on('zoomend', this.onMapZoom);
+  function handleClick() {
+    console.log('TOGGLE image!');
+    if (xtpFullScreen.current) { // back to small size
+      xtpFullScreen.current = false;
+      xtpPopupWidth.current =  300;
+      xtpPopupHeight.current = 400;
+    } else { // make image fullscreen
+      xtpFullScreen.current = true;
+      xtpPopupWidth.current =  600;
+      xtpPopupHeight.current = 800;
+    }
+    // Toggle the state to re-render component
+    if (xtpState) {
+      setXtpState(false);
+    } else {
+      setXtpState(true);
+    }
+    xtpAutoClose.current = true;
+    setTimeout(() => {
+      closePopup();
+      setTimeout(() => {
+        openPopup();
+      }, 100);
+    }, 100);
   }
-
-  componentWillUnmount() {
-    console.log('componentWillUnmount');
-    this.props.leaflet.map.off('zoomend', this.onMapZoom);
-  }
   
-  render() {
-    console.log(['Create Popup this.props.pid=',this.props.pid]);
-    //console.log('Create Popup');
-    return (
-      <Popup
-        position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
-        offset={[0, 0]}
-        autoPanPaddingTopLeft={[5, 125]}
-        maxWidth={this.dimensions.popupW}
-        maxHeight={this.dimensions.popupH}
-        autoPan={true}
-        className="popup single-popup"
-      >
-        {console.log('Create Card')}
-        <Card className="no-margin">
-          <div className="location-popup-wrapper">
-            <p>TESTING...</p>
+  return (
+    <>
+    {console.log(['Create Popup pid=',pid])}
+    <Popup
+      position={{ lat: lat+0.0001, lng: lon }}
+      offset={[0, 0]}
+      autoPanPaddingTopLeft={[5, 125]}
+      onClose={() => {
+        if (xtpAutoClose.current) {
+          console.log('onClose AUTO CLOSE... do nothing.');
+          xtpAutoClose.current = false;
+        } else {
+          console.log('onClose... RESET.');
+          xtpFullScreen.current = false;
+          xtpPopupWidth.current =  300;
+          xtpPopupHeight.current = 400;
+          resetStyles();
+          resetPopupLeft();
+        }
+      }}
+      onOpen={() => {
+        console.log('onOpen... process.');
+        processStyles();
+        processPopupLeft();
+      }}
+      maxWidth={xtpPopupWidth.current}
+      maxHeight={xtpPopupHeight.current}
+      autoPan={false}
+      className="popup single-popup"
+    >
+      {console.log('Create Card')}
+      <Card className="no-margin">
+        <div className="location-popup-wrapper">
+          <div className="location-thumbnail-image">
+            <img onClick={handleClick} src={xtpurl} width={xtpPopupWidth.current} height={xtpPopupHeight.current} />
           </div>
-        </Card>
-      </Popup>
-    );
-  }
+        </div>
+      </Card>
+    </Popup>
+    </>
+  );
 }
 
-const XtpTestPopupWithLeaflet = withLeaflet(XtpTestPopup);
-
-export {
-  XtpTestPopupWithLeaflet as default,
-  XtpTestPopup as Component,
+XtpTestPopup.propTypes = {
+  pid: PropTypes.string.isRequired,
+  lat: PropTypes.number.isRequired,
+  lon: PropTypes.number.isRequired,
+  xtpurl: PropTypes.string.isRequired,
 };
+
+XtpTestPopup.displayName = 'XtpTestPopup';

@@ -1038,43 +1038,45 @@ export default function ItineraryPage(props, context) {
     //const plan = mapHashToPlan();
     console.log(['state.plan=',state.plan]);
     const stateEdges = state.plan?.edges || [];
-    stateEdges.forEach((edge, i) => {
-      const legs = [];
-      edge.node.legs.forEach((leg,j) => {
-        console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
-        const decoded = polyline.decode(leg.legGeometry.points);
-        legs.push({
-          leg_index: j,
-          from: {
-            lat: leg.from.lat,
-            lon: leg.from.lon,
-            name: leg.from.name
-          },
-          to: {
-            lat: leg.to.lat,
-            lon: leg.to.lon,
-            name: leg.to.name
-          },
-          legGeometry: {
-            points: leg.legGeometry.points,
-            decoded: decoded
-          }
+    // If state.plan = {} => do nothing here
+    if (stateEdges.length > 0) {
+      stateEdges.forEach((edge, i) => {
+        const legs = [];
+        edge.node.legs.forEach((leg,j) => {
+          console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
+          const decoded = polyline.decode(leg.legGeometry.points);
+          legs.push({
+            leg_index: j,
+            from: {
+              lat: leg.from.lat,
+              lon: leg.from.lon,
+              name: leg.from.name
+            },
+            to: {
+              lat: leg.to.lat,
+              lon: leg.to.lon,
+              name: leg.to.name
+            },
+            legGeometry: {
+              points: leg.legGeometry.points,
+              decoded: decoded
+            }
+          });
         });
+        data.edges.push({edge_index:i,legs:legs});
       });
-      data.edges.push({edge_index:i,legs:legs});
-    });
-    console.log(['XTP-INFO REQUEST POST data=',data]);
-    const newState = { loading: false, xtpData: undefined };
-    getXTPInfoList(config.URL.XTP_DATA, data).then(res => {
-      console.log(['XTP-INFO RESPONSE=',res]);
-      if (res && res.infos && Array.isArray(res.infos) && res.infos.length > 0) {
-        newState.xtpData = res.infos;
-      }
-      setXTPInfoState(newState);
-    }).catch(() => {
-      setXTPInfoState(newState);
-    });
-  //}, [params.from, params.to]); // dependency array, if any of these change => we must trigger this useEffect action.
+      console.log(['XTP-INFO REQUEST POST data=',data]);
+      const newState = { loading: false, xtpData: undefined };
+      getXTPInfoList(config.URL.XTP_DATA, data).then(res => {
+        console.log(['XTP-INFO RESPONSE=',res]);
+        if (res && res.infos && Array.isArray(res.infos) && res.infos.length > 0) {
+          newState.xtpData = res.infos;
+        }
+        setXTPInfoState(newState);
+      }).catch(() => {
+        setXTPInfoState(newState);
+      });
+    }
   }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
 
   // merge two separate bike + transit plans into one
