@@ -175,7 +175,7 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
-  const [xtpInfoState, setXTPInfoState] = useState({ loading: false });
+  const [xtpInfoState, setXTPInfoState] = useState({ loading: false, xtpData: [] });
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
   const [naviMode, setNaviMode] = useState(false);
@@ -1066,7 +1066,7 @@ export default function ItineraryPage(props, context) {
         data.edges.push({edge_index:i,legs:legs});
       });
       console.log(['XTP-INFO REQUEST POST data=',data]);
-      const newState = { loading: false, xtpData: undefined };
+      const newState = { loading: false, xtpData: [] };
       getXTPInfoList(config.URL.XTP_DATA, data).then(res => {
         console.log(['XTP-INFO RESPONSE=',res]);
         if (res && res.infos && Array.isArray(res.infos) && res.infos.length > 0) {
