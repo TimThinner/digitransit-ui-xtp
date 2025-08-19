@@ -246,6 +246,8 @@ module.exports = {
       new TerserJsPlugin({
         cache: true,
         parallel: true,
+        keep_classnames: true,
+        keep_fnames: true,
         sourceMap: !isProduction,
       }),
       new OptimizeCSSAssetsPlugin({}),
