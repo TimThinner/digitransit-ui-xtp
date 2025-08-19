@@ -10,6 +10,9 @@ import ViaPointPopup from './popups/ViaPointPopup';
 import XtpPopup from './popups/XtpPopup';
 import XtpTestPopup from './popups/XtpTestPopup';
 
+import { isBrowser } from '../../util/browser';
+const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
+
 export default function LocationMarker({
   position,
   type,
@@ -83,6 +86,11 @@ export default function LocationMarker({
       }}
       zIndexOffset={12000}
     >
+      {validType === 'xtp' && (
+        <Popup
+          A pretty popup. <br /> Easily customizable.
+        </Popup>
+      )}
       {validType === 'via' && (
         <ViaPointPopup
           lat={position.lat}
