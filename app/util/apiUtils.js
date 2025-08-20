@@ -112,6 +112,9 @@ https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-t
 			}
 		});
 	}
+	// Test synchronous return
+	return mock_data;
+	/*
 	return retryFetch(
 		'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow',
 		2,
@@ -127,6 +130,8 @@ https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-t
 	.catch(err => {
 		throw new Error(`Error fetching XTP Info List: ${err}`);
 	});
+	*/
+	
   /*
   return new Promise(function(resolve) {
     const promises = [];
