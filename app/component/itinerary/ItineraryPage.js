@@ -175,7 +175,7 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
-  const [xtpInfoState, setXTPInfoState] = useState({ loading: false, xtpData: [] });
+  const [xtpInfoState, setXTPInfoState] = useState({ loading: false, xtpData:[] });
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
   const [naviMode, setNaviMode] = useState(false);
@@ -1031,7 +1031,9 @@ export default function ItineraryPage(props, context) {
   }, [params.from, query.time]);
 
   async function makeXTPInfoQuery() {
-    //setXTPInfoState({ ...xtpInfoState, loading: true });
+    
+    setXTPInfoState({...xtpData, loading:true});
+    
     const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const MOCK_DATA = {infos:[]};
     const data = {edges:[]};
@@ -1090,15 +1092,17 @@ export default function ItineraryPage(props, context) {
           }
         });
       }
-      const newState = { loading: false, xtpData: MOCK_DATA.infos };
-      setXTPInfoState(newState);
+      setXTPInfoState({loading:false, xtpData:MOCK_DATA.infos});
     }
   }
 
   useEffect(() => {
-    makeXTPInfoQuery();
-  }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
-
+    if (xtpInfoState.loading===false) {
+      makeXTPInfoQuery();
+    }
+  }, []); // dependency array, if any of these change => we must trigger this useEffect action.
+  // [state.plan]
+  
   // merge two separate bike + transit plans into one
   useEffect(() => {
     if (
@@ -1416,6 +1420,8 @@ export default function ItineraryPage(props, context) {
   const to = otpToLocation(params.to);
   const viaPoints = getIntermediatePlaces(query);
   const xtpPoints = xtpInfoState.xtpData;
+  
+  console.log(['Just before renderMap xtpPoints=',xtpPoints]);
 
   const hasItineraries = combinedEdges.length > 0;
   if (hasItineraries && match.routes.some(route => route.printPage)) {
