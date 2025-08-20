@@ -175,7 +175,7 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
-  const [xtpInfoState, setXTPInfoState] = useState({ loading: false, xtpData:[] });
+  const [xtpInfoState, setXTPInfoState] = useState({xtpData:[]});
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
   const [naviMode, setNaviMode] = useState(false);
@@ -1031,15 +1031,12 @@ export default function ItineraryPage(props, context) {
   }, [params.from, query.time]);
 
   async function makeXTPInfoQuery() {
-    
-    setXTPInfoState({...xtpData, loading:true});
-    
     const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const MOCK_DATA = {infos:[]};
     const data = {edges:[]};
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
-    console.log(['state.plan=',state.plan]);
+    console.log(['makeXTPInfoQuery state.plan=',state.plan]);
     const stateEdges = state.plan?.edges || [];
     // If state.plan = {} => do nothing here
     if (stateEdges.length > 0) {
@@ -1092,16 +1089,16 @@ export default function ItineraryPage(props, context) {
           }
         });
       }
-      setXTPInfoState({loading:false, xtpData:MOCK_DATA.infos});
+      console.log(['NOW do the setXTPInfoState MOCK_DATA.infos=',MOCK_DATA.infos]);
+      setXTPInfoState({xtpData:MOCK_DATA.infos});
+      console.log('setXTPInfoState DONE!!!!!!!');
     }
   }
 
   useEffect(() => {
-    if (xtpInfoState.loading===false) {
-      makeXTPInfoQuery();
-    }
-  }, []); // dependency array, if any of these change => we must trigger this useEffect action.
-  // [state.plan]
+    console.log('state.plan HAS CHANGED => useEffect makeXTPInfoQuery');
+    makeXTPInfoQuery();
+  }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
   
   // merge two separate bike + transit plans into one
   useEffect(() => {
