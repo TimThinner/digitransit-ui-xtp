@@ -137,7 +137,9 @@ export default function ItineraryPage(props, context) {
   const mobileRef = useRef();
   const ariaRef = useRef('summary-page.title');
   const mapLayerRef = useRef();
-
+  // Try using ref instead of state!
+  const xtpDataRef = useRef([]);
+  
   const [state, setState] = useState({
     ...emptyState,
     loading: LOADSTATE.UNSET,
@@ -175,7 +177,8 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
-  const [xtpInfoState, setXTPInfoState] = useState({xtpData:[]});
+  //const [xtpInfoState, setXTPInfoState] = useState({xtpData:[]});
+  
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
   const [naviMode, setNaviMode] = useState(false);
@@ -1089,9 +1092,12 @@ export default function ItineraryPage(props, context) {
           }
         });
       }
-      console.log(['NOW do the setXTPInfoState MOCK_DATA.infos=',MOCK_DATA.infos]);
-      setXTPInfoState({xtpData:MOCK_DATA.infos});
-      console.log('setXTPInfoState DONE!!!!!!!');
+      //console.log(['NOW do the setXTPInfoState MOCK_DATA.infos=',MOCK_DATA.infos]);
+      console.log(['NOW set the xtpDataRef.current MOCK_DATA.infos=',MOCK_DATA.infos]);
+      xtpDataRef.current = MOCK_DATA.infos;
+      //setXTPInfoState({xtpData:MOCK_DATA.infos});
+      console.log('xtpDataRef.current SET is DONE!!!!!!!');
+      //console.log('setXTPInfoState DONE!!!!!!!');
     }
   }
 
@@ -1416,7 +1422,9 @@ export default function ItineraryPage(props, context) {
   const from = otpToLocation(params.from);
   const to = otpToLocation(params.to);
   const viaPoints = getIntermediatePlaces(query);
-  const xtpPoints = xtpInfoState.xtpData;
+  //const xtpPoints = xtpInfoState.xtpData;
+  //const xtpPoints = xtpDataRef.current.length > 0 ? xtpDataRef.current : [];
+  const xtpPoints = xtpDataRef.current;
   
   console.log(['Just before renderMap xtpPoints=',xtpPoints]);
 
