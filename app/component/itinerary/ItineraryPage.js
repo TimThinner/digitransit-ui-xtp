@@ -1030,9 +1030,10 @@ export default function ItineraryPage(props, context) {
     }
   }, [params.from, query.time]);
 
-  useEffect(() => {
-    setXTPInfoState({ ...xtpInfoState, loading: true });
-    // construct POST data here.
+  async function makeXTPInfoQuery() {
+    //setXTPInfoState({ ...xtpInfoState, loading: true });
+    const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
+    const MOCK_DATA = {infos:[]};
     const data = {edges:[]};
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
@@ -1066,17 +1067,36 @@ export default function ItineraryPage(props, context) {
         data.edges.push({edge_index:i,legs:legs});
       });
       console.log(['XTP-INFO REQUEST POST data=',data]);
-      const newState = { loading: false, xtpData: [] };
-      getXTPInfoList(config.URL.XTP_DATA, data).then(res => {
-        console.log(['XTP-INFO RESPONSE=',res]);
-        if (res && res.infos && Array.isArray(res.infos) && res.infos.length > 0) {
-          newState.xtpData = res.infos;
-        }
-        setXTPInfoState(newState);
-      }).catch(() => {
-        setXTPInfoState(newState);
-      });
+      // Normally data is given as parameter to REST service that returns XTP data.
+      // Fill MOCK_DATA:
+      // Simulate network delay ... https://gist.github.com/nhuxhr/043b8148a65ff6a77275c61946b226a2
+      const simulate_data = await (await fetch(MOCK_URL)).json();
+      console.log(['simulate_data=',simulate_data]);
+      if (data.edges.length > 0) {
+        data.edges.forEach(e=>{
+          const ei = e.edge_index;
+          if (e.legs && Array.isArray(e.legs) && e.legs.length > 0) {
+            e.legs.forEach(leg=>{
+              MOCK_DATA.infos.push({
+                edge_index: ei,
+                leg_index: leg.leg_index,
+                type: 'photo',
+                url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg',
+                lat:  leg.from.lat,
+                lon: leg.from.lon,
+                name: leg.from.name
+              });
+            });
+          }
+        });
+      }
+      const newState = { loading: false, xtpData: MOCK_DATA.infos };
+      setXTPInfoState(newState);
     }
+  }
+
+  useEffect(() => {
+    makeXTPInfoQuery();
   }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
 
   // merge two separate bike + transit plans into one
