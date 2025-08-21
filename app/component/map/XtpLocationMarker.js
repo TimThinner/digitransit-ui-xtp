@@ -5,7 +5,7 @@ import React from 'react';
 import { xtpShape } from '../../util/shapes';
 
 import Icon from '../Icon';
-import XtpIconMarker from './XTPIconMarker';
+import XtpIconMarker from './XtpIconMarker';
 /*
 import XtpPopup from './popups/XtpPopup';
 import XtpTestPopup from './popups/XtpTestPopup';
