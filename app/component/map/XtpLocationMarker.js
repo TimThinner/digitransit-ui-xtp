@@ -91,7 +91,7 @@ xtp_last_index
 pid
 */
 XtpLocationMarker.propTypes = {
-  position: IconMarker.propTypes.position,
+  position: XtpIconMarker.propTypes.position,
   type: PropTypes.oneOf(['from', 'via', 'to', 'xtp', 'favourite']),
   className: PropTypes.string,
   isLarge: PropTypes.bool,
