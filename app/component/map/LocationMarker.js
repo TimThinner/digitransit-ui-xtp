@@ -86,11 +86,6 @@ export default function LocationMarker({
       }}
       zIndexOffset={12000}
     >
-      {validType === 'xtp' && (
-        <Popup>
-          A pretty popup.<br />Easily customizable.
-        </Popup>
-      )}
       {validType === 'via' && (
         <ViaPointPopup
           lat={position.lat}
