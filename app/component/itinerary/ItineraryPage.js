@@ -1105,7 +1105,7 @@ export default function ItineraryPage(props, context) {
   useEffect(() => {
     console.log('state.plan HAS CHANGED => useEffect makeXTPInfoQuery');
     //makeXTPInfoQuery();
-    const mock_data = mockgetXtpMockData();
+    const mock_data = getXtpMockData();
     console.log(['NOW do the setXTPInfoState mock_data=',mock_data]);
     setXTPInfoState({xtpData:mock_data});
     console.log('setXTPInfoState DONE!!!!!!!');
