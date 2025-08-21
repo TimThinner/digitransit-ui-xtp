@@ -14,6 +14,7 @@ import BackButton from '../BackButton';
 import CookieSettingsButton from '../CookieSettingsButton';
 import ItineraryLine from './ItineraryLine';
 import LocationMarker from './LocationMarker';
+import XtpLocationMarker from './XtpLocationMarker';
 import ParkingAreaMarker from './non-tile-layer/ParkingAreaMarker';
 import MapWithTracking from './MapWithTracking';
 import VehicleMarkerContainer from './VehicleMarkerContainer';
@@ -167,16 +168,16 @@ const ItineraryPageMap = (
     const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
     leafletObjs.push(
-      <LocationMarker
+      <XtpLocationMarker
         key={`xtp_${i}`}
         position={pos}
         type="xtp"
         xtp={xtp}
         xtp_last_index={xtp_last_index}
         pid={pid}
+        onClickMarker={()=>console.log(['clicked pid=',pid])}
       />
     );
-    
   });
   
   viaPoints.forEach((via, i) => {

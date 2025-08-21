@@ -1101,7 +1101,7 @@ export default function ItineraryPage(props, context) {
       //console.log('setXTPInfoState DONE!!!!!!!');
     }
   }*/
-
+  
   useEffect(() => {
     console.log('state.plan HAS CHANGED => useEffect makeXTPInfoQuery');
     //makeXTPInfoQuery();
@@ -1357,6 +1357,7 @@ export default function ItineraryPage(props, context) {
         to={to}
         viaPoints={viaPoints}
         xtpPoints={xtpPoints}
+        onClickMarker=
         mapLayers={props.mapLayers}
         mapLayerOptions={mapLayerOptions}
         setMWTRef={setMWTRef}
