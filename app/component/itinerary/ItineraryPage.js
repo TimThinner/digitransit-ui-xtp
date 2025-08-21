@@ -78,6 +78,7 @@ import {
   sortAndMergeExternalPlans,
   stopClient,
   updateClient,
+  getXtpMockData,
 } from './ItineraryPageUtils';
 import ItineraryTabs from './ItineraryTabs';
 import { useItineraryContext } from './context/ItineraryContext';
@@ -138,7 +139,7 @@ export default function ItineraryPage(props, context) {
   const ariaRef = useRef('summary-page.title');
   const mapLayerRef = useRef();
   // Try using ref instead of state!
-  const xtpDataRef = useRef([]);
+  //const xtpDataRef = useRef([]);
   
   const [state, setState] = useState({
     ...emptyState,
@@ -177,7 +178,7 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
-  //const [xtpInfoState, setXTPInfoState] = useState({xtpData:[]});
+  const [xtpInfoState, setXTPInfoState] = useState({xtpData:[]});
   
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
@@ -1032,7 +1033,7 @@ export default function ItineraryPage(props, context) {
       makeWeatherQuery();
     }
   }, [params.from, query.time]);
-
+  /*
   async function makeXTPInfoQuery() {
     const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const MOCK_DATA = {infos:[]};
@@ -1099,11 +1100,15 @@ export default function ItineraryPage(props, context) {
       console.log('xtpDataRef.current SET is DONE!!!!!!!');
       //console.log('setXTPInfoState DONE!!!!!!!');
     }
-  }
+  }*/
 
   useEffect(() => {
     console.log('state.plan HAS CHANGED => useEffect makeXTPInfoQuery');
-    makeXTPInfoQuery();
+    //makeXTPInfoQuery();
+    const mock_data = mockgetXtpMockData();
+    console.log(['NOW do the setXTPInfoState mock_data=',mock_data]);
+    setXTPInfoState({xtpData:mock_data});
+    console.log('setXTPInfoState DONE!!!!!!!');
   }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
   
   // merge two separate bike + transit plans into one
@@ -1422,9 +1427,9 @@ export default function ItineraryPage(props, context) {
   const from = otpToLocation(params.from);
   const to = otpToLocation(params.to);
   const viaPoints = getIntermediatePlaces(query);
-  //const xtpPoints = xtpInfoState.xtpData;
+  const xtpPoints = xtpInfoState.xtpData;
   //const xtpPoints = xtpDataRef.current.length > 0 ? xtpDataRef.current : [];
-  const xtpPoints = xtpDataRef.current;
+  //const xtpPoints = xtpDataRef.current;
   
   console.log(['Just before renderMap xtpPoints=',xtpPoints]);
 
