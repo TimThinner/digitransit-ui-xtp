@@ -1357,7 +1357,6 @@ export default function ItineraryPage(props, context) {
         to={to}
         viaPoints={viaPoints}
         xtpPoints={xtpPoints}
-        onClickMarker=
         mapLayers={props.mapLayers}
         mapLayerOptions={mapLayerOptions}
         setMWTRef={setMWTRef}
