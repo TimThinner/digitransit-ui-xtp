@@ -1,27 +1,33 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
-
+import React, {
+  //useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
+//import React from 'react';
 import { xtpShape } from '../../util/shapes';
-
 import Icon from '../Icon';
 import XtpIconMarker from './XtpIconMarker';
-import ViaPointPopup from './popups/ViaPointPopup';
 /*
 import XtpPopup from './popups/XtpPopup';
 import XtpTestPopup from './popups/XtpTestPopup';
 */
-export default function XtpLocationMarker({
-  position,
-  type,
-  className,
-  isLarge,
-  disabled,
-  xtp,
-  xtp_last_index,
-  pid,
-  onClickMarker,
-}) {
+export default function XtpLocationMarker = forwardRef (
+  (
+    {
+      position,
+      type,
+      className,
+      isLarge,
+      disabled,
+      xtp,
+      xtp_last_index,
+      pid,
+      onClickMarker,
+    },
+    ref,
+  ) => {
   /*
   XTP: We want to show different icon for XTP "LocationMarker".
   In case of Xtp change img from:
@@ -39,50 +45,53 @@ export default function XtpLocationMarker({
   <circle fill="none" stroke="#b40" stroke-width="2" cx="33" cy="15" r="1"/>
   </symbol>
   
-  
   New: Add pid ('xtp_0', 'xtp_1', etc.) to IconMarker classes.
-  
-  
   */
   //const xtp_marker_next = () => {
     //console.log('xtp_marker_next');
   //}
-  
-  const validType = 'xtp';
-  const sideLength = isLarge ? 30 : 24;
-  
-  const test_classes = cx(validType, className, pid);
-  console.log(['LocationMarker test_classes=',test_classes]);
-  
-  const marker = (
-    <XtpIconMarker
-      position={position}
-      className={cx(validType, className, pid)}
-      icon={{
-        className: cx(validType, className, pid),
-        element: (
-          <Icon
-            img={`icon-icon_mapMarker-xtp-map`}
-            color={disabled ? '#bbbbbb' : null}
-          />
-        ),
-        iconAnchor: [sideLength / 2, sideLength],
-        iconSize: [sideLength, sideLength],
-      }}
-      zIndexOffset={12000}
-      onClickMarker={onClickMarker}
-    >
-      {validType === 'via' && (
-        <ViaPointPopup
-          lat={position.lat}
-          lon={position.lon}
-          key={`${position.lat}${position.lon}`}
-        />
-      )}
-    </XtpIconMarker>
-  );
-  return marker;
-}
+    const validType = 'xtp';
+    const sideLength = isLarge ? 30 : 24;
+    
+    const test_classes = cx(validType, className, pid);
+    console.log(['LocationMarker test_classes=',test_classes]);
+    
+    const marker = (
+      <XtpIconMarker
+        position={position}
+        className={cx(validType, className, pid)}
+        icon={{
+          className: cx(validType, className, pid),
+          element: (
+            <Icon
+              img={`icon-icon_mapMarker-xtp-map`}
+              color={disabled ? '#bbbbbb' : null}
+            />
+          ),
+          iconAnchor: [sideLength / 2, sideLength],
+          iconSize: [sideLength, sideLength],
+        }}
+        zIndexOffset={12000}
+        onClickMarker={onClickMarker}
+        ref={ref}
+      >
+      </XtpIconMarker>
+    );
+    // Can we use marker like this?
+    useImperativeHandle(ref, () => ({
+      sayHello: () => {
+        console.log(['HELLO! marker=',marker]);
+        const popup = marker.getPopup();
+        if (popup) {
+          marker.closePopup();
+          marker.unbindPopup(); 
+        }
+        marker.bindPopup("<strong>Hello world!</strong><br />I am a popup.", {maxWidth: 500}).openPopup();
+      },
+    }));
+    return marker;
+  }
+);
 /*
 key
 position
