@@ -47,6 +47,10 @@ const ItineraryPageMap = (
   const leafletObjs = [];
   const xtpActiveMarkers = [];
   
+  const markerClicked = (e,pid,xtp,xtp_last_index,pos) => {
+    console.log(['markerClicked e=',e,'pid=',pid,'xtp=',xtp,'xtp_last_index=',xtp_last_index,'pos=',pos]);
+  };
+  
   if (showVehicles) {
     leafletObjs.push(
       <VehicleMarkerContainer key="vehicles" useLargeIcon topics={topics} />,
@@ -175,7 +179,8 @@ const ItineraryPageMap = (
         xtp={xtp}
         xtp_last_index={xtp_last_index}
         pid={pid}
-        onClickMarker={()=>console.log(['clicked pid=',pid])}
+        //onClickMarker={()=>console.log(['clicked pid=',pid])}
+        onClickMarker={(e)=>markerClicked(e,pid,xtp,xtp_last_index,pos)}
       />
     );
   });
