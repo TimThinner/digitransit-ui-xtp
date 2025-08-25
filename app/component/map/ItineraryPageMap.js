@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import { matchShape, routerShape } from 'found';
 import PropTypes from 'prop-types';
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { onLocationPopup } from '../../util/queryUtils';
 import {
   configShape,
@@ -46,19 +46,6 @@ const ItineraryPageMap = (
   const { hash } = match.params;
   const leafletObjs = [];
   const xtpActiveMarkers = [];
-  
-  const childRef = useRef();
-  
-  /*
-				marker.bindPopup(info,{
-					maxWidth: "auto"
-				}).openPopup();
-  */
-  const markerClicked = (e,pid,xtp,xtp_last_index,pos) => {
-    console.log(['markerClicked e=',e,'pid=',pid,'xtp=',xtp,'xtp_last_index=',xtp_last_index,'pos=',pos]);
-    // SEE: https://medium.com/swlh/using-react-function-components-directly-as-refs-91d07628e50a
-    childRef.current.sayHello();
-  };
   
   if (showVehicles) {
     leafletObjs.push(
@@ -190,9 +177,6 @@ const ItineraryPageMap = (
         xtp={xtp}
         xtp_last_index={xtp_last_index}
         pid={pid}
-        //onClickMarker={()=>console.log(['clicked pid=',pid])}
-        onClickMarker={(e)=>markerClicked(e,pid,xtp,xtp_last_index,pos)}
-        ref={childRef}
       />
     );
   });
