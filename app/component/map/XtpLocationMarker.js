@@ -103,5 +103,3 @@ XtpLocationMarker.defaultProps = {
   pid: undefined,
   //onClickMarker: undefined,
 };
-
-export default XtpLocationMarker;
