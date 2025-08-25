@@ -6,6 +6,7 @@ import { xtpShape } from '../../util/shapes';
 
 import Icon from '../Icon';
 import XtpIconMarker from './XtpIconMarker';
+import ViaPointPopup from './popups/ViaPointPopup';
 /*
 import XtpPopup from './popups/XtpPopup';
 import XtpTestPopup from './popups/XtpTestPopup';

@@ -22,7 +22,7 @@ import {
 } from '../../store/localStorage';
 import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import { getWeatherData } from '../../util/apiUtils';
-import { getXTPInfoList } from '../../util/apiUtils';
+//import { getXTPInfoList } from '../../util/apiUtils';
 import { isIOS } from '../../util/browser';
 import { boundWithMinimumArea, GeodeticToEcef } from '../../util/geo-utils';
 import {
@@ -78,7 +78,7 @@ import {
   sortAndMergeExternalPlans,
   stopClient,
   updateClient,
-  getXtpMockData,
+  //getXtpMockData,
 } from './ItineraryPageUtils';
 import ItineraryTabs from './ItineraryTabs';
 import { useItineraryContext } from './context/ItineraryContext';
@@ -1033,7 +1033,7 @@ export default function ItineraryPage(props, context) {
       makeWeatherQuery();
     }
   }, [params.from, query.time]);
-  /*
+  
   async function makeXTPInfoQuery() {
     const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const MOCK_DATA = {infos:[]};
@@ -1093,22 +1093,23 @@ export default function ItineraryPage(props, context) {
           }
         });
       }
-      //console.log(['NOW do the setXTPInfoState MOCK_DATA.infos=',MOCK_DATA.infos]);
-      console.log(['NOW set the xtpDataRef.current MOCK_DATA.infos=',MOCK_DATA.infos]);
-      xtpDataRef.current = MOCK_DATA.infos;
-      //setXTPInfoState({xtpData:MOCK_DATA.infos});
-      console.log('xtpDataRef.current SET is DONE!!!!!!!');
-      //console.log('setXTPInfoState DONE!!!!!!!');
+      console.log(['NOW do the setXTPInfoState MOCK_DATA.infos=',MOCK_DATA.infos]);
+      setXTPInfoState({xtpData:MOCK_DATA.infos});
+      console.log('setXTPInfoState DONE!!!!!!!');
+      //console.log(['NOW set the xtpDataRef.current MOCK_DATA.infos=',MOCK_DATA.infos]);
+      //xtpDataRef.current = MOCK_DATA.infos;
+      //console.log('xtpDataRef.current SET is DONE!!!!!!!');
     }
-  }*/
+  }
   
   useEffect(() => {
-    console.log('state.plan HAS CHANGED => useEffect makeXTPInfoQuery');
-    //makeXTPInfoQuery();
-    const mock_data = getXtpMockData();
-    console.log(['NOW do the setXTPInfoState mock_data=',mock_data]);
-    setXTPInfoState({xtpData:mock_data});
-    console.log('setXTPInfoState DONE!!!!!!!');
+    console.log('useEffect state.plan HAS CHANGED => makeXTPInfoQuery');
+    makeXTPInfoQuery();
+    console.log('makeXTPInfoQuery DONE!');
+    //const mock_data = getXtpMockData();
+    //console.log(['NOW do the setXTPInfoState mock_data=',mock_data]);
+    //setXTPInfoState({xtpData:mock_data});
+    //console.log('setXTPInfoState DONE!!!!!!!');
   }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
   
   // merge two separate bike + transit plans into one
