@@ -4,13 +4,7 @@ import React from 'react';
 import { xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import XtpIconMarker from './XtpIconMarker';
-import Popup from 'react-leaflet/es/Popup';
-/*
 import XtpPopup from './popups/XtpPopup';
-import XtpTestPopup from './popups/XtpTestPopup';
-*/
-//import useWindowSize from '../../../hooks/useWindowSize';
-
 /*
 key
 position
@@ -78,9 +72,14 @@ export default function XtpLocationMarker({
       }}
       zIndexOffset={12000}
     >
-      <Popup>
-        A pretty CSS3 popup. <br /> Easily customizable.
-      </Popup>
+      <XtpPopup
+        lat={xtp.lat}
+        lon={xtp.lon}
+        xtpurl={xtp.url}
+        key={`${xtp.lat}${xtp.lon}`}
+        xtp_last_index={xtp_last_index}
+        pid={pid}
+      />
     </XtpIconMarker>
   );
 }
@@ -94,17 +93,15 @@ XtpLocationMarker.propTypes = {
   xtp: xtpShape,
   xtp_last_index: PropTypes.number,
   pid: PropTypes.string,
-  //onClickMarker: PropTypes.func,
 };
 
 XtpLocationMarker.defaultProps = {
   position: undefined,
-  type: 'via',
+  type: 'xtp',
   className: undefined,
   isLarge: false,
   disabled: false,
   xtp: undefined,
   xtp_last_index: undefined,
   pid: undefined,
-  //onClickMarker: undefined,
 };

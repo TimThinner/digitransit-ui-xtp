@@ -4,13 +4,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 //import { configShape } from '../../../util/shapes';
 import Card from '../../Card';
-import { isBrowser } from '../../../util/browser';
 import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
-
+import Popup from 'react-leaflet/es/Popup';
 //import useWindowSize from '../../../hooks/useWindowSize';
 
-const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
-//import Popup from 'react-leaflet/es/Popup';
 /*
   in map.scss:
   .single-popup {
@@ -244,7 +241,7 @@ class XtpPopup extends React.Component {
     const c_index = parseInt(this.props.pid.slice(4));
     const prev_state = c_index !== 0 ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
     const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty
-    const popup = (
+    return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
         offset={[0, 0]}
@@ -285,7 +282,6 @@ class XtpPopup extends React.Component {
         </Card>
       </Popup>
     );
-    return popup;
   }
 }
 

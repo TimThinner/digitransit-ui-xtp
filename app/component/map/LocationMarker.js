@@ -55,14 +55,7 @@ export default function LocationMarker({
     </IconMarker>
   );
 }
-/*
-key
-position
-type
-xtp
-xtp_last_index
-pid
-*/
+
 LocationMarker.propTypes = {
   position: IconMarker.propTypes.position,
   type: PropTypes.oneOf(['from', 'via', 'to', 'favourite']),

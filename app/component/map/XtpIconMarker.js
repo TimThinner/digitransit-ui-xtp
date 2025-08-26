@@ -9,8 +9,6 @@ export default class XtpIconMarker extends React.Component {
   constructor(props, ...args) {
     super(props, ...args);
     const _this = this;
-    //this.markerRef = React.createRef();
-    //this.handleClickMarker = this.handleClickMarker.bind(this);
     this.Icon = L.Icon.extend({
       options: {
         // @section
@@ -38,23 +36,12 @@ export default class XtpIconMarker extends React.Component {
     });
     this.state = { icon: new this.Icon(props.icon) };
   }
-  /*
-  handleClickMarker() {
-    console.log(['HELLO! this.markerRef=',this.markerRef]);
-    const popup = this.markerRef.current.getPopup();
-    if (popup) {
-      this.markerRef.current.closePopup();
-      this.markerRef.current.unbindPopup(); 
-    }
-    this.markerRef.current.bindPopup("<strong>Hello world!</strong><br />I am a popup.", {maxWidth: 500}).openPopup();
-  }
-  */
+
   componentDidUpdate() {
     this.state.icon.initialize(this.props.icon);
   }
 
   render() {
-    console.log(['this.props.children=',this.props.children]);
     return [
       this.state.div &&
         createPortal(this.props.icon.element, this.state.div, 'icon'),
@@ -81,11 +68,9 @@ XtpIconMarker.propTypes = {
   }).isRequired,
   zIndexOffset: PropTypes.number,
   children: PropTypes.node,
-  //onClickMarker: PropTypes.func,
 };
 
 XtpIconMarker.defaultProps = {
   zIndexOffset: undefined,
   children: undefined,
-  //onClickMarker: undefined,
 };
