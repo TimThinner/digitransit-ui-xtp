@@ -8,6 +8,10 @@ import XtpIconMarker from './XtpIconMarker';
 import XtpPopup from './popups/XtpPopup';
 import XtpTestPopup from './popups/XtpTestPopup';
 */
+//import useWindowSize from '../../../hooks/useWindowSize';
+import { isBrowser } from '../../../util/browser';
+const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
+
 /*
 key
 position
@@ -58,7 +62,7 @@ export default function XtpLocationMarker({
   const test_classes = cx(validType, className, pid);
   console.log(['LocationMarker test_classes=',test_classes]);
   
-  const marker = (
+  return (
     <XtpIconMarker
       position={position}
       className={cx(validType, className, pid)}
@@ -75,9 +79,11 @@ export default function XtpLocationMarker({
       }}
       zIndexOffset={12000}
     >
+      <Popup>
+        A pretty CSS3 popup. <br /> Easily customizable.
+      </Popup>
     </XtpIconMarker>
   );
-  return marker;
 }
 
 XtpLocationMarker.propTypes = {
