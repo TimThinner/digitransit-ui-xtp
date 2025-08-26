@@ -4,13 +4,12 @@ import React from 'react';
 import { xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import XtpIconMarker from './XtpIconMarker';
+import Popup from 'react-leaflet/es/Popup';
 /*
 import XtpPopup from './popups/XtpPopup';
 import XtpTestPopup from './popups/XtpTestPopup';
 */
 //import useWindowSize from '../../../hooks/useWindowSize';
-import { isBrowser } from '../../../util/browser';
-const Popup = isBrowser ? require('react-leaflet/es/Popup').default : null; // eslint-disable-line global-require
 
 /*
 key
