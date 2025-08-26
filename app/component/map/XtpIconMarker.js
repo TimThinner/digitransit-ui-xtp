@@ -63,7 +63,7 @@ export default class XtpIconMarker extends React.Component {
         icon={this.state.icon}
         keyboard={false}
         zIndexOffset={this.props.zIndexOffset}
-        onClick={this.handleClickMarker}>Click</button>
+        onClick={this.handleClickMarker}
         ref={this.markerRef}
       >
         {this.props.children}
