@@ -10,6 +10,7 @@ export default class XtpIconMarker extends React.Component {
     super(props, ...args);
     const _this = this;
     this.markerRef = React.createRef();
+    this.handleClickMarker = this.handleClickMarker.bind(this);
     this.Icon = L.Icon.extend({
       options: {
         // @section
@@ -38,7 +39,7 @@ export default class XtpIconMarker extends React.Component {
     this.state = { icon: new this.Icon(props.icon) };
   }
   
-  onClickMarker() {
+  handleClickMarker() {
     console.log(['HELLO! this.markerRef=',this.markerRef]);
     const popup = this.markerRef.current.getPopup();
     if (popup) {
@@ -62,7 +63,7 @@ export default class XtpIconMarker extends React.Component {
         icon={this.state.icon}
         keyboard={false}
         zIndexOffset={this.props.zIndexOffset}
-        onClick={this.onClickMarker}
+        onClick={this.handleClickMarker}>Click</button>
         ref={this.markerRef}
       >
         {this.props.children}
