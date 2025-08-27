@@ -264,7 +264,7 @@ class XtpPopup extends React.Component {
             this.autoClose = false;
           } else {
             console.log('onClose... RESET.');
-            this.  = false;
+            this.fullScreen = false;
             this.setDefaultDimensions();
             this.processStyles();
             this.processPopupLeft();
