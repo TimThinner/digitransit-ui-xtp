@@ -195,7 +195,13 @@ class XtpPopup extends React.Component {
       const prev_index = c_index-1;
       const prev_id = 'xtp_'+prev_index;
       console.log(['OPEN POPUP id=',prev_id]);
-      this.openPopup(prev_id);
+      //this.openPopup(prev_id);
+      setTimeout(() => {
+        this.closePopup();
+        setTimeout(() => {
+          this.openPopup(prev_id);
+        }, 100);
+      }, 100);
     }
   }
   
@@ -206,7 +212,13 @@ class XtpPopup extends React.Component {
       const next_index = c_index+1;
       const next_id = 'xtp_'+next_index;
       console.log(['OPEN POPUP id=',next_id]);
-      this.openPopup(next_id);
+      //this.openPopup(next_id);
+      setTimeout(() => {
+        this.closePopup();
+        setTimeout(() => {
+          this.openPopup(next_id);
+        }, 100);
+      }, 100);
     }
   }
   
@@ -252,7 +264,7 @@ class XtpPopup extends React.Component {
             this.autoClose = false;
           } else {
             console.log('onClose... RESET.');
-            this.fullScreen = false;
+            this.  = false;
             this.setDefaultDimensions();
             this.processStyles();
             this.processPopupLeft();

@@ -97,7 +97,7 @@ export default class Legs extends React.Component {
     let xtp_leg_icon = false;
     const xtp_leg_points = xtpEdgePoints.filter(p => p.leg_index === j);
     if (xtp_leg_points.length > 0) {
-      console.log(['FOR leg index=',j,' XTP LEG-ICON is true!']);
+      //console.log(['FOR leg index=',j,' XTP LEG-ICON is true!']);
       xtp_leg_icon = true;
     }
     return xtp_leg_icon;
