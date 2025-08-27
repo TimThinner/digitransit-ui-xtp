@@ -29,7 +29,7 @@ class XtpPopup extends React.Component {
     leaflet: PropTypes.shape({
       map: PropTypes.shape({
         //openPopup: PropTypes.func.isRequired,
-        closePopup: PropTypes.func.isRequired,
+        //closePopup: PropTypes.func.isRequired,
         getZoom: PropTypes.func.isRequired,
         on: PropTypes.func.isRequired,
         off: PropTypes.func.isRequired,
@@ -40,6 +40,8 @@ class XtpPopup extends React.Component {
     lat: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
     xtpurl: PropTypes.string.isRequired,
+    openPopup: PropTypes.func.isRequired,
+    closePopup: PropTypes.func.isRequired,
   };
   
   constructor(props) {
@@ -120,17 +122,18 @@ class XtpPopup extends React.Component {
     console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
   }
-  
+  /*
   closePopup = () => {
     this.props.leaflet.map.closePopup();
-    /*
-    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
-    console.log(['closePopup elems=',elems]);
-    [...elems].forEach(e=>{
-      e.click();
-    });*/
+    
+    //const elems = document.querySelectorAll('a.leaflet-popup-close-button');
+    //console.log(['closePopup elems=',elems]);
+    //[...elems].forEach(e=>{
+    //  e.click();
+    //});
   }
-  
+  */
+  /*
   openPopup = (pid) => {
     //this.props.leaflet.map.openPopup(pid);
     const elems = document.querySelectorAll('.'+pid);
@@ -139,7 +142,7 @@ class XtpPopup extends React.Component {
       e.click();
     });
   }
-  
+  */
   //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
   getMapDimensions = () => {
     const dim = {w:0,h:0};
@@ -197,9 +200,11 @@ class XtpPopup extends React.Component {
       console.log(['OPEN POPUP id=',prev_id]);
       //this.openPopup(prev_id);
       setTimeout(() => {
-        this.closePopup();
+        //this.closePopup();
+        this.props.closePopup();
         setTimeout(() => {
-          this.openPopup(prev_id);
+          //this.openPopup(prev_id);
+          this.props.openPopup(prev_id);
         }, 100);
       }, 100);
     }
@@ -214,9 +219,11 @@ class XtpPopup extends React.Component {
       console.log(['OPEN POPUP id=',next_id]);
       //this.openPopup(next_id);
       setTimeout(() => {
-        this.closePopup();
+        //this.closePopup();
+        this.props.closePopup();
         setTimeout(() => {
-          this.openPopup(next_id);
+          //this.openPopup(next_id);
+          this.props.openPopup(next_id);
         }, 100);
       }, 100);
     }
@@ -240,9 +247,11 @@ class XtpPopup extends React.Component {
     }
     this.autoClose = true;
     setTimeout(() => {
-      this.closePopup();
+      //this.closePopup();
+      this.props.closePopup();
       setTimeout(() => {
-        this.openPopup(this.props.pid);
+        //this.openPopup(this.props.pid);
+        this.props.openPopup(this.props.pid);
       }, 100);
     }, 100);
   };

@@ -55,6 +55,22 @@ export default function XtpLocationMarker({
   const test_classes = cx(validType, className, pid);
   console.log(['LocationMarker test_classes=',test_classes]);
   
+  function closePopup() {
+    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
+    console.log(['closePopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
+  }
+  
+  function openPopup(a_pid) {
+    const elems = document.querySelectorAll('.'+a_pid);
+    console.log(['openPopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
+  }
+  
   return (
     <XtpIconMarker
       position={position}
@@ -79,6 +95,8 @@ export default function XtpLocationMarker({
         key={`${xtp.lat}${xtp.lon}`}
         xtp_last_index={xtp_last_index}
         pid={pid}
+        openPopup={openPopup}
+        closePopup={closePopup}
       />
     </XtpIconMarker>
   );
