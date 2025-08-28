@@ -3,7 +3,7 @@ import { getJson } from '../util/xhrPromise';
 import geolocationMessages from '../util/geolocationMessages';
 import { addAnalyticsEvent } from '../util/analyticsUtils';
 
-const MOCKPOS = false;
+const MOCKPOS = true; // test!
 let geoWatchId;
 
 function reverseGeocodeAddress(actionContext, coords) {
@@ -102,6 +102,7 @@ function mockPositionChange(actionContext) {
         heading: 0,
       },
     };
+    console.log(['mockPositionChange newPos=',newPos]);
     geoCallback(actionContext, newPos);
   }
 }
