@@ -31,6 +31,7 @@ class XtpPopup extends React.Component {
         //openPopup: PropTypes.func.isRequired,
         //closePopup: PropTypes.func.isRequired,
         getZoom: PropTypes.func.isRequired,
+        getCenter: PropTypes.func.isRequired,
         on: PropTypes.func.isRequired,
         off: PropTypes.func.isRequired,
       }).isRequired,
