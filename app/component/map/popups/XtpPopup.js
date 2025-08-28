@@ -50,6 +50,7 @@ class XtpPopup extends React.Component {
     this.state = {
       clicked: false, // toggles false / true
       zoom: this.props.leaflet.map.getZoom(),
+      center: this.props.leaflet.map.getCenter().toString(),
     };
     this.fullScreen = false;
     this.dimensions = {picW:300, picH:400, popupW:300, popupH:400};
@@ -80,12 +81,21 @@ class XtpPopup extends React.Component {
   setImgSize({fullscreen:true, width:new_w, height:new_h});
   */
   
+  
   onMapZoom = () => {
     // Toggle the state to re-render component
     const zoom = this.props.leaflet.map.getZoom();
     console.log(['onMapZoom zoom=',zoom]);
     this.setState({zoom:zoom});
   }
+  
+  onMapMove = () => {
+    const center = this.props.leaflet.map.getCenter().toString();
+    //console.log(map.getCenter().toString());
+    console.log(['onMapMove center=',center]);
+    this.setState({center:center});
+  }
+  
   /*
   this.props.pid is the "key" to the Marker behind this Popup.
   */
@@ -116,11 +126,13 @@ class XtpPopup extends React.Component {
   componentDidMount() {
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
+    this.props.leaflet.map.on("moveend", this.onMapMove);
   }
 
   componentWillUnmount() {
     console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
+    this.props.leaflet.map.off("moveend", this.onMapMove);
   }
   /*
   closePopup = () => {
