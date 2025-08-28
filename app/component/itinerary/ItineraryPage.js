@@ -1090,6 +1090,24 @@ export default function ItineraryPage(props, context) {
                 name: leg.from.name
               });
             });
+            // add some extra "infos" for the last leg.
+            const mock_last_index = MOCK_DATA.infos.length-1;
+            const last_leg = MOCK_DATA.infos[mock_last_index];
+            const extra_leg_index = last_leg.leg_index;
+            for (let i = 1; i < 5; i++) { // 1,2,3,4
+              const name = last_leg.name + '(extra-'+i+')';
+              const lat = last_leg.lat + i/500;
+              const lon = last_leg.lon + i/500;
+              MOCK_DATA.infos.push({
+                edge_index: ei,
+                leg_index: extra_leg_index,
+                type: 'photo',
+                url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg',
+                lat: lat,
+                lon: lon,
+                name: name
+              });
+            }
           }
         });
       }
