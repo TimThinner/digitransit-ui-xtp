@@ -42,6 +42,7 @@ class XtpPopup extends React.Component {
     xtpurl: PropTypes.string.isRequired,
     openPopup: PropTypes.func.isRequired,
     closePopup: PropTypes.func.isRequired,
+    open_on_init: PropTypes.bool.isRequired,
   };
   
   constructor(props) {
@@ -117,6 +118,12 @@ class XtpPopup extends React.Component {
   componentDidMount() {
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
+    if (this.props.open_on_init) {
+      setTimeout(() => {
+        //this.openPopup(this.props.pid);
+        this.props.openPopup(this.props.pid);
+      }, 200);
+    }
   }
 
   componentWillUnmount() {

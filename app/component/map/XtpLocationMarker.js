@@ -66,6 +66,16 @@ function XtpLocationMarker(props) {
   
   const dist = distance(props.xtp, props.locationState);
   console.log(['LocationMarker distance=',dist]);
+  console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
+  console.log(['LocationMarker alternate_polylinee=',props.xtp.alternate_polyline]);
+  /*
+  if (dist < props.xtp.activation_range) {
+    setTimeout(() => {
+      openPopup(props.pid);
+    }, 100);
+  }
+  */
+  const openOnInit = dist < props.xtp.activation_range ? true : false;
   
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
@@ -109,6 +119,7 @@ function XtpLocationMarker(props) {
         pid={props.pid}
         openPopup={openPopup}
         closePopup={closePopup}
+        open_on_init={openOnInit}
       />
     </XtpIconMarker>
   );
