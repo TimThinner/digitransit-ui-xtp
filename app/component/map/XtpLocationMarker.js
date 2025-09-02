@@ -1,10 +1,16 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { xtpShape } from '../../util/shapes';
+import { 
+  xtpShape,
+  locationShape,
+} from '../../util/shapes';
 import Icon from '../Icon';
 import XtpIconMarker from './XtpIconMarker';
 import XtpPopup from './popups/XtpPopup';
+// New imports to add locationState into this component
+import PositionStore from '../../store/PositionStore';
+import { connectToStores } from 'fluxible-addons-react';
 /*
 key
 position
@@ -13,7 +19,8 @@ xtp
 xtp_last_index
 pid
 */
-export default function XtpLocationMarker({
+//export default function XtpLocationMarker({
+function XtpLocationMarker({
   position,
   type,
   className,
@@ -88,6 +95,7 @@ export default function XtpLocationMarker({
       }}
       zIndexOffset={12000}
     >
+      {console.log(['REFRESH XtpPopup props=',props'locationState=',locationState])}
       <XtpPopup
         lat={xtp.lat}
         lon={xtp.lon}
@@ -111,6 +119,7 @@ XtpLocationMarker.propTypes = {
   xtp: xtpShape,
   xtp_last_index: PropTypes.number,
   pid: PropTypes.string,
+  locationState: locationShape,
 };
 
 XtpLocationMarker.defaultProps = {
@@ -122,4 +131,17 @@ XtpLocationMarker.defaultProps = {
   xtp: undefined,
   xtp_last_index: undefined,
   pid: undefined,
+  locationState: undefined,
 };
+/*
+How to add locationState into this component?
+*/
+const XtpLocationMarkerWithStores = connectToStores(
+  XtpLocationMarker,
+  [PositionStore],
+  ({ getStore }) => {
+    const locationState = getStore(PositionStore).getLocationState(),
+    return { locationState };
+  },
+);
+export { XtpLocationMarkerWithStores as default, XtpLocationMarker as Component };
