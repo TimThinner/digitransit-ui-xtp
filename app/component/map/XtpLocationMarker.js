@@ -20,16 +20,17 @@ xtp_last_index
 pid
 */
 //export default function XtpLocationMarker({
-function XtpLocationMarker({
-  position,
-  type,
-  className,
-  isLarge,
-  disabled,
-  xtp,
-  xtp_last_index,
-  pid,
-}) {
+function XtpLocationMarker(props) {
+  //position,
+  //type,
+  //className,
+  //isLarge,
+  //disabled,
+  //xtp,
+  //xtp_last_index,
+  //pid,
+  //}) {
+
   /*
   XTP: We want to show different icon for XTP "LocationMarker".
   In case of Xtp change img from:
@@ -57,9 +58,9 @@ function XtpLocationMarker({
   //}
   
   const validType = 'xtp';
-  const sideLength = isLarge ? 30 : 24;
+  const sideLength = props.isLarge ? 30 : 24;
   
-  const test_classes = cx(validType, className, pid);
+  const test_classes = cx(validType, props.className, props.pid);
   console.log(['LocationMarker test_classes=',test_classes]);
   
   function closePopup() {
@@ -80,14 +81,14 @@ function XtpLocationMarker({
   
   return (
     <XtpIconMarker
-      position={position}
-      className={cx(validType, className, pid)}
+      position={props.position}
+      className={cx(validType, props.className, props.pid)}
       icon={{
-        className: cx(validType, className, pid),
+        className: cx(validType, props.className, props.pid),
         element: (
           <Icon
             img={`icon-icon_mapMarker-xtp-map`}
-            color={disabled ? '#bbbbbb' : null}
+            color={props.disabled ? '#bbbbbb' : null}
           />
         ),
         iconAnchor: [sideLength / 2, sideLength],
@@ -97,12 +98,12 @@ function XtpLocationMarker({
     >
       {console.log(['REFRESH XtpPopup props=',props,'locationState=',locationState])}
       <XtpPopup
-        lat={xtp.lat}
-        lon={xtp.lon}
-        xtpurl={xtp.url}
-        key={`${xtp.lat}${xtp.lon}`}
-        xtp_last_index={xtp_last_index}
-        pid={pid}
+        lat={props.xtp.lat}
+        lon={props.xtp.lon}
+        xtpurl={props.xtp.url}
+        key={`${props.xtp.lat}${props.xtp.lon}`}
+        xtp_last_index={props.xtp_last_index}
+        pid={props.pid}
         openPopup={openPopup}
         closePopup={closePopup}
       />
