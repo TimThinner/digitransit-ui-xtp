@@ -11,6 +11,7 @@ import XtpPopup from './popups/XtpPopup';
 // New imports to add locationState into this component
 import PositionStore from '../../store/PositionStore';
 import { connectToStores } from 'fluxible-addons-react';
+import distance from '@digitransit-search-util/digitransit-search-util-distance';
 /*
 key
 position
@@ -61,7 +62,10 @@ function XtpLocationMarker(props) {
   const sideLength = props.isLarge ? 30 : 24;
   
   const test_classes = cx(validType, props.className, props.pid);
-  console.log(['LocationMarker test_classes=',test_classes]);
+  //console.log(['LocationMarker test_classes=',test_classes]);
+  
+  const dist = distance(props.xtp, props.locationState);
+  console.log(['LocationMarker distance=',dist]);
   
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
@@ -96,7 +100,6 @@ function XtpLocationMarker(props) {
       }}
       zIndexOffset={12000}
     >
-      {console.log(['REFRESH XtpPopup props=',props])}
       <XtpPopup
         lat={props.xtp.lat}
         lon={props.xtp.lon}

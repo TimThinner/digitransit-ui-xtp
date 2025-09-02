@@ -258,8 +258,6 @@ class XtpPopup extends React.Component {
   };
   
   render() {
-    console.log(['Create Popup this.props.pid=',this.props.pid]);
-    //console.log('Create Popup');
     const c_index = parseInt(this.props.pid.slice(4));
     const prev_state = c_index !== 0 ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
     const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty
@@ -290,7 +288,6 @@ class XtpPopup extends React.Component {
         autoPan={true}
         className="popup single-popup"
       >
-        {console.log('Create Card')}
         <Card className="no-margin">
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
