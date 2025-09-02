@@ -140,7 +140,7 @@ const XtpLocationMarkerWithStores = connectToStores(
   XtpLocationMarker,
   [PositionStore],
   ({ getStore }) => {
-    const locationState = getStore(PositionStore).getLocationState(),
+    const locationState = getStore(PositionStore).getLocationState();
     return { locationState };
   },
 );
