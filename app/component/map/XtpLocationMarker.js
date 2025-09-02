@@ -95,7 +95,7 @@ function XtpLocationMarker({
       }}
       zIndexOffset={12000}
     >
-      {console.log(['REFRESH XtpPopup props=',props'locationState=',locationState])}
+      {console.log(['REFRESH XtpPopup props=',props,'locationState=',locationState])}
       <XtpPopup
         lat={xtp.lat}
         lon={xtp.lon}
