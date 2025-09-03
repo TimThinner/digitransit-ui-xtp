@@ -117,7 +117,7 @@ function watchPosition(actionContext) {
   }, quietTimeoutSeconds * 1000);
   try {
     if (MOCKPOS) {
-      setInterval(mockPositionChange, 5000, actionContext);
+      setInterval(mockPositionChange, 30000, actionContext);
     }
     geoWatchId = navigator.geolocation.watchPosition(
       position => {

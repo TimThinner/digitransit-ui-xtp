@@ -42,7 +42,7 @@ class XtpPopup extends React.Component {
     xtpurl: PropTypes.string.isRequired,
     openPopup: PropTypes.func.isRequired,
     closePopup: PropTypes.func.isRequired,
-    open_on_init: PropTypes.bool.isRequired,
+    autoOpen: PropTypes.bool.isRequired,
   };
   
   constructor(props) {
@@ -114,16 +114,18 @@ class XtpPopup extends React.Component {
     console.log(['markers=',markers]);
     return markers;
   }*/
-  
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log(['componentDidUpdate prevProps=',prevProps]);
+    if (this.props.autoOpen===true) {
+      console.log(['componentDidUpdate autoOpen this.props.pid=',this.props.pid]);
+      this.props.openPopup(this.props.pid);
+    }
+  }
+
   componentDidMount() {
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
-    if (this.props.open_on_init) {
-      setTimeout(() => {
-        //this.openPopup(this.props.pid);
-        this.props.openPopup(this.props.pid);
-      }, 200);
-    }
   }
 
   componentWillUnmount() {
@@ -265,6 +267,7 @@ class XtpPopup extends React.Component {
   };
   
   render() {
+    console.log(['Create Popup this.props.pid=',this.props.pid]);
     const c_index = parseInt(this.props.pid.slice(4));
     const prev_state = c_index !== 0 ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
     const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty

@@ -124,32 +124,13 @@ const ItineraryPageMap = (
   if (to.lat && to.lon) {
     leafletObjs.push(<LocationMarker key="toMarker" position={to} type="to" />);
   }
-  /* XTP:
-  {
-    "infos":[
-      {
-        "edge_index": 2,
-        "leg_index": 3,
-        "type": "photo",
-        "lat": 60.175022,
-        "lon": 24.804236,
-        "url": "https://route-media-server.vtt.fi/photos/4hio3kj3h5hkj2kj22g3.jpg"
-      }
-    ]
-  }
-  
-  NEW:
+  /*
   active is the active edge => when we show camera-icons, we must show only those 
   where active === edge_index
-  
-  xtp_handle_next,
-  xtp_handle_prev,
-  xtp_add_popup,
-  xtp_handle_click,
+  Send also the whole list of xtpActiveMarkers to each XtpLocationMarker.
+  XtpLocationMarker has the knowledge of user location => it is able to detect which 
+  marker is closest to user location, see autoOpen.
   */
-  
-  
-  
   xtpPoints.forEach((xtp) => {
     if (active === xtp.edge_index) {
       xtpActiveMarkers.push(xtp);
@@ -158,15 +139,6 @@ const ItineraryPageMap = (
   const xtp_last_index = xtpActiveMarkers.length-1;
   xtpActiveMarkers.forEach((xtp, i) => {
     console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
-    // Todo: add "pid" and "xtp_last_index" to handle "next" and "prev" popup.
-    // UNDER CONSTRUCTION!
-    
-    // Add changes to:
-    //   LocationMarker.js
-    //   XtpPopup.js
-    
-    // See commit: https://github.com/TimThinner/digitransit-ui-xtp/commit/0501930135741f70992626692d3a78369a030794
-    
     const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
     leafletObjs.push(
@@ -176,6 +148,7 @@ const ItineraryPageMap = (
         type="xtp"
         xtp={xtp}
         xtp_last_index={xtp_last_index}
+        xtp_active_markers={xtpActiveMarkers}
         pid={pid}
       />
     );

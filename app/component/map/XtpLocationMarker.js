@@ -65,9 +65,8 @@ function XtpLocationMarker(props) {
   //console.log(['LocationMarker test_classes=',test_classes]);
   
   const dist = distance(props.xtp, props.locationState);
-  console.log(['LocationMarker distance=',dist]);
-  console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
-  console.log(['LocationMarker alternate_polylinee=',props.xtp.alternate_polyline]);
+  //console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
+  //console.log(['LocationMarker alternate_polylinee=',props.xtp.alternate_polyline]);
   /*
   if (dist < props.xtp.activation_range) {
     setTimeout(() => {
@@ -75,7 +74,27 @@ function XtpLocationMarker(props) {
     }, 100);
   }
   */
-  const openOnInit = dist < props.xtp.activation_range ? true : false;
+  // Go through all props.xtp_active_markers to find if any of the 
+  // markers is within activation range.
+  const within_activation_range = [];
+  props.xtp_active_markers.forEach((am_xtp, i) => {
+    const dist = distance(am_xtp, props.locationState);
+    if (dist <= am_xtp.activation_range) {
+      const pid = 'xtp_'+i;
+      within_activation_range.push({pid:pid,dist:dist});
+    }
+  });
+  console.log(['within_activation_range=',within_activation_range]);
+  // find the closest of those candidates
+  const min_distance = {pid:null,dist:100000};
+  within_activation_range.forEach((war) => {
+    if (war.dist < min_distance.dist) {
+      min_distance.dist = war.dist;
+      min_distance.pid = war.pid;
+    }
+  });
+  const autoOpen = min_distance.pid === props.pid ? true : false;
+  console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
   
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
@@ -119,7 +138,7 @@ function XtpLocationMarker(props) {
         pid={props.pid}
         openPopup={openPopup}
         closePopup={closePopup}
-        open_on_init={openOnInit}
+        autoOpen={autoOpen}
       />
     </XtpIconMarker>
   );
@@ -133,6 +152,7 @@ XtpLocationMarker.propTypes = {
   disabled: PropTypes.bool,
   xtp: xtpShape,
   xtp_last_index: PropTypes.number,
+  xtp_active_markers: PropTypes.arrayOf(xtpShape),
   pid: PropTypes.string,
   locationState: locationShape,
 };
@@ -145,6 +165,7 @@ XtpLocationMarker.defaultProps = {
   disabled: false,
   xtp: undefined,
   xtp_last_index: undefined,
+  xtp_active_markers: [],
   pid: undefined,
   locationState: undefined,
 };
