@@ -64,7 +64,7 @@ function XtpLocationMarker(props) {
   const test_classes = cx(validType, props.className, props.pid);
   //console.log(['LocationMarker test_classes=',test_classes]);
   
-  const dist = distance(props.xtp, props.locationState);
+  //const dist = distance(props.xtp, props.locationState);
   //console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
   //console.log(['LocationMarker alternate_polylinee=',props.xtp.alternate_polyline]);
   /*

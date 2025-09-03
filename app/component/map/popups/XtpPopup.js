@@ -55,6 +55,7 @@ class XtpPopup extends React.Component {
     this.fullScreen = false;
     this.dimensions = {picW:300, picH:400, popupW:300, popupH:400};
     this.autoClose = false;
+    this.autoOpenEnabled = true;
   }
   
   setDefaultDimensions = () => {
@@ -117,7 +118,7 @@ class XtpPopup extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     console.log(['componentDidUpdate prevProps=',prevProps]);
-    if (this.props.autoOpen===true) {
+    if (this.autoOpenEnabled===true && this.props.autoOpen===true) {
       console.log(['componentDidUpdate autoOpen this.props.pid=',this.props.pid]);
       this.props.openPopup(this.props.pid);
     }
@@ -201,6 +202,14 @@ class XtpPopup extends React.Component {
     this.props.xtp_handle_next();
   }*/
   
+  toggleStop = () => {
+    if (this.autoOpenEnabled===true) {
+      this.autoOpenEnabled = false;
+    } else {
+      this.autoOpenEnabled = true;
+    }
+  }
+  
   handlePrev = () => {
     const c_index = parseInt(this.props.pid.slice(4));
     console.log(['HANDLE previous! c_index=',c_index]);
@@ -271,6 +280,8 @@ class XtpPopup extends React.Component {
     const c_index = parseInt(this.props.pid.slice(4));
     const prev_state = c_index !== 0 ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
     const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty
+    const stop_state = 'y';
+    const title = this.autoOpenEnabled ? 'AUTO' : 'MANUAL';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -305,6 +316,7 @@ class XtpPopup extends React.Component {
             </div>
             <div className="xtp-map-popup-button-container">
               <div className="xtp-map-popup-button-wrapper"><button disabled={!prev_state} onClick={this.handlePrev}>Previous</button></div>
+              <div className="xtp-map-popup-button-wrapper"><button disabled={!stop_state} onClick={this.toggleStop}>{title}</button></div>
               <div className="xtp-map-popup-button-wrapper"><button disabled={!next_state} onClick={this.handleNext}>Next</button></div>
             </div>
           </div>
