@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
-//import React from 'react';
-import React, { useRef } from 'react';
+import React from 'react';
+//import React, { useRef } from 'react';
 import { 
   xtpShape,
   locationShape,
@@ -53,8 +53,6 @@ function XtpLocationMarker(props) {
   
   New: Add pid ('xtp_0', 'xtp_1', etc.) to IconMarker classes.
   */
-  const markerRef = useRef('');
-  
   const validType = 'xtp';
   const sideLength = props.isLarge ? 30 : 24;
   
@@ -104,12 +102,8 @@ function XtpLocationMarker(props) {
   });
   const autoOpen = min_distance.pid === props.pid ? true : false;
   console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
-  /*
-  Close is always called before open. The markerRef is used to avoid 
-  accidentally close when open is called on marker twice.
-  */
+  
   function closePopup() {
-    markerRef.current = '';
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
     console.log(['closePopup elems=',elems]);
     [...elems].forEach(e=>{
@@ -122,9 +116,9 @@ function XtpLocationMarker(props) {
   closes popup, we ignore it.
   */
   function openPopup(a_pid) {
-    if (markerRef.current.length === 0) {
+    const xtp_popup = document.querySelectorAll('.xtp-map-popup-button-container');
+    if (xtp_popup.length === 0) {
       console.log('No Popup open => go ahead and send click');
-      markerRef.current = a_pid;
       const elems = document.querySelectorAll('.'+a_pid);
       console.log(['openPopup elems=',elems]);
       [...elems].forEach(e=>{
