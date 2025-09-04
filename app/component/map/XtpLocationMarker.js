@@ -104,21 +104,22 @@ function XtpLocationMarker(props) {
   });
   const autoOpen = min_distance.pid === props.pid ? true : false;
   console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
-  
+  /*
+  Close is always called before open. The markerRef is used to avoid 
+  accidentally close when open is called on marker twice.
+  */
   function closePopup() {
-    if (markerRef.current.length > 0) {
-      markerRef.current = '';
-      const elems = document.querySelectorAll('a.leaflet-popup-close-button');
-      console.log(['closePopup elems=',elems]);
-      [...elems].forEach(e=>{
-        e.click();
-      });
-    } else {
-      console.log('POPUP IS ALREADY CLOSED!')
-    }
+    markerRef.current = '';
+    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
+    console.log(['closePopup elems=',elems]);
+    [...elems].forEach(e=>{
+      e.click();
+    });
   }
   /*
-  This function sends a click to marker-element, and second click closes popup.
+  NOTE: Marker click performs open/close when clicked multiple times.
+  This function sends a click to marker-element, and since second click 
+  closes popup, we ignore it.
   */
   function openPopup(a_pid) {
     if (markerRef.current.length === 0) {
@@ -130,7 +131,7 @@ function XtpLocationMarker(props) {
         e.click();
       });
     } else {
-      console.log('POPUP IS ALREADY OPEN!')
+      console.log('POPUP IS ALREADY OPEN! DO NOT CLOSE IT')
     }
   }
   

@@ -135,27 +135,7 @@ class XtpPopup extends React.Component {
     console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
   }
-  /*
-  closePopup = () => {
-    this.props.leaflet.map.closePopup();
-    
-    //const elems = document.querySelectorAll('a.leaflet-popup-close-button');
-    //console.log(['closePopup elems=',elems]);
-    //[...elems].forEach(e=>{
-    //  e.click();
-    //});
-  }
-  */
-  /*
-  openPopup = (pid) => {
-    //this.props.leaflet.map.openPopup(pid);
-    const elems = document.querySelectorAll('.'+pid);
-    console.log(['openPopup elems=',elems]);
-    [...elems].forEach(e=>{
-      e.click();
-    });
-  }
-  */
+  
   //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
   getMapDimensions = () => {
     const dim = {w:0,h:0};
@@ -197,14 +177,6 @@ class XtpPopup extends React.Component {
     });
   }
   
-  /*
-  handlePrev = () => {
-    this.props.xtp_handle_prev();
-  }
-  handleNext = () => {
-    this.props.xtp_handle_next();
-  }*/
-  
   toggleStop = () => {
     this.setState(prevState => ({
       autoOpenEnabled: !prevState.autoOpenEnabled
@@ -217,13 +189,9 @@ class XtpPopup extends React.Component {
     if (c_index > 0) {
       const prev_index = c_index-1;
       const prev_id = 'xtp_'+prev_index;
-      console.log(['OPEN POPUP id=',prev_id]);
-      //this.openPopup(prev_id);
       setTimeout(() => {
-        //this.closePopup();
         this.props.closePopup();
         setTimeout(() => {
-          //this.openPopup(prev_id);
           this.props.openPopup(prev_id);
         }, 100);
       }, 100);
@@ -236,13 +204,9 @@ class XtpPopup extends React.Component {
     if (c_index < this.props.xtp_last_index) {
       const next_index = c_index+1;
       const next_id = 'xtp_'+next_index;
-      console.log(['OPEN POPUP id=',next_id]);
-      //this.openPopup(next_id);
       setTimeout(() => {
-        //this.closePopup();
         this.props.closePopup();
         setTimeout(() => {
-          //this.openPopup(next_id);
           this.props.openPopup(next_id);
         }, 100);
       }, 100);
@@ -265,10 +229,8 @@ class XtpPopup extends React.Component {
     }));
     this.autoClose = true;
     setTimeout(() => {
-      //this.closePopup();
       this.props.closePopup();
       setTimeout(() => {
-        //this.openPopup(this.props.pid);
         this.props.openPopup(this.props.pid);
       }, 100);
     }, 100);
