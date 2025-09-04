@@ -53,7 +53,7 @@ class XtpPopup extends React.Component {
   };
   
   static defaultProps = {
-    windowSize: {width:300,height:400,{outer:{width:300,height:400}}},
+    windowSize: {width:300,height:400,outer:{width:300,height:400}},
   };
   
   constructor(props) {
