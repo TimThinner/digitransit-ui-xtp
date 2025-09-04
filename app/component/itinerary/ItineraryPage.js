@@ -1084,7 +1084,7 @@ export default function ItineraryPage(props, context) {
                 edge_index: ei,
                 leg_index: leg.leg_index,
                 alternate_polyline: '',
-                activation_range: 400,
+                activation_range: 1000,
                 type: 'photo',
                 url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg',
                 lat:  leg.from.lat,

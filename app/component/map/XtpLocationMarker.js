@@ -91,6 +91,7 @@ function XtpLocationMarker(props) {
   const within_activation_range = [];
   props.xtp_active_markers.forEach((am_xtp, i) => {
     const dist = distance(am_xtp, props.locationState);
+    console.log(['dist=',dist]);
     if (dist <= am_xtp.activation_range) {
       const pid = 'xtp_'+i;
       within_activation_range.push({pid:pid,dist:dist});
