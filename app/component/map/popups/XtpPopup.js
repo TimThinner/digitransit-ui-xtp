@@ -145,7 +145,7 @@ class XtpPopup extends React.Component {
       dim.h = e.clientHeight;
     });
     console.log(['GET MAP DIMENSIONS elems=',elems,'dim=',dim]);
-    console.log(['props.windowSize=',props.windowSize]);
+    console.log(['this.props.windowSize=',this.props.windowSize]);
     return dim;
   }
   
@@ -189,12 +189,10 @@ class XtpPopup extends React.Component {
     if (c_index > 0) {
       const prev_index = c_index-1;
       const prev_id = 'xtp_'+prev_index;
+      this.props.closePopup();
       setTimeout(() => {
-        this.props.closePopup();
-        setTimeout(() => {
-          this.props.openPopup(prev_id);
-        }, 100);
-      }, 100);
+        this.props.openPopup(prev_id);
+      }, 400);
     }
   }
   
@@ -204,12 +202,10 @@ class XtpPopup extends React.Component {
     if (c_index < this.props.xtp_last_index) {
       const next_index = c_index+1;
       const next_id = 'xtp_'+next_index;
+      this.props.closePopup();
       setTimeout(() => {
-        this.props.closePopup();
-        setTimeout(() => {
-          this.props.openPopup(next_id);
-        }, 100);
-      }, 100);
+        this.props.openPopup(next_id);
+      }, 400);
     }
   }
   
@@ -228,12 +224,10 @@ class XtpPopup extends React.Component {
       clicked: !prevState.clicked
     }));
     this.autoClose = true;
+    this.props.closePopup();
     setTimeout(() => {
-      this.props.closePopup();
-      setTimeout(() => {
-        this.props.openPopup(this.props.pid);
-      }, 100);
-    }, 100);
+      this.props.openPopup(this.props.pid);
+    }, 400);
   };
   
   render() {
