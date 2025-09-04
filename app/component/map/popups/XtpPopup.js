@@ -6,7 +6,6 @@ import React from 'react';
 import Card from '../../Card';
 import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
 import Popup from 'react-leaflet/es/Popup';
-//import useWindowSize from '../../../hooks/useWindowSize';
 
 /*
   in map.scss:
@@ -43,6 +42,18 @@ class XtpPopup extends React.Component {
     openPopup: PropTypes.func.isRequired,
     closePopup: PropTypes.func.isRequired,
     autoOpen: PropTypes.bool.isRequired,
+    windowSize: PropTypes.shape({
+      width: PropTypes.number,
+      height: PropTypes.number,
+      outer: {
+        width: PropTypes.number,
+        height: PropTypes.number,
+      },
+    }),
+  };
+  
+  static defaultProps = {
+    windowSize: {width:300,height:400,{outer:{width:300,height:400}}},
   };
   
   constructor(props) {
@@ -72,16 +83,6 @@ class XtpPopup extends React.Component {
     this.dimensions.popupW = 600;
     this.dimensions.popupH = 800;
   }
-  
-  //const size = useWindowSize();
-  //const sizeH = Math.round(size.height/2);
-  //const sizeW = Math.round(size.width/2);
-  /*
-  Keep aspect ratio 3/4
-  const new_h = size.height-40;
-  const new_w = Math.round(300*size.height/400);
-  setImgSize({fullscreen:true, width:new_w, height:new_h});
-  */
   
   onMapZoom = () => {
     // Toggle the state to re-render component
@@ -118,7 +119,7 @@ class XtpPopup extends React.Component {
   }*/
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(['componentDidUpdate prevProps=',prevProps]);
+    console.log(['componentDidUpdate prevProps=',prevProps,'prevState=',prevState]);
     if (this.state.autoOpenEnabled===true && this.props.autoOpen===true) {
       console.log(['componentDidUpdate autoOpen this.props.pid=',this.props.pid]);
       this.props.openPopup(this.props.pid);
@@ -164,6 +165,7 @@ class XtpPopup extends React.Component {
       dim.h = e.clientHeight;
     });
     console.log(['GET MAP DIMENSIONS elems=',elems,'dim=',dim]);
+    console.log(['props.windowSize=',props.windowSize]);
     return dim;
   }
   
@@ -204,11 +206,9 @@ class XtpPopup extends React.Component {
   }*/
   
   toggleStop = () => {
-    if (this.state.autoOpenEnabled === true) {
-      this.setState({autoOpenEnabled: false});
-    } else {
-      this.setState({autoOpenEnabled: true});
-    }
+    this.setState(prevState => ({
+      autoOpenEnabled: !prevState.autoOpenEnabled
+    }));
   }
   
   handlePrev = () => {
@@ -260,11 +260,9 @@ class XtpPopup extends React.Component {
       this.setZoomedDimensions();
     }
     // Toggle the state to re-render component
-    if (this.state.clicked) {
-      this.setState({clicked: false});
-    } else {
-      this.setState({clicked: true});
-    }
+    this.setState(prevState => ({
+      clicked: !prevState.clicked
+    }));
     this.autoClose = true;
     setTimeout(() => {
       //this.closePopup();

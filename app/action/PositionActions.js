@@ -3,7 +3,7 @@ import { getJson } from '../util/xhrPromise';
 import geolocationMessages from '../util/geolocationMessages';
 import { addAnalyticsEvent } from '../util/analyticsUtils';
 
-const MOCKPOS = false;
+const MOCKPOS = true;
 let geoWatchId;
 
 function reverseGeocodeAddress(actionContext, coords) {

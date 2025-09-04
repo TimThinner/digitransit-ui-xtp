@@ -12,6 +12,7 @@ import XtpPopup from './popups/XtpPopup';
 import PositionStore from '../../store/PositionStore';
 import { connectToStores } from 'fluxible-addons-react';
 import distance from '@digitransit-search-util/digitransit-search-util-distance';
+import useWindowSize from '../../hooks/useWindowSize';
 /*
 key
 position
@@ -61,7 +62,18 @@ function XtpLocationMarker(props) {
   const validType = 'xtp';
   const sideLength = props.isLarge ? 30 : 24;
   
-  const test_classes = cx(validType, props.className, props.pid);
+  const windowSize = useWindowSize();
+  //const sizeH = Math.round(windowSize.height/2);
+  //const sizeW = Math.round(windowSize.width/2);
+  console.log(['useWindowSize size=',windowSize]);
+  /*
+  Keep aspect ratio 3/4
+  const new_h = size.height-40;
+  const new_w = Math.round(300*size.height/400);
+  setImgSize({fullscreen:true, width:new_w, height:new_h});
+  */
+  
+  //const test_classes = cx(validType, props.className, props.pid);
   //console.log(['LocationMarker test_classes=',test_classes]);
   
   //const dist = distance(props.xtp, props.locationState);
@@ -139,6 +151,7 @@ function XtpLocationMarker(props) {
         openPopup={openPopup}
         closePopup={closePopup}
         autoOpen={autoOpen}
+        windowSize={windowSize}
       />
     </XtpIconMarker>
   );
