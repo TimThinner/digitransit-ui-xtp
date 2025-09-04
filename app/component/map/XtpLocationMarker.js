@@ -1,6 +1,7 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
-import React from 'react';
+//import React from 'react';
+import React, { useRef } from 'react';
 import { 
   xtpShape,
   locationShape,
@@ -50,14 +51,9 @@ function XtpLocationMarker(props) {
   <circle fill="none" stroke="#b40" stroke-width="2" cx="33" cy="15" r="1"/>
   </symbol>
   
-  
   New: Add pid ('xtp_0', 'xtp_1', etc.) to IconMarker classes.
-  
-  
   */
-  //const xtp_marker_next = () => {
-    //console.log('xtp_marker_next');
-  //}
+  const markerRef = useRef('');
   
   const validType = 'xtp';
   const sideLength = props.isLarge ? 30 : 24;
@@ -110,19 +106,32 @@ function XtpLocationMarker(props) {
   console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
   
   function closePopup() {
-    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
-    console.log(['closePopup elems=',elems]);
-    [...elems].forEach(e=>{
-      e.click();
-    });
+    if (markerRef.current.length > 0) {
+      markerRef.current = '';
+      const elems = document.querySelectorAll('a.leaflet-popup-close-button');
+      console.log(['closePopup elems=',elems]);
+      [...elems].forEach(e=>{
+        e.click();
+      });
+    } else {
+      console.log('POPUP IS ALREADY CLOSED!')
+    }
   }
-  
+  /*
+  This function sends a click to marker-element, and second click closes popup.
+  */
   function openPopup(a_pid) {
-    const elems = document.querySelectorAll('.'+a_pid);
-    console.log(['openPopup elems=',elems]);
-    [...elems].forEach(e=>{
-      e.click();
-    });
+    if (markerRef.current.length === 0) {
+      console.log('No Popup open => go ahead and send click');
+      markerRef.current = a_pid;
+      const elems = document.querySelectorAll('.'+a_pid);
+      console.log(['openPopup elems=',elems]);
+      [...elems].forEach(e=>{
+        e.click();
+      });
+    } else {
+      console.log('POPUP IS ALREADY OPEN!')
+    }
   }
   
   return (
