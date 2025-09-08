@@ -59,7 +59,7 @@ function XtpLocationMarker(props) {
   const windowSize = useWindowSize();
   //const sizeH = Math.round(windowSize.height/2);
   //const sizeW = Math.round(windowSize.width/2);
-  console.log(['useWindowSize size=',windowSize]);
+  //console.log(['useWindowSize size=',windowSize]);
   /*
   Keep aspect ratio 3/4
   const new_h = size.height-40;
@@ -85,13 +85,13 @@ function XtpLocationMarker(props) {
   const within_activation_range = [];
   props.xtp_active_markers.forEach((am_xtp, i) => {
     const dist = distance(am_xtp, props.locationState);
-    console.log(['dist=',dist]);
+    //console.log(['dist=',dist]);
     if (dist <= am_xtp.activation_range) {
       const pid = 'xtp_'+i;
       within_activation_range.push({pid:pid,dist:dist});
     }
   });
-  console.log(['within_activation_range=',within_activation_range]);
+  //console.log(['within_activation_range=',within_activation_range]);
   // find the closest of those candidates
   const min_distance = {pid:null,dist:100000};
   within_activation_range.forEach((war) => {
@@ -101,7 +101,7 @@ function XtpLocationMarker(props) {
     }
   });
   const autoOpen = min_distance.pid === props.pid ? true : false;
-  console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
+  //console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
   
   function closePopup() {
     const elems = document.querySelectorAll('a.leaflet-popup-close-button');
