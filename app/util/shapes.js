@@ -290,6 +290,9 @@ export const xtpShape = PropTypes.shape({
   leg_index: PropTypes.number,
   type: PropTypes.string,
   url: PropTypes.string,
+  name: PropTypes.string,
+  alternate_polyline: PropTypes.string,
+  activation_range: PropTypes.number,
 });
 
 const StatusPropType = PropTypes.oneOf([
