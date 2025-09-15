@@ -68,7 +68,7 @@ const ItineraryPageMap = (
   const xtpHandleNext = () => {
     console.log('HANDLE next!');
     if (xtpForce.index < xtpActiveMarkers.length-1) {
-      setXtpForce({index:xtpForce.index+1); // State change => re-render
+      setXtpForce({index:xtpForce.index+1}); // State change => re-render
     }
   };
   
