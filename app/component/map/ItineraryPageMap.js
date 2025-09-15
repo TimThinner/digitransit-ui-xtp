@@ -48,19 +48,27 @@ const ItineraryPageMap = (
   const leafletObjs = [];
   const xtpActiveMarkers = [];
   
-  const [xtpForceActive, setXtpForceActive] = useState(0);
+  const [xtpForce, setXtpForce] = useState({auto:true,index:0});
   
-  const handlePrev = () => {
+  const xtpToggleAuto = () => {
+    if (xtpForce.auto) {
+      setXtpForce({auto:false}); // State change => re-render
+    } else {
+      setXtpForce({auto:true}); // State change => re-render
+    }
+  }
+  
+  const xtpHandlePrev = () => {
     console.log('HANDLE previous!');
-    if (xtpForceActive > 0) {
-      setXtpForceActive(xtpForceActive-1);
+    if (xtpForce.index > 0) {
+      setXtpForce({index:xtpForce.index-1}); // State change => re-render
     }
   };
   
-  const handleNext = () => {
+  const xtpHandleNext = () => {
     console.log('HANDLE next!');
-    if (xtpForceActive < xtpActiveMarkers.length-1) {
-      setXtpForceActive(xtpForceActive+1);
+    if (xtpForce.index < xtpActiveMarkers.length-1) {
+      setXtpForce({index:xtpForce.index+1); // State change => re-render
     }
   };
   
@@ -167,15 +175,13 @@ const ItineraryPageMap = (
         xtp_last_index={xtp_last_index}
         xtp_active_markers={xtpActiveMarkers}
         pid={pid}
-        handlePrev={handlePrev}
-        handleNext={handleNext}
-        xtpForceActive={xtpForceActive}
+        xtpToggleAuto={xtpToggleAuto}
+        xtpHandlePrev={xtpHandlePrev}
+        xtpHandleNext={xtpHandleNext}
+        xtpForce={xtpForce}
       />
     );
   });
-  
-  
-  
   
   viaPoints.forEach((via, i) => {
     leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);
