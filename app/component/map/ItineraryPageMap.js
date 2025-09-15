@@ -1,7 +1,8 @@
 /* eslint-disable react/no-array-index-key */
 import { matchShape, routerShape } from 'found';
 import PropTypes from 'prop-types';
-import React from 'react';
+//import React from 'react';
+import React, { useState } from 'react';
 import { onLocationPopup } from '../../util/queryUtils';
 import {
   configShape,
@@ -46,6 +47,22 @@ const ItineraryPageMap = (
   const { hash } = match.params;
   const leafletObjs = [];
   const xtpActiveMarkers = [];
+  
+  const [xtpForceActive, setXtpForceActive] = useState(0);
+  
+  const handlePrev = () => {
+    console.log('HANDLE previous!');
+    if (xtpForceActive > 0) {
+      setXtpForceActive(xtpForceActive-1);
+    }
+  };
+  
+  const handleNext = () => {
+    console.log('HANDLE next!');
+    if (xtpForceActive < xtpActiveMarkers.length-1) {
+      setXtpForceActive(xtpForceActive+1);
+    }
+  };
   
   if (showVehicles) {
     leafletObjs.push(
@@ -150,9 +167,15 @@ const ItineraryPageMap = (
         xtp_last_index={xtp_last_index}
         xtp_active_markers={xtpActiveMarkers}
         pid={pid}
+        handlePrev={handlePrev}
+        handleNext={handleNext}
+        xtpForceActive={xtpForceActive}
       />
     );
   });
+  
+  
+  
   
   viaPoints.forEach((via, i) => {
     leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);

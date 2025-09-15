@@ -13,7 +13,7 @@ import XtpPopup from './popups/XtpPopup';
 import PositionStore from '../../store/PositionStore';
 import { connectToStores } from 'fluxible-addons-react';
 import distance from '@digitransit-search-util/digitransit-search-util-distance';
-import useWindowSize from '../../hooks/useWindowSize';
+//import useWindowSize from '../../hooks/useWindowSize';
 /*
 key
 position
@@ -56,7 +56,7 @@ function XtpLocationMarker(props) {
   const validType = 'xtp';
   const sideLength = props.isLarge ? 30 : 24;
   
-  const windowSize = useWindowSize();
+  //const windowSize = useWindowSize();
   //const sizeH = Math.round(windowSize.height/2);
   //const sizeW = Math.round(windowSize.width/2);
   //console.log(['useWindowSize size=',windowSize]);
@@ -100,37 +100,26 @@ function XtpLocationMarker(props) {
       min_distance.pid = war.pid;
     }
   });
-  const autoOpen = min_distance.pid === props.pid ? true : false;
-  //console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
   
-  function closePopup() {
-    const elems = document.querySelectorAll('a.leaflet-popup-close-button');
-    console.log(['closePopup elems=',elems]);
-    [...elems].forEach(e=>{
-      e.click();
-    });
-  }
-  /*
-  NOTE: Marker click performs open/close when clicked multiple times.
-  This function sends a click to marker-element, and since second click 
-  closes popup, we ignore it.
-  */
-  function openPopup(a_pid) {
-    const xtp_popup = document.querySelectorAll('.xtp-map-popup-button-container');
-    if (xtp_popup.length === 0) {
-      console.log('No Popup open => go ahead and send click');
-      const elems = document.querySelectorAll('.'+a_pid);
-      console.log(['openPopup elems=',elems]);
-      [...elems].forEach(e=>{
-        e.click();
-      });
-    } else {
-      console.log('POPUP IS ALREADY OPEN! DO NOT CLOSE IT')
+  // If this marker is the closest to user.
+  const autoOpenByProximity = min_distance.pid === props.pid ? true : false;
+  //console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
+  // AND if autoOpen is Enabled.
+  
+  const isAutoEnabled = props.xtpForce.auto && autoOpenByProximity;
+  
+  initMarker = ref => {
+    if (ref) {
+      ref.leafletElement.openPopup()
     }
   }
   
+  // autoHandler is handed to 
+  const autoHandler = isAutoEnabled ? initMarker : null;
+  
   return (
     <XtpIconMarker
+      autoHandler={autoHandler}
       position={props.position}
       className={cx(validType, props.className, props.pid)}
       icon={{
@@ -153,10 +142,10 @@ function XtpLocationMarker(props) {
         key={`${props.xtp.lat}${props.xtp.lon}`}
         xtp_last_index={props.xtp_last_index}
         pid={props.pid}
-        openPopup={openPopup}
-        closePopup={closePopup}
-        autoOpen={autoOpen}
-        windowSize={windowSize}
+        handlePrev={props.xtpHandlePrev}
+        handleNext={props.xtpHandleNext}
+        toggleAuto={props.xtpToggleAuto}
+        autoOpen={props.xtpForce.auto}
       />
     </XtpIconMarker>
   );
@@ -172,6 +161,13 @@ XtpLocationMarker.propTypes = {
   xtp_last_index: PropTypes.number,
   xtp_active_markers: PropTypes.arrayOf(xtpShape),
   pid: PropTypes.string,
+  xtpToggleAuto: PropTypes.func.isRequired,
+  xtpHandlePrev: PropTypes.func.isRequired,
+  xtpHandleNext: PropTypes.func.isRequired,
+  xtpForce: PropTypes.shape({
+    auto: PropTypes.bool.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
   locationState: locationShape,
 };
 

@@ -46,6 +46,7 @@ export default class XtpIconMarker extends React.Component {
       this.state.div &&
         createPortal(this.props.icon.element, this.state.div, 'icon'),
       <Marker
+        ref={this.props.autoHandler}
         key="marker"
         {...this.props}
         icon={this.state.icon}
@@ -68,9 +69,11 @@ XtpIconMarker.propTypes = {
   }).isRequired,
   zIndexOffset: PropTypes.number,
   children: PropTypes.node,
+  autoHandler: PropTypes.func,
 };
 
 XtpIconMarker.defaultProps = {
   zIndexOffset: undefined,
   children: undefined,
+  autoHandler: null,
 };
