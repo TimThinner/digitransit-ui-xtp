@@ -108,7 +108,7 @@ function XtpLocationMarker(props) {
   
   const isAutoEnabled = props.xtpForce.auto && autoOpenByProximity;
   
-  initMarker = ref => {
+  const initMarker = ref => {
     if (ref) {
       ref.leafletElement.openPopup()
     }
