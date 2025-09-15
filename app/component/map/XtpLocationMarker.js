@@ -100,13 +100,29 @@ function XtpLocationMarker(props) {
       min_distance.pid = war.pid;
     }
   });
+
+  const getAutoByIndex = pid_ind => {
+    if (props.xtpForce.auto===false && props.xtpForce.index === pid_ind) {
+      // manual AND current forced marker is current marker
+      return true;
+    }
+    return false;
+  }
+
+  const getAutoByProximity = min_pid => {
+    if (props.xtpForce.auto===true && props.pid === min_pid) {
+      // auto AND minimum distance marker is current marker
+      return true;
+    }
+    return false;
+  }
+
+  // Note that pid is 'xtp_'+i;
+  const pid_index = parseInt(props.pid.slice(4));
+  const autoOpenByForce = getAutoByIndex(pid_index) ? true : false;
+  const autoOpenByProxi = getAutoByProximity(min_distance.pid) ? true : false;
   
-  // If this marker is the closest to user.
-  const autoOpenByProximity = min_distance.pid === props.pid ? true : false;
-  //console.log(['autoOpen=',autoOpen,'min_distance.pid=',min_distance.pid,'min_distance.dist=',min_distance.dist]);
-  // AND if autoOpen is Enabled.
-  
-  const isAutoEnabled = props.xtpForce.auto && autoOpenByProximity;
+  const isAutoEnabled = autoOpenByForce || autoOpenByProxi;
   
   const initMarker = ref => {
     if (ref) {
@@ -114,7 +130,7 @@ function XtpLocationMarker(props) {
     }
   }
   
-  // autoHandler is handed to 
+  // autoHandler is handed to Marker in XtpIconMarker.
   const autoHandler = isAutoEnabled ? initMarker : null;
   
   return (
