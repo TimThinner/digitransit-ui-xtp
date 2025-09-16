@@ -49,9 +49,11 @@ class XtpPopup extends React.Component {
     console.log(['constructor props=',props]);
     super(props);
     this.state = {
-      picW: 300,
-      picH: 400,
-      zoom: this.props.leaflet.map.getZoom(),
+      popup: {
+        picW: 300,
+        picH: 400, 
+        zoom: this.props.leaflet.map.getZoom(),
+      },
     };
     this.popupW = 320;
     this.popupH = 420;
@@ -61,7 +63,13 @@ class XtpPopup extends React.Component {
     // Toggle the state to re-render component
     const zoom = this.props.leaflet.map.getZoom();
     console.log(['onMapZoom zoom=',zoom]);
-    this.setState({zoom:zoom});
+    this.setState(prevState => ({
+      popup: {              // object that we want to update
+        ...prevState.popup, // keep all other key-value pairs
+        zoom: zoom          // update the value of specific key
+      }
+    }));
+    //this.setState({zoom:zoom});
   }
   
   componentDidMount() {
@@ -77,12 +85,26 @@ class XtpPopup extends React.Component {
   handleClick = () => {
     if (this.state.picW===300) {
       console.log('handleClick picW===300 setState 600x800');
-      this.setState({picW:600,picH:800});
+      this.setState(prevState => ({
+        popup: {              // object that we want to update
+          ...prevState.popup, // keep all other key-value pairs
+          picW: 600,           // update the value of specific key
+          picH: 800,           // update the value of specific key
+        }
+      }));
+      //this.setState({picW:600,picH:800});
       this.popupW = 620;
       this.popupH = 820;
     } else {
       console.log('handleClick picW===600 setState 300x400');
-      this.setState({picW:300,picH:400});
+      this.setState(prevState => ({
+        popup: {              // object that we want to update
+          ...prevState.popup, // keep all other key-value pairs
+          picW: 300,           // update the value of specific key
+          picH: 400,           // update the value of specific key
+        }
+      }));
+      //this.setState({picW:300,picH:400});
       this.popupW = 320;
       this.popupH = 420;
     }
