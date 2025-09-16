@@ -76,10 +76,12 @@ class XtpPopup extends React.Component {
   
   handleClick = () => {
     if (this.state.picW===300) {
+      console.log('handleClick picW===300 setState 600x800');
       this.setState({picW:600,picH:800});
       this.popupW = 620;
       this.popupH = 820;
     } else {
+      console.log('handleClick picW===600 setState 300x400');
       this.setState({picW:300,picH:400});
       this.popupW = 320;
       this.popupH = 420;
@@ -87,7 +89,7 @@ class XtpPopup extends React.Component {
   }
   
   render() {
-    //console.log(['Create Popup this.props.pid=',this.props.pid]);
+    console.log(['Create Popup this.props.pid=',this.props.pid]);
     const c_index = parseInt(this.props.pid.slice(4));
     const prev_state = c_index !== 0 ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
     const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty

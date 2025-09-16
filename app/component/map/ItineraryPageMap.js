@@ -52,23 +52,25 @@ const ItineraryPageMap = (
   
   const xtpToggleAuto = () => {
     if (xtpForce.auto) {
-      setXtpForce({auto:false}); // State change => re-render
+      setXtpForce({...xtpForce,auto:false}); // State change => re-render
     } else {
-      setXtpForce({auto:true}); // State change => re-render
+      setXtpForce({...xtpForce,auto:true}); // State change => re-render
     }
   }
   
   const xtpHandlePrev = () => {
-    console.log('HANDLE previous!');
-    if (xtpForce.index > 0) {
-      setXtpForce({index:xtpForce.index-1}); // State change => re-render
+    const index = xtpForce.index;
+    console.log(['HANDLE previous index=',index]);
+    if (index > 0) {
+      setXtpForce({...xtpForce,index:index-1}); // State change => re-render
     }
   };
   
   const xtpHandleNext = () => {
-    console.log('HANDLE next!');
-    if (xtpForce.index < xtpActiveMarkers.length-1) {
-      setXtpForce({index:xtpForce.index+1}); // State change => re-render
+    const index = xtpForce.index;
+    console.log(['HANDLE next index=',index]);
+    if (index < xtpActiveMarkers.length-1) {
+      setXtpForce({...xtpForce,index:index+1}); // State change => re-render
     }
   };
   
