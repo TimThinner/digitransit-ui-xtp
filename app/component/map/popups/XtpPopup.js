@@ -14,6 +14,12 @@ import Popup from 'react-leaflet/es/Popup';
       width: 320px;
     }
   }
+  .single-popup-xtp {
+    .leaflet-popup-content {
+      width: 420px;
+    }
+  }
+  
   pid = 'xtp_0', 'xtp_1', etc.
 */
 //export default function XtpPopup({ pid, lat, lon, xtpurl }) {
@@ -133,6 +139,7 @@ class XtpPopup extends React.Component {
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
+    const xtpClassNames = this.state.popup.picW===300 ? 'popup single-popup' : 'popup single-popup-xtp';
     const auto_state = 'y';
     return (
       <Popup
@@ -148,7 +155,7 @@ class XtpPopup extends React.Component {
         maxWidth={this.popupW}
         maxHeight={this.popupH}
         autoPan={true}
-        className="popup single-popup"
+        className={xtpClassNames}
       >
         <Card className="no-margin">
           <div className="location-popup-wrapper">
