@@ -83,7 +83,7 @@ class XtpPopup extends React.Component {
   }
   
   handleClick = () => {
-    if (this.state.picW===300) {
+    if (this.state.popup.picW===300) {
       console.log('handleClick picW===300 setState 600x800');
       this.setState(prevState => ({
         popup: {              // object that we want to update
@@ -110,13 +110,30 @@ class XtpPopup extends React.Component {
     }
   }
   
+  getPrevButtonState = () => {
+    const c_index = parseInt(this.props.pid.slice(4));
+    if (this.props.autoOpen) {
+       return ''; // "Previous"-button is disabled when "AUTO" mode is selected.
+    }
+    // "Previous"-button is enabled if current-index is not zero.
+    return c_index !== 0 ? 'y' : '';
+  }
+  
+  getNextButtonState = () => {
+    const c_index = parseInt(this.props.pid.slice(4));
+    if (this.props.autoOpen) {
+       return ''; // "Next"-button is disabled when "AUTO" mode is selected.
+    }
+    // "Next"-button is enabled if current-index is smaller than last index.
+    return c_index < this.props.xtp_last_index ? 'y' : '';
+  }
+  
   render() {
     console.log(['Create Popup this.props.pid=',this.props.pid]);
-    const c_index = parseInt(this.props.pid.slice(4));
-    const prev_state = c_index !== 0 ? 'y' : ''; // "Previous"-button is disabled when prev_state is empty
-    const next_state = c_index < this.props.xtp_last_index ? 'y' : ''; // "Next"-button is disabled when next_state is empty
-    const stop_state = 'y';
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
+    const prev_state = this.getPrevButtonState();
+    const next_state = this.getNextButtonState();
+    const auto_state = 'y';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -136,11 +153,11 @@ class XtpPopup extends React.Component {
         <Card className="no-margin">
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.popup.picW} height={this.state.popup.picH} />
             </div>
             <div className="xtp-map-popup-button-container">
               <div className="xtp-map-popup-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>Previous</button></div>
-              <div className="xtp-map-popup-button-wrapper"><button disabled={!stop_state} onClick={this.props.toggleAuto}>{title}</button></div>
+              <div className="xtp-map-popup-button-wrapper"><button disabled={!auto_state} onClick={this.props.toggleAuto}>{title}</button></div>
               <div className="xtp-map-popup-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>Next</button></div>
             </div>
           </div>
