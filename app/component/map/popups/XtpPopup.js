@@ -57,12 +57,12 @@ class XtpPopup extends React.Component {
     this.state = {
       popup: {
         picW: 300,
-        picH: 400, 
+        //picH: 400, 
         zoom: this.props.leaflet.map.getZoom(),
       },
     };
     this.popupW = 320;
-    this.popupH = 420;
+    //this.popupH = 420;
   }
   
   onMapZoom = () => {
@@ -90,29 +90,29 @@ class XtpPopup extends React.Component {
   
   handleClick = () => {
     if (this.state.popup.picW===300) {
-      console.log('handleClick picW===300 setState 600x800');
+      console.log('handleClick picW===300 setState 600');
       this.setState(prevState => ({
         popup: {              // object that we want to update
           ...prevState.popup, // keep all other key-value pairs
           picW: 600,           // update the value of specific key
-          picH: 800,           // update the value of specific key
+          //picH: 800,           // update the value of specific key
         }
       }));
       //this.setState({picW:600,picH:800});
       this.popupW = 620;
-      this.popupH = 820;
+      //this.popupH = 820;
     } else {
-      console.log('handleClick picW===600 setState 300x400');
+      console.log('handleClick picW===600 setState 300');
       this.setState(prevState => ({
         popup: {              // object that we want to update
           ...prevState.popup, // keep all other key-value pairs
           picW: 300,           // update the value of specific key
-          picH: 400,           // update the value of specific key
+          //picH: 400,           // update the value of specific key
         }
       }));
       //this.setState({picW:300,picH:400});
       this.popupW = 320;
-      this.popupH = 420;
+      //this.popupH = 420;
     }
   }
   
@@ -153,14 +153,13 @@ class XtpPopup extends React.Component {
           console.log('onOpen.');
         }}
         maxWidth={this.popupW}
-        maxHeight={this.popupH}
         autoPan={true}
         className={xtpClassNames}
       >
         <Card className="no-margin">
           <div className="location-popup-wrapper">
             <div className="location-thumbnail-image">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.popup.picW} height={this.state.popup.picH} />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.popup.picW} />
             </div>
             <div className="xtp-map-popup-button-container">
               <div className="xtp-map-popup-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>Previous</button></div>

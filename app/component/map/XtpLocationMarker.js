@@ -102,7 +102,7 @@ function XtpLocationMarker(props) {
   });
 
   const getAutoByIndex = pid_ind => {
-    if (props.xtpForce.auto===false && props.xtpForce.index === pid_ind) {
+    if (!props.xtpForce.auto && props.xtpForce.index === pid_ind) {
       // manual AND current forced marker is current marker
       return true;
     }
@@ -110,7 +110,7 @@ function XtpLocationMarker(props) {
   }
 
   const getAutoByProximity = min_pid => {
-    if (props.xtpForce.auto===true && props.pid === min_pid) {
+    if (props.xtpForce.auto && props.pid === min_pid) {
       // auto AND minimum distance marker is current marker
       return true;
     }
@@ -121,7 +121,8 @@ function XtpLocationMarker(props) {
   const pid_index = parseInt(props.pid.slice(4));
   const autoOpenByForce = getAutoByIndex(pid_index) ? true : false;
   const autoOpenByProxi = getAutoByProximity(min_distance.pid) ? true : false;
-  
+  console.log(['autoOpenByForce=',autoOpenByForce,'autoOpenByProxi=',autoOpenByProxi]);
+
   const isAutoEnabled = autoOpenByForce || autoOpenByProxi;
   
   const initMarker = ref => {
