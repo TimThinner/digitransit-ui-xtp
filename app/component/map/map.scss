@@ -1609,6 +1609,12 @@ div.leaflet-control-scale-line {
   }
 }
 
+.xtp-popup-wrapper {
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  margin: 10px 14px;
+}
 .xtp-map-popup-button-container {
   display: flex;
 }
@@ -1616,14 +1622,15 @@ div.leaflet-control-scale-line {
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: 50%;
-  padding: 0 10px;
+  padding: 4px;
 }
-.xtp-map-popup-button-wrapper > button{
+.xtp-map-popup-button-wrapper > button {
   width: 100%;
   background-color: #fff;
   line-height: 2em;
   color: #000;
   cursor: pointer;
+  border: 1px solid #000;
 }
 .xtp-map-popup-button-wrapper > button[disabled], 
 .xtp-map-popup-button-wrapper > button[disabled]:hover {
@@ -1632,4 +1639,5 @@ div.leaflet-control-scale-line {
   line-height: 2em;
   color: #ccc;
   cursor: default;
+  border: 1px solid #ccc;
 }

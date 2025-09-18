@@ -147,7 +147,7 @@ class XtpPopup extends React.Component {
         className="popup single-popup-xtp"
       >
         <Card className="no-margin">
-          <div className="location-popup-wrapper">
+          <div className="xtp-popup-wrapper">
             <div className="xtp-map-popup-button-container">
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
