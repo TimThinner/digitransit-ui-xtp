@@ -56,12 +56,12 @@ class XtpPopup extends React.Component {
     console.log(['constructor props=',props]);
     super(props);
     this.state = {
-      popup: {
-        picW: 300,
-        zoom: this.props.leaflet.map.getZoom(),
-      },
+      picW: 200,
+      picH: 267,
+      zoom: this.props.leaflet.map.getZoom(),
     };
-    this.popupW = 320;
+    this.popupW = 270;
+    this.popupH = 360;
   }
   
   onMapZoom = () => {
@@ -84,18 +84,22 @@ class XtpPopup extends React.Component {
   }
   
   handleClick = () => {
-    if (this.state.popup.picW===300) {
-      this.setState(prevState => ({
-        ...prevState, // keep all other key-value pairs
-        picW: 600,           // update the value of specific key
-      }));
-      this.popupW = 620;
-    } else {
+    if (this.state.picW===200) {
       this.setState(prevState => ({
         ...prevState, // keep all other key-value pairs
         picW: 300,    // update the value of specific key
+        picH: 400,    // update the value of specific key
       }));
-      this.popupW = 320;
+      this.popupW = 360;
+      this.popupH = 480;
+    } else {
+      this.setState(prevState => ({
+        ...prevState, // keep all other key-value pairs
+        picW: 200,    // update the value of specific key
+        picH: 267,    // update the value of specific key
+      }));
+      this.popupW = 270;
+      this.popupH = 360;
     }
   }
   
@@ -127,7 +131,7 @@ class XtpPopup extends React.Component {
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
-    //const xtpClassNames = this.state.popup.picW===300 ? 'popup single-popup' : 'popup single-popup-xtp';
+    const xtpClassNames = this.state.picW===200 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     const auto_state = 'y';
     return (
       <Popup
@@ -143,8 +147,9 @@ class XtpPopup extends React.Component {
           this.props.handleSetIndex(c_index);
         }}
         maxWidth={this.popupW}
+        maxHeight={this.popupH}
         autoPan={true}
-        className="popup single-popup-xtp"
+        className={xtpClassNames}
       >
         <Card className="no-margin">
           <div className="xtp-popup-wrapper">
@@ -152,7 +157,7 @@ class XtpPopup extends React.Component {
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="location-thumbnail-image">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.popup.picW} />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} />
             </div>
             <div className="xtp-map-popup-button-container">
               <div className="xtp-map-popup-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>Previous</button></div>
