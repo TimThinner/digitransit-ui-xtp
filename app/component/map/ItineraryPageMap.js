@@ -52,9 +52,9 @@ const ItineraryPageMap = (
   
   const xtpToggleAuto = () => {
     if (xtpForce.auto) {
-      setXtpForce({...xtpForce,auto:false}); // State change => re-render
+      setXtpForce({...xtpForce,auto:false});
     } else {
-      setXtpForce({...xtpForce,auto:true}); // State change => re-render
+      setXtpForce({...xtpForce,auto:true});
     }
   }
   
@@ -62,17 +62,24 @@ const ItineraryPageMap = (
     const index = xtpForce.index;
     console.log(['HANDLE previous index=',index]);
     if (index > 0) {
-      setXtpForce({...xtpForce,index:index-1}); // State change => re-render
+      setXtpForce({...xtpForce,index:index-1});
     }
-  };
+  }
   
   const xtpHandleNext = () => {
     const index = xtpForce.index;
     console.log(['HANDLE next index=',index]);
     if (index < xtpActiveMarkers.length-1) {
-      setXtpForce({...xtpForce,index:index+1}); // State change => re-render
+      setXtpForce({...xtpForce,index:index+1});
     }
-  };
+  }
+  
+  const xtpHandleSetIndex = (new_index) => {
+    if (xtpForce.index !== new_index) {
+      console.log(['HANDLE SetIndex CHANGE new_index=',new_index]);
+      setXtpForce({...xtpForce,index:new_index});
+    }
+  }
   
   if (showVehicles) {
     leafletObjs.push(
@@ -180,6 +187,7 @@ const ItineraryPageMap = (
         xtpToggleAuto={xtpToggleAuto}
         xtpHandlePrev={xtpHandlePrev}
         xtpHandleNext={xtpHandleNext}
+        xtpHandleSetIndex={xtpHandleSetIndex}
         xtpForce={xtpForce}
       />
     );

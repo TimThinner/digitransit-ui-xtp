@@ -47,6 +47,7 @@ class XtpPopup extends React.Component {
     xtpurl: PropTypes.string.isRequired,
     handlePrev: PropTypes.func.isRequired,
     handleNext: PropTypes.func.isRequired,
+    handleSetIndex: PropTypes.func.isRequired,
     toggleAuto: PropTypes.func.isRequired,
     autoOpen: PropTypes.bool.isRequired,
   };
@@ -57,25 +58,19 @@ class XtpPopup extends React.Component {
     this.state = {
       popup: {
         picW: 300,
-        //picH: 400, 
         zoom: this.props.leaflet.map.getZoom(),
       },
     };
     this.popupW = 320;
-    //this.popupH = 420;
   }
   
   onMapZoom = () => {
     // Toggle the state to re-render component
     const zoom = this.props.leaflet.map.getZoom();
-    console.log(['onMapZoom zoom=',zoom]);
     this.setState(prevState => ({
-      popup: {              // object that we want to update
-        ...prevState.popup, // keep all other key-value pairs
-        zoom: zoom          // update the value of specific key
-      }
+      ...prevState, // keep all other key-value pairs
+      zoom: zoom    // update the value of specific key
     }));
-    //this.setState({zoom:zoom});
   }
   
   componentDidMount() {
@@ -90,30 +85,22 @@ class XtpPopup extends React.Component {
   
   handleClick = () => {
     if (this.state.popup.picW===300) {
-      console.log('handleClick picW===300 setState 600');
       this.setState(prevState => ({
-        popup: {              // object that we want to update
-          ...prevState.popup, // keep all other key-value pairs
-          picW: 600,           // update the value of specific key
-          //picH: 800,           // update the value of specific key
-        }
+        ...prevState, // keep all other key-value pairs
+        picW: 600,           // update the value of specific key
       }));
-      //this.setState({picW:600,picH:800});
       this.popupW = 620;
-      //this.popupH = 820;
     } else {
-      console.log('handleClick picW===600 setState 300');
       this.setState(prevState => ({
-        popup: {              // object that we want to update
-          ...prevState.popup, // keep all other key-value pairs
-          picW: 300,           // update the value of specific key
-          //picH: 400,           // update the value of specific key
-        }
+        ...prevState, // keep all other key-value pairs
+        picW: 300,    // update the value of specific key
       }));
-      //this.setState({picW:300,picH:400});
       this.popupW = 320;
-      //this.popupH = 420;
     }
+  }
+  
+  handleClose = () => {
+    this.props.handleSetIndex(-1);
   }
   
   getPrevButtonState = () => {
@@ -139,7 +126,7 @@ class XtpPopup extends React.Component {
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
-    const xtpClassNames = this.state.popup.picW===300 ? 'popup single-popup' : 'popup single-popup-xtp';
+    //const xtpClassNames = this.state.popup.picW===300 ? 'popup single-popup' : 'popup single-popup-xtp';
     const auto_state = 'y';
     return (
       <Popup
@@ -151,13 +138,18 @@ class XtpPopup extends React.Component {
         }}
         onOpen={() => {
           console.log('onOpen.');
+          const c_index = parseInt(this.props.pid.slice(4));
+          this.props.handleSetIndex(c_index);
         }}
         maxWidth={this.popupW}
         autoPan={true}
-        className={xtpClassNames}
+        className="popup single-popup-xtp"
       >
         <Card className="no-margin">
           <div className="location-popup-wrapper">
+            <div className="xtp-map-popup-button-container">
+              <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
+            </div>
             <div className="location-thumbnail-image">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.popup.picW} />
             </div>

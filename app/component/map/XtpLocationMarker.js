@@ -119,6 +119,9 @@ function XtpLocationMarker(props) {
 
   // Note that pid is 'xtp_'+i;
   const pid_index = parseInt(props.pid.slice(4));
+  // If user selects "MANUAL" => popup should autoOpen ONLY WHEN "Next" or "Previous" -buttons are clicked.
+  // It should be a ONE-SHOT thing! Otherwise in MANUAL the same thing happens as in "AUTO" -mode, except 
+  // that last index is opened over and over again.
   const autoOpenByForce = getAutoByIndex(pid_index) ? true : false;
   const autoOpenByProxi = getAutoByProximity(min_distance.pid) ? true : false;
   console.log(['autoOpenByForce=',autoOpenByForce,'autoOpenByProxi=',autoOpenByProxi]);
@@ -162,6 +165,7 @@ function XtpLocationMarker(props) {
         handlePrev={props.xtpHandlePrev}
         handleNext={props.xtpHandleNext}
         toggleAuto={props.xtpToggleAuto}
+        handleSetIndex={props.xtpHandleSetIndex}
         autoOpen={props.xtpForce.auto}
       />
     </XtpIconMarker>
@@ -181,6 +185,7 @@ XtpLocationMarker.propTypes = {
   xtpToggleAuto: PropTypes.func.isRequired,
   xtpHandlePrev: PropTypes.func.isRequired,
   xtpHandleNext: PropTypes.func.isRequired,
+  xtpHandleSetIndex: PropTypes.func.isRequired,
   xtpForce: PropTypes.shape({
     auto: PropTypes.bool.isRequired,
     index: PropTypes.number.isRequired,
