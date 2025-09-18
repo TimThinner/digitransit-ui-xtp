@@ -100,7 +100,7 @@ class XtpPopup extends React.Component {
   }
   
   handleClose = () => {
-    this.props.closePopup();
+    this.props.leaflet.map.closePopup();
     this.props.handleSetIndex(-1);
   }
   
