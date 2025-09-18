@@ -123,7 +123,7 @@ class XtpPopup extends React.Component {
   }
   
   render() {
-    console.log(['Create Popup this.props.pid=',this.props.pid]);
+    //console.log(['Create Popup this.props.pid=',this.props.pid]);
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();

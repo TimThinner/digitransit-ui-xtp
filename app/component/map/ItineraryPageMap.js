@@ -172,7 +172,7 @@ const ItineraryPageMap = (
   });
   const xtp_last_index = xtpActiveMarkers.length-1;
   xtpActiveMarkers.forEach((xtp, i) => {
-    console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
+    //console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
     const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
     leafletObjs.push(

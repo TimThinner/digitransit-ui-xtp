@@ -1613,7 +1613,7 @@ div.leaflet-control-scale-line {
   display: flex;
   flex-direction: column;
   font-size: 16px;
-  margin: 10px 14px;
+  margin: 4px 14px 10px 14px;
 }
 .xtp-map-popup-button-container {
   display: flex;
@@ -1628,9 +1628,9 @@ div.leaflet-control-scale-line {
   width: 100%;
   background-color: #fff;
   line-height: 2em;
-  color: #000;
+  color: #555;
   cursor: pointer;
-  border: 1px solid #000;
+  border: 1px solid #777;
 }
 .xtp-map-popup-button-wrapper > button[disabled], 
 .xtp-map-popup-button-wrapper > button[disabled]:hover {
