@@ -124,7 +124,7 @@ function XtpLocationMarker(props) {
   // that last index is opened over and over again.
   const autoOpenByForce = getAutoByIndex(pid_index) ? true : false;
   const autoOpenByProxi = getAutoByProximity(min_distance.pid) ? true : false;
-  console.log(['autoOpenByForce=',autoOpenByForce,'autoOpenByProxi=',autoOpenByProxi]);
+  //console.log(['autoOpenByForce=',autoOpenByForce,'autoOpenByProxi=',autoOpenByProxi]);
 
   const isAutoEnabled = autoOpenByForce || autoOpenByProxi;
   

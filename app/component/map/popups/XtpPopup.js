@@ -34,7 +34,7 @@ class XtpPopup extends React.Component {
     leaflet: PropTypes.shape({
       map: PropTypes.shape({
         //openPopup: PropTypes.func.isRequired,
-        //closePopup: PropTypes.func.isRequired,
+        closePopup: PropTypes.func.isRequired,
         getZoom: PropTypes.func.isRequired,
         on: PropTypes.func.isRequired,
         off: PropTypes.func.isRequired,
@@ -100,6 +100,7 @@ class XtpPopup extends React.Component {
   }
   
   handleClose = () => {
+    this.props.closePopup();
     this.props.handleSetIndex(-1);
   }
   
@@ -137,8 +138,8 @@ class XtpPopup extends React.Component {
           console.log('onClose.');
         }}
         onOpen={() => {
-          console.log('onOpen.');
           const c_index = parseInt(this.props.pid.slice(4));
+          console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
         maxWidth={this.popupW}
