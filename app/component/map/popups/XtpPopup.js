@@ -112,7 +112,7 @@ class XtpPopup extends React.Component {
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
-    const xtpClassNames = this.state.popup.picW===240 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
+    const xtpClassNames = this.state.picW===240 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
