@@ -6,20 +6,7 @@ import React from 'react';
 import Card from '../../Card';
 import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
 import Popup from 'react-leaflet/es/Popup';
-
 /*
-  in map.scss:
-  .single-popup {
-    .leaflet-popup-content {
-      width: 320px;
-    }
-  }
-  .single-popup-xtp {
-    .leaflet-popup-content {
-      width: 420px;
-    }
-  }
-  
   pid = 'xtp_0', 'xtp_1', etc.
 */
 //export default function XtpPopup({ pid, lat, lon, xtpurl }) {
@@ -56,12 +43,10 @@ class XtpPopup extends React.Component {
     console.log(['constructor props=',props]);
     super(props);
     this.state = {
-      picW: 200,
-      picH: 267,
+      picW: 240,
+      picH: 320,
       zoom: this.props.leaflet.map.getZoom(),
     };
-    this.popupW = 270;
-    this.popupH = 360;
   }
   
   onMapZoom = () => {
@@ -84,22 +69,18 @@ class XtpPopup extends React.Component {
   }
   
   handleClick = () => {
-    if (this.state.picW===200) {
+    if (this.state.picW===240) {
       this.setState(prevState => ({
-        ...prevState, // keep all other key-value pairs
-        picW: 300,    // update the value of specific key
-        picH: 400,    // update the value of specific key
+        ...prevState,
+        picW: 480,
+        picH: 640,
       }));
-      this.popupW = 360;
-      this.popupH = 480;
     } else {
       this.setState(prevState => ({
-        ...prevState, // keep all other key-value pairs
-        picW: 200,    // update the value of specific key
-        picH: 267,    // update the value of specific key
+        ...prevState,
+        picW: 240,
+        picH: 320,
       }));
-      this.popupW = 270;
-      this.popupH = 360;
     }
   }
   
@@ -131,8 +112,6 @@ class XtpPopup extends React.Component {
     const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
-    const xtpClassNames = this.state.picW===200 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
-    const auto_state = 'y';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -146,23 +125,21 @@ class XtpPopup extends React.Component {
           console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
-        maxWidth={this.popupW}
-        maxHeight={this.popupH}
-        autoPan={true}
-        className={xtpClassNames}
+        maxWidth={this.state.picW}
+        width={this.state.picW}
+        autoPan={false}
+        className="popup single-popup-xtp"
       >
         <Card className="no-margin">
           <div className="xtp-popup-wrapper">
             <div className="xtp-map-popup-button-container">
+              <div className="xtp-map-popup-button-wrapper"><button onClick={this.props.toggleAuto}>{title}</button></div>
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
-            <div className="location-thumbnail-image">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} />
-            </div>
-            <div className="xtp-map-popup-button-container">
-              <div className="xtp-map-popup-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>Previous</button></div>
-              <div className="xtp-map-popup-button-wrapper"><button disabled={!auto_state} onClick={this.props.toggleAuto}>{title}</button></div>
-              <div className="xtp-map-popup-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>Next</button></div>
+            <div className="xtp-image-container">
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} alt="" />
+              <div className="xtp-left-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>&nbsp;&#x1F808;&nbsp;</button></div>
+              <div className="xtp-right-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>&nbsp;&#x1F80A;&nbsp;</button></div>
             </div>
           </div>
         </Card>
