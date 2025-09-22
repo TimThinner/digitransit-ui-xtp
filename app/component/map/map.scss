@@ -676,6 +676,14 @@ div.leaflet-marker-icon.vehicle-icon {
     display: none;
   }
 }
+.single-popup-xtp-zoomed {
+  .leaflet-popup-content {
+    width: 480px;
+  }
+  .leaflet-popup-close-button {
+    display: none;
+  }
+}
 
 .narrow-popup {
   .leaflet-popup-content {
@@ -1645,40 +1653,50 @@ div.leaflet-control-scale-line {
   position: relative;
 }
 .xtp-left-button-wrapper {
-	position: absolute;
-	top: 0;
-	left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-10px);
 }
 .xtp-left-button-wrapper > button {
-	height: 200px;
-	background: rgba(255,255,255,1);
-	color: #000;
-	font-size:20px;
-	cursor: pointer;
+  height: 200px;
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  font-size:16px;
+  cursor: pointer;
+}
+.xtp-left-button-wrapper > button:hover {
+  height: 200px;
+  background: rgba(255,255,255,1);
+  color: #000;
+  font-size:16px;
+  cursor: pointer;
 }
 .xtp-left-button-wrapper > button[disabled],
 .xtp-left-button-wrapper > button[disabled]:hover {
-	color: #fff;
-	background: rgba(255,255,255,1);
-	cursor: default;
-	border: 1px solid #ccc;
+  color: #fff;
+  background: rgba(255,255,255,0);
+  cursor: default;
+  border: 1px solid #ccc;
 }
+
 .xtp-right-button-wrapper {
-	position: absolute;
-	top: 0;
-	right: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(10px);
 }
 .xtp-right-button-wrapper > button {
-	height: 200px;
-	background: rgba(255,255,255,1);
-	color: #000;
-	font-size:20px;
-	cursor: pointer;
+  height: 200px;
+  background: rgba(255,255,255,1);
+  color: #000;
+  font-size:20px;
+  cursor: pointer;
 }
 .xtp-right-button-wrapper > button[disabled],
 .xtp-right-button-wrapper > button[disabled]:hover {
-	color: #fff;
-	background: rgba(255,255,255,1);
-	cursor: default;
-	border: 1px solid #ccc;
+  color: #fff;
+  background: rgba(255,255,255,0);
+  cursor: default;
+  border: 1px solid #ccc;
 }
