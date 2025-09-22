@@ -670,6 +670,7 @@ div.leaflet-marker-icon.vehicle-icon {
 }
 .single-popup-xtp {
   .leaflet-popup-content {
+    padding: 0 10px;
     width: 240px;
   }
   .leaflet-popup-close-button {
@@ -678,6 +679,7 @@ div.leaflet-marker-icon.vehicle-icon {
 }
 .single-popup-xtp-zoomed {
   .leaflet-popup-content {
+    padding: 0 10px;
     width: 480px;
   }
   .leaflet-popup-close-button {
