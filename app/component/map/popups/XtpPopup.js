@@ -149,7 +149,7 @@ class XtpPopup extends React.Component {
                   <div className="toggle-label-text">
                     {this.context.intl.formatMessage({ 
                       id: 'xtp-auto-manual',
-                      defaultMessage: 'Auto/Manual',
+                      defaultMessage: 'Auto',
                     })}
                   </div>
                   <Toggle
