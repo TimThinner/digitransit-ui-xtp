@@ -1658,46 +1658,40 @@ div.leaflet-control-scale-line {
   position: absolute;
   top: 0;
   left: 0;
-  transform: translateX(-16px);
+  transform: translateX(-24px);
 }
 .xtp-left-button-wrapper > button {
   height: 200px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.75);
   color: #000;
   font-size:24px;
   cursor: pointer;
-}
-.xtp-left-button-wrapper > button:hover {
-  background: rgba(255,255,255,1);
 }
 .xtp-left-button-wrapper > button[disabled],
 .xtp-left-button-wrapper > button[disabled]:hover {
   color: #ccc;
   background: rgba(255,255,255,0);
   cursor: default;
-  border: 1px solid #ccc;
+  border: none;
 }
 
 .xtp-right-button-wrapper {
   position: absolute;
   top: 0;
   right: 0;
-  transform: translateX(16px);
+  transform: translateX(24px);
 }
 .xtp-right-button-wrapper > button {
   height: 200px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.75);
   color: #000;
   font-size:24px;
   cursor: pointer;
-}
-.xtp-right-button-wrapper > button:hover {
-  background: rgba(255,255,255,1);
 }
 .xtp-right-button-wrapper > button[disabled],
 .xtp-right-button-wrapper > button[disabled]:hover {
   color: #ccc;
   background: rgba(255,255,255,0);
   cursor: default;
-  border: 1px solid #ccc;
+  border: none;
 }

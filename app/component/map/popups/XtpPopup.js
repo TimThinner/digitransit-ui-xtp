@@ -109,9 +109,11 @@ class XtpPopup extends React.Component {
   
   render() {
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
-    const title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
+    const a_title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
+    const p_title = prev_state==='' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '&nbsp;&nbsp;&lt;&nbsp;&nbsp;';
+    const n_title = next_state==='' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '&nbsp;&nbsp;&gt;&nbsp;&nbsp;';
     const xtpClassNames = this.state.picW===240 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     return (
       <Popup
@@ -134,13 +136,13 @@ class XtpPopup extends React.Component {
         <Card className="no-margin">
           <div className="xtp-popup-wrapper">
             <div className="xtp-map-popup-button-container">
-              <div className="xtp-map-popup-button-wrapper"><button onClick={this.props.toggleAuto}>{title}</button></div>
+              <div className="xtp-map-popup-button-wrapper"><button onClick={this.props.toggleAuto}>{a_title}</button></div>
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} alt="" />
-              <div className="xtp-left-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>&nbsp;&nbsp;&lt;&nbsp;&nbsp;</button></div>
-              <div className="xtp-right-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</button></div>
+              <div className="xtp-left-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
+              <div className="xtp-right-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>
           </div>
         </Card>
