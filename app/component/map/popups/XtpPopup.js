@@ -139,8 +139,8 @@ class XtpPopup extends React.Component {
             </div>
             <div className="xtp-image-container">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} alt="" />
-              <div className="xtp-left-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>&nbsp;&#x1F808;&nbsp;</button></div>
-              <div className="xtp-right-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>&nbsp;&#x1F80A;&nbsp;</button></div>
+              <div className="xtp-left-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>&nbsp;&nbsp;&lt;&nbsp;&nbsp;</button></div>
+              <div className="xtp-right-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</button></div>
             </div>
           </div>
         </Card>
