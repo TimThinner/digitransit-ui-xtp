@@ -112,8 +112,8 @@ class XtpPopup extends React.Component {
     const a_title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
-    const p_title = prev_state==='' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '&nbsp;&nbsp;&lt;&nbsp;&nbsp;';
-    const n_title = next_state==='' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '&nbsp;&nbsp;&gt;&nbsp;&nbsp;';
+    const p_title = prev_state==='' ? '' : '&lt;';
+    const n_title = next_state==='' ? '' : '&gt;';
     const xtpClassNames = this.state.picW===240 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     return (
       <Popup
