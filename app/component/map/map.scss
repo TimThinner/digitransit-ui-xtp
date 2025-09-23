@@ -1660,7 +1660,8 @@ div.leaflet-control-scale-line {
   left: 0;
   transform: translateX(-24px);
 }
-.xtp-left-button-wrapper > button {
+.xtp-left-button-wrapper > button,
+.xtp-left-button-wrapper > button:hover {
   height: 200px;
   width: 44px;
   background: rgba(255,255,255,0.75);
@@ -1668,6 +1669,7 @@ div.leaflet-control-scale-line {
   font-size:24px;
   cursor: pointer;
 }
+
 .xtp-left-button-wrapper > button[disabled],
 .xtp-left-button-wrapper > button[disabled]:hover {
   color: #ccc;
@@ -1682,7 +1684,8 @@ div.leaflet-control-scale-line {
   right: 0;
   transform: translateX(24px);
 }
-.xtp-right-button-wrapper > button {
+.xtp-right-button-wrapper > button,
+.xtp-right-button-wrapper > button:hover {
   height: 200px;
   width: 44px;
   background: rgba(255,255,255,0.75);
