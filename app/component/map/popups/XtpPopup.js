@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 //import React, { useState } from 'react';
 //import React, { useRef, useState, useEffect } from 'react';
 import React from 'react';
-//import { configShape } from '../../../util/shapes';
+import { locationShape } from '../../../util/shapes';
 import Card from '../../Card';
 import Toggle from '../../Toggle';
 import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
@@ -36,6 +36,7 @@ class XtpPopup extends React.Component {
     handleSetIndex: PropTypes.func.isRequired,
     toggleAuto: PropTypes.func.isRequired,
     autoOpen: PropTypes.bool.isRequired,
+    locationState: locationShape.isRequired,
   };
   
   constructor(props) {
@@ -97,6 +98,16 @@ class XtpPopup extends React.Component {
     return c_index !== 0 ? 'y' : '';
   }
   
+  getToggleModeClass = () => {
+    if (this.props.autoOpen) {
+      if (this.props.locationState.lat===0 && this.props.locationState.lon===0) {
+        return 'xtp-navi-auto-inactive';
+      } else {
+        return 'xtp-navi-auto';
+    }
+    return 'xtp-navi-manual';
+  }
+  
   getNextButtonState = () => {
     const c_index = parseInt(this.props.pid.slice(4));
     if (this.props.autoOpen) {
@@ -109,7 +120,8 @@ class XtpPopup extends React.Component {
   render() {
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
     const a_title = this.props.autoOpen ? 'Auto ON' : 'Auto OFF';
-    const toggleModeClassName = this.props.autoOpen ? 'xtp-navi-auto' : 'xtp-navi-manual';
+    const toggleModeClassName = this.getToggleModeClass();
+    //const toggleModeClassName = this.props.autoOpen ? 'xtp-navi-auto' : 'xtp-navi-manual';
     // Try how the map behaves when autoPanning is always true.
     //const autoPan = this.props.autoOpen ? false : true; // Automatic pan in manual mode.
     const prev_state = this.getPrevButtonState();

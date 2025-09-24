@@ -90,7 +90,7 @@ function XtpLocationMarker(props) {
   // name: PropTypes.string,
   const within_activation_range = [];
   props.xtp_active_markers.forEach((am_xtp, i) => {
-    console.log(['props.locationState lat=',props.locationState.lat,'lon=',props.locationState.lon]);
+    //console.log(['props.locationState lat=',props.locationState.lat,'lon=',props.locationState.lon]);
     const dist = distance(am_xtp, props.locationState);
     if (dist <= am_xtp.activation_range) {
       const pid = 'xtp_'+i;
@@ -173,6 +173,7 @@ function XtpLocationMarker(props) {
         toggleAuto={props.xtpToggleAuto}
         handleSetIndex={props.xtpHandleSetIndex}
         autoOpen={props.xtpForce.auto}
+        locationState={props.locationState}
       />
     </XtpIconMarker>
   );
