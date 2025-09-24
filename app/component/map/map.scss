@@ -672,6 +672,9 @@ div.leaflet-marker-icon.vehicle-icon {
   .leaflet-popup-content {
     padding: 0 10px;
     width: 240px;
+    .card {
+      overflow-x: visible;
+    }
   }
   .leaflet-popup-close-button {
     display: none;
@@ -681,6 +684,9 @@ div.leaflet-marker-icon.vehicle-icon {
   .leaflet-popup-content {
     padding: 0 10px;
     width: 480px;
+    .card {
+      overflow-x: visible;
+    }
   }
   .leaflet-popup-close-button {
     display: none;
