@@ -1635,17 +1635,20 @@ div.leaflet-control-scale-line {
 }
 .xtp-map-popup-button-wrapper > button {
   width: 100%;
-  background-color: #fff;
+  background: rgba(255,255,255,1);
   line-height: 2em;
   color: #555;
   cursor: pointer;
   border: 1px solid #777;
+  border-radius: 8px;
 }
 .xtp-map-popup-button-wrapper > button.xtp-navi-auto {
-  border: 4px solid #007ac9;
+  background: rgba(0,122,201,1);
+  color: #fff;
 }
 .xtp-map-popup-button-wrapper > button.xtp-navi-manual {
-  border: 1px solid #000;
+  background: rgba(255,255,255,1);
+  color: #555;
 }
 
 .xtp-image-container {
