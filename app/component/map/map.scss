@@ -670,7 +670,7 @@ div.leaflet-marker-icon.vehicle-icon {
 }
 .single-popup-xtp {
   .leaflet-popup-content {
-    padding: 0;
+    padding: 0 10px;
     width: 240px;
   }
   .leaflet-popup-close-button {
@@ -679,7 +679,7 @@ div.leaflet-marker-icon.vehicle-icon {
 }
 .single-popup-xtp-zoomed {
   .leaflet-popup-content {
-    padding: 0;
+    padding: 0 10px;
     width: 480px;
   }
   .leaflet-popup-close-button {
@@ -1641,14 +1641,11 @@ div.leaflet-control-scale-line {
   cursor: pointer;
   border: 1px solid #777;
 }
-.xtp-map-popup-button-wrapper > button[disabled], 
-.xtp-map-popup-button-wrapper > button[disabled]:hover {
-  width: 100%;
-  background-color: #fff;
-  line-height: 2em;
-  color: #ccc;
-  cursor: default;
-  border: 1px solid #ccc;
+.xtp-map-popup-button-wrapper > button.xtp-navi-auto {
+  border: 4px solid #007ac9;
+}
+.xtp-map-popup-button-wrapper > button.xtp-navi-manual {
+  border: 1px solid #000;
 }
 
 .xtp-image-container {

@@ -7,7 +7,6 @@ import Card from '../../Card';
 import Toggle from '../../Toggle';
 import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
 import Popup from 'react-leaflet/es/Popup';
-import { intlShape } from 'react-intl';
 /*
   pid = 'xtp_0', 'xtp_1', etc.
 */
@@ -16,9 +15,6 @@ import { intlShape } from 'react-intl';
 // See similar example at function SelectStopRow  !!!!!
 
 class XtpPopup extends React.Component {
-  static contextTypes = {
-    intl: intlShape.isRequired,
-  };
   static displayName = 'XtpPopup';
   static propTypes = {
     leaflet: PropTypes.shape({
@@ -111,10 +107,10 @@ class XtpPopup extends React.Component {
   }
   
   render() {
-    const { intl } = this.context;
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
-    //<div className="xtp-map-popup-button-wrapper"><button onClick={this.props.toggleAuto}>{a_title}</button></div>
-    const a_title = this.props.autoOpen ? 'AUTO' : 'MANUAL';
+    const a_title = this.props.autoOpen ? 'Auto ON' : 'Auto OFF';
+    const toggleModeClassName = this.props.autoOpen ? 'xtp-navi-auto' : 'xtp-navi-manual';
+    const autoPan = this.props.autoOpen ? false : true; // Automatic pan in manual mode.
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
     const p_title = prev_state==='' ? '' : '<';
@@ -135,32 +131,13 @@ class XtpPopup extends React.Component {
         }}
         maxWidth={this.state.picW}
         width={this.state.picW}
-        autoPan={false}
+        autoPan={autoPan}
         className={xtpClassNames}
       >
         <Card className="no-margin">
           <div className="xtp-popup-wrapper">
             <div className="xtp-map-popup-button-container">
-              <div className="xtp-map-popup-button-wrapper">
-                <label
-                  htmlFor={`toggle-auto-${this.props.pid}`}
-                  className="settings-header toggle-label"
-                >
-                  <div className="toggle-label-text">
-                    {this.context.intl.formatMessage({ 
-                      id: 'xtp-auto-manual',
-                      defaultMessage: 'Auto',
-                    })}
-                  </div>
-                  <Toggle
-                    id={`toggle-auto-${this.props.pid}`}
-                    toggled={this.props.autoOpen}
-                    onToggle={() => {
-                      this.props.toggleAuto();
-                    }}
-                  />
-                </label>
-              </div>
+              <div className="xtp-map-popup-button-wrapper"><button className={toggleModeClassName} onClick={this.props.toggleAuto}>{a_title}</button></div>
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
