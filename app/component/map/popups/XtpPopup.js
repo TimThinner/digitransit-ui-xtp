@@ -108,7 +108,7 @@ class XtpPopup extends React.Component {
   
   render() {
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
-    const a_title = this.props.autoOpen ? 'GPS ON' : 'GPS OFF';
+    const a_title = this.props.autoOpen ? 'Auto ON' : 'Auto OFF';
     const toggleModeClassName = this.props.autoOpen ? 'xtp-navi-auto' : 'xtp-navi-manual';
     const autoPan = this.props.autoOpen ? false : true; // Automatic pan in manual mode.
     const prev_state = this.getPrevButtonState();
