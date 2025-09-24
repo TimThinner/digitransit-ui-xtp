@@ -104,6 +104,7 @@ class XtpPopup extends React.Component {
         return 'xtp-navi-auto-inactive';
       } else {
         return 'xtp-navi-auto';
+      }
     }
     return 'xtp-navi-manual';
   }
