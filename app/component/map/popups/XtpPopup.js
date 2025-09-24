@@ -110,7 +110,8 @@ class XtpPopup extends React.Component {
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
     const a_title = this.props.autoOpen ? 'Auto ON' : 'Auto OFF';
     const toggleModeClassName = this.props.autoOpen ? 'xtp-navi-auto' : 'xtp-navi-manual';
-    const autoPan = this.props.autoOpen ? false : true; // Automatic pan in manual mode.
+    // Try how the map behaves when autoPanning is always true.
+    //const autoPan = this.props.autoOpen ? false : true; // Automatic pan in manual mode.
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
     const p_title = prev_state==='' ? '' : '<';
@@ -131,7 +132,7 @@ class XtpPopup extends React.Component {
         }}
         maxWidth={this.state.picW}
         width={this.state.picW}
-        autoPan={autoPan}
+        autoPan={true}
         className={xtpClassNames}
       >
         <Card className="no-margin">
