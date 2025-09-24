@@ -51,7 +51,6 @@ const ItineraryPageMap = (
   const [xtpForce, setXtpForce] = useState({auto:true,index:0});
   
   const xtpToggleAuto = () => {
-    // Check if we can make sure here that GPS is on when auto is true
     if (xtpForce.auto) {
       setXtpForce({...xtpForce,auto:false});
     } else {
