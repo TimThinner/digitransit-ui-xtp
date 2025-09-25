@@ -145,7 +145,7 @@ class XtpPopup extends React.Component {
         }}
         maxWidth={this.state.picW}
         width={this.state.picW}
-        autoPan={true}
+        autoPan={false}
         className={xtpClassNames}
       >
         <Card className="no-margin">
