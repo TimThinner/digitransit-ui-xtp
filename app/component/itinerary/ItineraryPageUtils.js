@@ -642,36 +642,3 @@ export const isStoredItineraryRelevant = ({ itinerary, params }, match) => {
     params.secondHash === match.params.secondHash
   );
 };
-
-export function getXtpMockData() {
-  const a = [
-    {
-      "edge_index": 0,
-      "leg_index": 0,
-      "type": "photo",
-      "url": "https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg",
-      "lat": 60.174906,
-      "lon": 24.803302,
-      "name": "Tapiola (M)"
-    },
-    {
-      "edge_index": 0,
-      "leg_index": 1,
-      "type": "photo",
-      "url": "https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg",
-      "lat": 60.175017,
-      "lon": 24.803463,
-      "name": "Tapiola"
-    },
-    {
-      "edge_index": 0,
-      "leg_index": 2,
-      "type": "photo",
-      "url": "https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg",
-      "lat": 60.170379,
-      "lon": 24.939846,
-      "name": "Rautatientori"
-    }
-  ];
-  return a;
-}

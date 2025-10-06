@@ -143,8 +143,8 @@ class XtpPopup extends React.Component {
           console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
-        maxWidth={this.state.picW}
-        width={this.state.picW}
+        maxWidth={this.state.picW+'px'}
+        width={this.state.picW+'px'}
         autoPan={false}
         className={xtpClassNames}
       >
