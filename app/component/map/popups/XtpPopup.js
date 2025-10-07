@@ -43,8 +43,7 @@ class XtpPopup extends React.Component {
     console.log(['constructor props=',props]);
     super(props);
     this.state = {
-      picW: 240,
-      picH: 320,
+      size: 'S',
       zoom: this.props.leaflet.map.getZoom(),
     };
   }
@@ -68,18 +67,28 @@ class XtpPopup extends React.Component {
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
   }
   
+  //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
+  getMapDimensions = () => {
+    const dim = {w:0,h:0};
+    const elems = document.querySelectorAll('div.leaflet-container');
+    [...elems].forEach(e=>{
+      dim.w = e.clientWidth;
+      dim.h = e.clientHeight;
+    });
+    console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
+    return dim;
+  }
+  
   handleClick = () => {
-    if (this.state.picW===240) {
+    if (this.state.size==='S') {
       this.setState(prevState => ({
         ...prevState,
-        picW: 480,
-        picH: 640,
+        size: 'L',
       }));
     } else {
       this.setState(prevState => ({
         ...prevState,
-        picW: 240,
-        picH: 320,
+        size: 'S',
       }));
     }
   }
@@ -122,15 +131,14 @@ class XtpPopup extends React.Component {
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
     const a_title = this.props.autoOpen ? 'Auto ON' : 'Auto OFF';
     const toggleModeClassName = this.getToggleModeClass();
-    //const toggleModeClassName = this.props.autoOpen ? 'xtp-navi-auto' : 'xtp-navi-manual';
-    // Try how the map behaves when autoPanning is always true.
-    //const autoPan = this.props.autoOpen ? false : true; // Automatic pan in manual mode.
     const prev_state = this.getPrevButtonState();
     const next_state = this.getNextButtonState();
     const p_title = prev_state==='' ? '' : '<';
     const n_title = next_state==='' ? '' : '>';
-    const xtpClassNames = this.state.picW===240 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
-    const btnClass = this.state.picW===240 ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
+    const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
+    const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
+    const mapdim = this.getMapDimensions();
+    const dimw = this.state.size==='S' ? mapdim.w/2 : mapdim.w;
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -144,8 +152,8 @@ class XtpPopup extends React.Component {
           console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
-        maxWidth={this.state.picW+'px'}
-        width={this.state.picW+'px'}
+        maxWidth={dimw+'px'}
+        width={dimw+'px'}
         autoPan={false}
         className={xtpClassNames}
       >
@@ -156,7 +164,7 @@ class XtpPopup extends React.Component {
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} alt="" />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={dimw} alt="" />
               <div className="xtp-popup-left-button-wrapper"><button className={btnClass} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
               <div className="xtp-popup-right-button-wrapper"><button className={btnClass} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>
