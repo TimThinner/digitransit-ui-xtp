@@ -151,7 +151,8 @@ class XtpPopup extends React.Component {
     const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     const mapdim = this.getMapDimensions();
     const dimw = this.state.size==='S' ? mapdim.w/4 : mapdim.w/2;
-    const dimwpx = dimw+'px';
+    const dimwfloor = Math.floor(dimw);
+    const dimwfloorpx = dimwfloor+'px';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -165,8 +166,8 @@ class XtpPopup extends React.Component {
           console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
-        maxWidth={dimwpx}
-        width={dimwpx}
+        maxWidth={dimwfloorpx}
+        width={dimwfloorpx}
         autoPan={false}
         className={xtpClassNames}
       >
@@ -177,7 +178,7 @@ class XtpPopup extends React.Component {
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={dimw} alt="" />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={dimwfloor} alt="" />
               <div className="xtp-popup-left-button-wrapper"><button className={btnClass} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
               <div className="xtp-popup-right-button-wrapper"><button className={btnClass} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>
