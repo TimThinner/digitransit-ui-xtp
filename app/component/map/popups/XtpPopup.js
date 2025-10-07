@@ -130,6 +130,7 @@ class XtpPopup extends React.Component {
     const p_title = prev_state==='' ? '' : '<';
     const n_title = next_state==='' ? '' : '>';
     const xtpClassNames = this.state.picW===240 ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
+    const btnClass = this.state.picW===240 ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -156,8 +157,8 @@ class XtpPopup extends React.Component {
             </div>
             <div className="xtp-image-container">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={this.state.picW} height={this.state.picH} alt="" />
-              <div className="xtp-left-button-wrapper"><button disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
-              <div className="xtp-right-button-wrapper"><button disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
+              <div className="xtp-popup-left-button-wrapper"><button className={btnClass} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
+              <div className="xtp-popup-right-button-wrapper"><button className={btnClass} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>
           </div>
         </Card>
