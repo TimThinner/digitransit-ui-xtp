@@ -1665,7 +1665,9 @@ div.leaflet-control-scale-line {
 .xtp-image-container {
   position: relative;
 }
-
+.xtp-image-container > img {
+  height: auto;
+}
 .xtp-popup-left-button-wrapper {
   position: absolute;
   top: 40px;
