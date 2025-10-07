@@ -43,9 +43,19 @@ class XtpPopup extends React.Component {
     console.log(['constructor props=',props]);
     super(props);
     this.state = {
+      width: 0,
+      height: 0,
       size: 'S',
       zoom: this.props.leaflet.map.getZoom(),
     };
+  }
+  
+  updateDimensions = () => {
+    this.setState(prevState => ({
+      ...prevState, // keep all other key-value pairs
+      width: window.innerWidth,
+      height: window.innerHeight,
+    }));
   }
   
   onMapZoom = () => {
@@ -53,18 +63,20 @@ class XtpPopup extends React.Component {
     const zoom = this.props.leaflet.map.getZoom();
     this.setState(prevState => ({
       ...prevState, // keep all other key-value pairs
-      zoom: zoom    // update the value of specific key
+      zoom: zoom,   // update the value of specific key
     }));
   }
   
   componentDidMount() {
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
+    window.addEventListener('resize', this.updateDimensions);
   }
 
   componentWillUnmount() {
     console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
+    window.removeEventListener('resize', this.updateDimensions);
   }
   
   //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
