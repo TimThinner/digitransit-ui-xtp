@@ -138,7 +138,8 @@ class XtpPopup extends React.Component {
     const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     const mapdim = this.getMapDimensions();
-    const dimw = this.state.size==='S' ? mapdim.w/2 : mapdim.w;
+    const dimw = this.state.size==='S' ? mapdim.w/4 : mapdim.w/2;
+    const dimwpx = dimw+'px';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -152,8 +153,8 @@ class XtpPopup extends React.Component {
           console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
-        maxWidth={dimw+'px'}
-        width={dimw+'px'}
+        maxWidth={dimwpx}
+        width={dimwpx}
         autoPan={false}
         className={xtpClassNames}
       >
