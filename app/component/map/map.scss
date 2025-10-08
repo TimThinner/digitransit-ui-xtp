@@ -1670,20 +1670,20 @@ div.leaflet-control-scale-line {
 }
 .xtp-popup-left-button-wrapper {
   position: absolute;
-  top: 40px;
+  top: 0px;
   left: 0;
   transform: translateX(-30px);
 }
 .xtp-popup-right-button-wrapper {
   position: absolute;
-  top: 40px;
+  top: 0px;
   right: 0;
   transform: translateX(30px);
 }
 .xtp-popup-navi-button,
 .xtp-popup-navi-button:hover {
-  height: 160px;
-  width: 50px;
+  height: 165px;
+  width: 40px;
   background: rgba(255,255,255,0.75);
   color: #000;
   font-size:24px;
@@ -1698,5 +1698,5 @@ div.leaflet-control-scale-line {
   border: none;
 }
 .xtp-popup-navi-button.zoomed {
-  height: 320px;
+  height: 345px;
 }

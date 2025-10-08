@@ -138,6 +138,24 @@ class XtpPopup extends React.Component {
     // "Next"-button is enabled if current-index is smaller than last index.
     return c_index < this.props.xtp_last_index ? 'y' : '';
   }
+  // Minimum width for small picture ('S') is 220px and for 'L' 460px
+  getPicWidth = (mapdim) => {
+    const min_S_pic_w = 220;
+    const min_L_pic_w = 460;
+    if (this.state.size==='S') {
+      const w = Math.floor(mapdim.w/4);
+      if (w < min_S_pic_w) {
+        return min_S_pic_w;
+      }
+      return w;
+    } else {
+      const w = Math.floor(mapdim.w/2);
+      if (w < min_L_pic_w) {
+        return min_L_pic_w;
+      }
+      return w;
+    }
+  }
   
   render() {
     //console.log(['Create Popup this.props.pid=',this.props.pid]);
@@ -150,9 +168,8 @@ class XtpPopup extends React.Component {
     const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     const mapdim = this.getMapDimensions();
-    const dimw = this.state.size==='S' ? mapdim.w/4 : mapdim.w/2;
-    const dimwfloor = Math.floor(dimw);
-    const dimwfloorpx = dimwfloor+'px';
+    const dimw = this.getPicWidth(mapdim);
+    const dimwpx = dimw+'px';
     return (
       <Popup
         position={{ lat: this.props.lat+0.0001, lng: this.props.lon }}
@@ -166,8 +183,8 @@ class XtpPopup extends React.Component {
           console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
-        maxWidth={dimwfloorpx}
-        width={dimwfloorpx}
+        maxWidth={dimwpx}
+        width={dimwpx}
         autoPan={false}
         className={xtpClassNames}
       >
@@ -178,7 +195,7 @@ class XtpPopup extends React.Component {
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={dimwfloor} alt="" />
+              <img onClick={this.handleClick} src={this.props.xtpurl} width={dimw} alt="" />
               <div className="xtp-popup-left-button-wrapper"><button className={btnClass} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
               <div className="xtp-popup-right-button-wrapper"><button className={btnClass} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>
