@@ -50,6 +50,17 @@ class XtpPopup extends React.Component {
     };
   }
   
+  getMapDimensions = () => {
+    const dim = {w:0,h:0};
+    const elems = document.querySelectorAll('div.leaflet-container');
+    [...elems].forEach(e=>{
+      dim.w = e.clientWidth;
+      dim.h = e.clientHeight;
+    });
+    //console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
+    return dim;
+  }
+  
   updateDimensions = () => {
     this.setState(prevState => ({
       ...prevState, // keep all other key-value pairs
@@ -67,7 +78,27 @@ class XtpPopup extends React.Component {
     }));
   }
   
+  componentDidUpdate() {
+    // Runs immediately after the DOM has been updated.
+    // Adjust CSS "hard-coded" popup width (240px or 480px).
+    console.log('componentDidUpdate');
+    const mapdim = this.getMapDimensions();
+    const min_S_popup_w = mapdim.w < 240 ? mapdim.w : 240;
+    const min_L_popup_w = mapdim.w < 480 ? mapdim.w : 480;
+    // .leaflet-popup-content {
+    //  width: 240px; or width: 480px;
+    const elems = document.querySelectorAll('.leaflet-popup-content');
+    [...elems].forEach(e=>{
+      if (this.state.size==='S') {
+        e.width = min_S_popup_w + 'px';
+      } else {
+        e.width = min_L_popup_w + 'px';
+      }
+    });
+  }
+  
   componentDidMount() {
+    // Runs immediately after the DOM has been updated.
     console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
     window.addEventListener('resize', this.updateDimensions);
@@ -77,18 +108,6 @@ class XtpPopup extends React.Component {
     console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
     window.removeEventListener('resize', this.updateDimensions);
-  }
-  
-  //Can we size the "zoomed" picture to half height (bottom half) and whole width of element "div.leaflet-container"?
-  getMapDimensions = () => {
-    const dim = {w:0,h:0};
-    const elems = document.querySelectorAll('div.leaflet-container');
-    [...elems].forEach(e=>{
-      dim.w = e.clientWidth;
-      dim.h = e.clientHeight;
-    });
-    console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
-    return dim;
   }
   
   handleClick = () => {
@@ -138,6 +157,7 @@ class XtpPopup extends React.Component {
     // "Next"-button is enabled if current-index is smaller than last index.
     return c_index < this.props.xtp_last_index ? 'y' : '';
   }
+  
   // Minimum width for small picture ('S') is 220px and for 'L' 460px
   // BUT never return picture width greater than leaflet-container client-width
   getPicWidth = (mapdimw) => {
