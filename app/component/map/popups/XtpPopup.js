@@ -139,17 +139,18 @@ class XtpPopup extends React.Component {
     return c_index < this.props.xtp_last_index ? 'y' : '';
   }
   // Minimum width for small picture ('S') is 220px and for 'L' 460px
-  getPicWidth = (mapdim) => {
-    const min_S_pic_w = 220;
-    const min_L_pic_w = 460;
+  // BUT never return picture width greater than leaflet-container client-width
+  getPicWidth = (mapdimw) => {
     if (this.state.size==='S') {
-      const w = Math.floor(mapdim.w/4);
+      const min_S_pic_w = mapdimw < 220 ? mapdimw : 220;
+      const w = Math.floor(mapdimw/4);
       if (w < min_S_pic_w) {
         return min_S_pic_w;
       }
       return w;
     } else {
-      const w = Math.floor(mapdim.w/2);
+      const min_L_pic_w = mapdimw < 460 ? mapdimw : 460;
+      const w = Math.floor(mapdimw/2);
       if (w < min_L_pic_w) {
         return min_L_pic_w;
       }
@@ -168,7 +169,7 @@ class XtpPopup extends React.Component {
     const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
     const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     const mapdim = this.getMapDimensions();
-    const dimw = this.getPicWidth(mapdim);
+    const dimw = this.getPicWidth(mapdim.w);
     const dimwpx = dimw+'px';
     return (
       <Popup
