@@ -77,7 +77,7 @@ class XtpPopup extends React.Component {
       zoom: zoom,   // update the value of specific key
     }));
   }
-  
+  /*
   componentDidUpdate() {
     // Runs immediately after the DOM has been updated.
     // Adjust CSS "hard-coded" popup width (240px or 480px).
@@ -96,7 +96,7 @@ class XtpPopup extends React.Component {
       }
     });
   }
-  
+  */
   componentDidMount() {
     // Runs immediately after the DOM has been updated.
     console.log('componentDidMount');
@@ -161,6 +161,7 @@ class XtpPopup extends React.Component {
   // Minimum width for small picture ('S') is 220px and for 'L' 460px
   // BUT never return picture width greater than leaflet-container client-width
   getPicWidth = (mapdimw) => {
+    /*
     if (this.state.size==='S') {
       const min_S_pic_w = mapdimw < 220 ? mapdimw : 220;
       const w = Math.floor(mapdimw/4);
@@ -176,6 +177,47 @@ class XtpPopup extends React.Component {
       }
       return w;
     }
+    */
+    let w = 0;
+    let c = 0;
+    if (this.state.size==='S') {
+      w = Math.floor(mapdimw/4);
+    } else {
+      w = Math.floor(mapdimw/2);
+    }
+    if (w >= 0 && w < 340) {
+      c = 220; // minimum popup width 240px pic 220px
+    } else if (w >= 340 && w < 440) {
+      c = 320;
+    } else if (w >= 440 && w < 540) {
+      c = 420:
+    } else if (w >= 540 && w < 640) {
+      c = 520;
+    } else {
+      c = 620;
+    }
+    return c;
+  }
+  
+  getPopupClasses = (mapdimw) => {
+    let w = 0;
+    let c = 'popup ';
+    if (this.state.size==='S') {
+      w = Math.floor(mapdimw/4);
+    } else {
+      w = Math.floor(mapdimw/2);
+    }
+    if (w >= 0 && w < 340) {
+      c += 'single-popup-xtp'; // minimum popup width 240px pic 220px
+    } else if (w >= 340 && w < 440) {
+      c += 'single-popup-xtp w340px'; // popup 340px pic 320px
+    } else if (w >= 440 && w < 540) {
+      c += 'single-popup-xtp w440px';
+    } else if (w >= 540 && w < 640) {
+      c += 'single-popup-xtp w540px';
+    } else {
+      c += 'single-popup-xtp w640px';
+    }
   }
   
   render() {
@@ -186,9 +228,17 @@ class XtpPopup extends React.Component {
     const next_state = this.getNextButtonState();
     const p_title = prev_state==='' ? '' : '<';
     const n_title = next_state==='' ? '' : '>';
-    const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
-    const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
+    /*
+    "single-popup-xtp" => 240px
+    "single-popup-xtp w300" => 340px 
+    "single-popup-xtp w400" => 440px 
+    "single-popup-xtp w500" => 540px 
+    "single-popup-xtp w600" => 640px 
+    */
     const mapdim = this.getMapDimensions();
+    //const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
+    const xtpClassNames = this.getPopupClasses(mapdim.w);
+    const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     const dimw = this.getPicWidth(mapdim.w);
     const dimwpx = dimw+'px';
     return (

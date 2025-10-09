@@ -668,30 +668,6 @@ div.leaflet-marker-icon.vehicle-icon {
     width: 320px;
   }
 }
-.single-popup-xtp {
-  .leaflet-popup-content {
-    padding: 2px;
-    width: 240px;
-    .card {
-      overflow-x: visible;
-    }
-  }
-  .leaflet-popup-close-button {
-    display: none;
-  }
-}
-.single-popup-xtp-zoomed {
-  .leaflet-popup-content {
-    padding: 2px;
-    width: 480px;
-    .card {
-      overflow-x: visible;
-    }
-  }
-  .leaflet-popup-close-button {
-    display: none;
-  }
-}
 
 .narrow-popup {
   .leaflet-popup-content {
@@ -1621,6 +1597,39 @@ div.leaflet-control-scale-line {
     height: 54px;
     margin-top: -27px;
     margin-left: -27px;
+  }
+}
+
+.single-popup-xtp {
+  .leaflet-popup-content {
+    padding: 2px;
+    width: 240px;
+    .card {
+      overflow-x: visible;
+    }
+  }
+  .leaflet-popup-close-button {
+    display: none;
+  }
+}
+.single-popup-xtp.w340px {
+  .leaflet-popup-content {
+    width: 340px;
+  }
+}
+.single-popup-xtp.w440px {
+  .leaflet-popup-content {
+    width: 440px;
+  }
+}
+.single-popup-xtp.w540px {
+  .leaflet-popup-content {
+    width: 540px;
+  }
+}
+.single-popup-xtp.w640px {
+  .leaflet-popup-content {
+    width: 640px;
   }
 }
 
