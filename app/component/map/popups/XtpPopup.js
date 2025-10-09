@@ -190,7 +190,7 @@ class XtpPopup extends React.Component {
     } else if (w >= 340 && w < 440) {
       c = 320;
     } else if (w >= 440 && w < 540) {
-      c = 420:
+      c = 420;
     } else if (w >= 540 && w < 640) {
       c = 520;
     } else {
