@@ -218,6 +218,7 @@ class XtpPopup extends React.Component {
     } else {
       c += 'single-popup-xtp w640px';
     }
+    return c;
   }
   
   render() {
