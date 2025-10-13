@@ -151,8 +151,10 @@ class XtpPopup extends React.Component {
         return 420;
       } else if (mapdimw >= 540 && mapdimw < 640) {
         return 520;
-      } else {
+      } else if (mapdimw >= 640 && mapdimw < 740) {
         return 620;
+      } else {
+        return 720;
       }
     }
   }
@@ -166,8 +168,10 @@ class XtpPopup extends React.Component {
       return 'single-popup-xtp w440px';
     } else if (w === 520) {
       return 'single-popup-xtp w540px';
+    } else if (w === 620) {
+      return 'single-popup-xtp w640px';
     }
-    return 'single-popup-xtp w640px';
+    return 'single-popup-xtp w740px';
   }
   
   getButtonClasses = (w) => {
@@ -179,8 +183,10 @@ class XtpPopup extends React.Component {
       return 'xtp-popup-navi-button h315px';
     } else if (w === 520) {
       return 'xtp-popup-navi-button h390px';
+    } else if (w === 620) {
+      return 'xtp-popup-navi-button h465px';
     }
-    return 'xtp-popup-navi-button h465px';
+    return 'xtp-popup-navi-button h540px';
   }
   
   render() {

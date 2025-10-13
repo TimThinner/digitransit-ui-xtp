@@ -1632,6 +1632,11 @@ div.leaflet-control-scale-line {
     width: 640px;
   }
 }
+.single-popup-xtp.w740px {
+  .leaflet-popup-content {
+    width: 740px;
+  }
+}
 
 .xtp-popup-wrapper {
   display: flex;
@@ -1717,4 +1722,7 @@ div.leaflet-control-scale-line {
 }
 .xtp-popup-navi-button.h465px {
   height: 465px;
+}
+.xtp-popup-navi-button.h540px {
+  height: 540px;
 }
