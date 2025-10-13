@@ -57,7 +57,7 @@ class XtpPopup extends React.Component {
       dim.w = e.clientWidth;
       dim.h = e.clientHeight;
     });
-    //console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
+    console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
     return dim;
   }
   
@@ -77,26 +77,7 @@ class XtpPopup extends React.Component {
       zoom: zoom,   // update the value of specific key
     }));
   }
-  /*
-  componentDidUpdate() {
-    // Runs immediately after the DOM has been updated.
-    // Adjust CSS "hard-coded" popup width (240px or 480px).
-    console.log('componentDidUpdate');
-    const mapdim = this.getMapDimensions();
-    const min_S_popup_w = mapdim.w < 240 ? mapdim.w : 240;
-    const min_L_popup_w = mapdim.w < 480 ? mapdim.w : 480;
-    // .leaflet-popup-content {
-    //  width: 240px; or width: 480px;
-    const elems = document.querySelectorAll('.leaflet-popup-content');
-    [...elems].forEach(e=>{
-      if (this.state.size==='S') {
-        e.width = min_S_popup_w + 'px';
-      } else {
-        e.width = min_L_popup_w + 'px';
-      }
-    });
-  }
-  */
+  
   componentDidMount() {
     // Runs immediately after the DOM has been updated.
     console.log('componentDidMount');
@@ -158,67 +139,48 @@ class XtpPopup extends React.Component {
     return c_index < this.props.xtp_last_index ? 'y' : '';
   }
   
-  // Minimum width for small picture ('S') is 220px and for 'L' 460px
-  // BUT never return picture width greater than leaflet-container client-width
   getPicWidth = (mapdimw) => {
-    /*
     if (this.state.size==='S') {
-      const min_S_pic_w = mapdimw < 220 ? mapdimw : 220;
-      const w = Math.floor(mapdimw/4);
-      if (w < min_S_pic_w) {
-        return min_S_pic_w;
+      return 220;
+    } else {
+      if (mapdimw >= 0 && mapdimw < 340) {
+        return 220;
+      } else if (mapdimw >= 340 && mapdimw < 440) {
+        return 320;
+      } else if (mapdimw >= 440 && mapdimw < 540) {
+        return 420;
+      } else if (mapdimw >= 540 && mapdimw < 640) {
+        return 520;
+      } else {
+        return 620;
       }
-      return w;
-    } else {
-      const min_L_pic_w = mapdimw < 460 ? mapdimw : 460;
-      const w = Math.floor(mapdimw/2);
-      if (w < min_L_pic_w) {
-        return min_L_pic_w;
-      }
-      return w;
     }
-    */
-    let w = 0;
-    let c = 0;
-    if (this.state.size==='S') {
-      w = Math.floor(mapdimw/4);
-    } else {
-      w = Math.floor(mapdimw/2);
-    }
-    if (w >= 0 && w < 340) {
-      c = 220; // minimum popup width 240px pic 220px
-    } else if (w >= 340 && w < 440) {
-      c = 320;
-    } else if (w >= 440 && w < 540) {
-      c = 420;
-    } else if (w >= 540 && w < 640) {
-      c = 520;
-    } else {
-      c = 620;
-    }
-    return c;
   }
   
-  getPopupClasses = (mapdimw) => {
-    let w = 0;
-    let c = 'popup ';
-    if (this.state.size==='S') {
-      w = Math.floor(mapdimw/4);
-    } else {
-      w = Math.floor(mapdimw/2);
+  getPopupClasses = (w) => {
+    if (w === 220) {
+      return 'popup single-popup-xtp'; // minimum popup width 240px pic 220px
+    } else if (w === 320) {
+      return 'single-popup-xtp w340px'; // popup 340px pic 320px
+    } else if (w === 420) {
+      return 'single-popup-xtp w440px';
+    } else if (w === 520) {
+      return 'single-popup-xtp w540px';
     }
-    if (w >= 0 && w < 340) {
-      c += 'single-popup-xtp'; // minimum popup width 240px pic 220px
-    } else if (w >= 340 && w < 440) {
-      c += 'single-popup-xtp w340px'; // popup 340px pic 320px
-    } else if (w >= 440 && w < 540) {
-      c += 'single-popup-xtp w440px';
-    } else if (w >= 540 && w < 640) {
-      c += 'single-popup-xtp w540px';
-    } else {
-      c += 'single-popup-xtp w640px';
+    return 'single-popup-xtp w640px';
+  }
+  
+  getButtonClasses = (w) => {
+    if (w === 220) {
+      return 'xtp-popup-navi-button';
+    } else if (w === 320) {
+      return 'xtp-popup-navi-button h240px';
+    } else if (w === 420) {
+      return 'xtp-popup-navi-button h315px';
+    } else if (w === 520) {
+      return 'xtp-popup-navi-button h390px';
     }
-    return c;
+    return 'xtp-popup-navi-button h465px';
   }
   
   render() {
@@ -229,18 +191,10 @@ class XtpPopup extends React.Component {
     const next_state = this.getNextButtonState();
     const p_title = prev_state==='' ? '' : '<';
     const n_title = next_state==='' ? '' : '>';
-    /*
-    "single-popup-xtp" => 240px
-    "single-popup-xtp w300" => 340px 
-    "single-popup-xtp w400" => 440px 
-    "single-popup-xtp w500" => 540px 
-    "single-popup-xtp w600" => 640px 
-    */
     const mapdim = this.getMapDimensions();
-    //const xtpClassNames = this.state.size==='S' ? 'popup single-popup-xtp' : 'popup single-popup-xtp-zoomed';
-    const xtpClassNames = this.getPopupClasses(mapdim.w);
-    const btnClass = this.state.size==='S' ? 'xtp-popup-navi-button' : 'xtp-popup-navi-button zoomed';
     const dimw = this.getPicWidth(mapdim.w);
+    const xtpClassNames = this.getPopupClasses(dimw);
+    const btnClasses = this.getButtonClasses(dimw);
     const dimwpx = dimw+'px';
     return (
       <Popup
@@ -268,8 +222,8 @@ class XtpPopup extends React.Component {
             </div>
             <div className="xtp-image-container">
               <img onClick={this.handleClick} src={this.props.xtpurl} width={dimw} alt="" />
-              <div className="xtp-popup-left-button-wrapper"><button className={btnClass} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
-              <div className="xtp-popup-right-button-wrapper"><button className={btnClass} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
+              <div className="xtp-popup-left-button-wrapper"><button className={btnClasses} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
+              <div className="xtp-popup-right-button-wrapper"><button className={btnClasses} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>
           </div>
         </Card>
