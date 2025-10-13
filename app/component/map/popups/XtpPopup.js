@@ -57,7 +57,7 @@ class XtpPopup extends React.Component {
       dim.w = e.clientWidth;
       dim.h = e.clientHeight;
     });
-    console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
+    //console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
     return dim;
   }
   
