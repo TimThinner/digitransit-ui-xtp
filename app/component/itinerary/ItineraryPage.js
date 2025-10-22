@@ -1033,7 +1033,10 @@ export default function ItineraryPage(props, context) {
   async function makeXTPInfoQuery() {
     const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const MOCK_DATA = {infos:[]};
-    const data = {edges:[]};
+    const data = {
+      "search_range":"100", // New parameter
+      edges:[]
+    };
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
     console.log(['makeXTPInfoQuery state.plan=',state.plan]);
@@ -1048,18 +1051,18 @@ export default function ItineraryPage(props, context) {
           legs.push({
             leg_index: j,
             from: {
-              lat: leg.from.lat,
-              lon: leg.from.lon,
+              lat: leg.from.lat.toString(), // String!
+              lon: leg.from.lon.toString(), // String!
               name: leg.from.name
             },
             to: {
-              lat: leg.to.lat,
-              lon: leg.to.lon,
+              lat: leg.to.lat.toString(), // String!
+              lon: leg.to.lon.toString(), // String!
               name: leg.to.name
             },
             legGeometry: {
-              points: leg.legGeometry.points,
-              decoded: decoded
+              points: "", //leg.legGeometry.points,
+              decoded: [] //decoded
             }
           });
         });
@@ -1083,8 +1086,8 @@ export default function ItineraryPage(props, context) {
                 activation_range: 100,
                 type: 'photo',
                 url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/xtppic.jpg',
-                lat:  leg.from.lat,
-                lon: leg.from.lon,
+                lat: parseFloat(leg.from.lat), // NOTE: Must convert string to floating point number.
+                lon: parseFloat(leg.from.lon), // NOTE: Must convert string to floating point number.
                 name: leg.from.name
               });
             });
