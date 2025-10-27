@@ -1031,10 +1031,11 @@ export default function ItineraryPage(props, context) {
   }, [params.from, query.time]);
   
   async function makeXTPInfoQuery() {
-    const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
-    const MOCK_DATA = {infos:[]};
-    const data = {
-      "search_range":"100", // New parameter
+    //const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
+    const MEDIA_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
+    const JSON_DATA = {infos:[]};
+    const request_data = {
+      "search_range":"500", // New parameter
       edges:[]
     };
     //const combinedEdges = getCombinedPlanEdges();
@@ -1066,61 +1067,55 @@ export default function ItineraryPage(props, context) {
             }
           });
         });
-        data.edges.push({edge_index:i,legs:legs});
+        request_data.edges.push({edge_index:i,legs:legs});
       });
-      console.log(['XTP-INFO REQUEST POST data=',data]);
-      // Normally data is given as parameter to REST service that returns XTP data.
-      // Fill MOCK_DATA:
-      // Simulate network delay ... https://gist.github.com/nhuxhr/043b8148a65ff6a77275c61946b226a2
-      const simulate_data = await (await fetch(MOCK_URL)).json();
-      console.log(['simulate_data=',simulate_data]);
-      if (data.edges.length > 0) {
-        data.edges.forEach(e=>{
-          const ei = e.edge_index;
-          if (e.legs && Array.isArray(e.legs) && e.legs.length > 0) {
-            e.legs.forEach(leg=>{
-              MOCK_DATA.infos.push({
-                edge_index: ei,
-                leg_index: leg.leg_index,
-                alternate_polyline: '',
-                activation_range: 100,
-                type: 'photo',
-                url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/xtppic.jpg',
-                lat: parseFloat(leg.from.lat), // NOTE: Must convert string to floating point number.
-                lon: parseFloat(leg.from.lon), // NOTE: Must convert string to floating point number.
-                name: leg.from.name
-              });
-            });
-            // add some extra "infos" for the last leg.
-            /*const mock_last_index = MOCK_DATA.infos.length-1;
-            const last_leg = MOCK_DATA.infos[mock_last_index];
-            const extra_leg_index = last_leg.leg_index;
-            for (let i = 1; i < 5; i++) { // 1,2,3,4
-              const name = last_leg.name + '(extra-'+i+')';
-              const lat = last_leg.lat + i/500;
-              const lon = last_leg.lon + i/500;
-              const garray = [];
-              garray.push({
-                activation_range: 400,
-                type: 'photo',
-                url: 'https://lyylidataportal.northeurope.cloudapp.azure.com/wp-content/themes/turms-theme/assets/js/images/pic.jpg',
-                lat: lat,
-                lon: lon,
-                name: name
-              });
-              MOCK_DATA.infos.push({
-                edge_index: ei,
-                leg_index: extra_leg_index,
-                alternate_polyline: '',
-                guides: garray
-              });
-            }*/
-          }
+      console.log(['XTP-INFO REQUEST POST request_data=',request_data]);
+      try {
+        //const data = await (await fetch(JSON_URL)).json();
+        const response = await fetch(MEDIA_URL, {
+          method: "POST",
+          body: JSON.stringify(request_data),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+        const resp = await response.json();
+        console.log(['response resp=',resp]);
+        if (resp.infos.length > 0) {
+          resp.infos.forEach(info=>{
+            const ei = info.edgeIndex;
+            const li = info.legIndex;
+            const apl = info.alternatePolyline;
+            if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
+              info.guides.forEach(guide=>{
+                const type = guide.type ? guide.type : 'photo';
+                const lat = guide.pointLocation.latitude; // This is a string!
+                const lon = guide.pointLocation.longitude; // This is a string!
+                const name = guide.pointLocation.streetAddress; // "not defined"
+                JSON_DATA.infos.push({
+                  edge_index: ei,
+                  leg_index: li,
+                  alternate_polyline: apl,
+                  activation_range: guide.activationRange,
+                  type: type,
+                  url: guide.guidanceFileURL,
+                  lat: parseFloat(lat), // Number(lat),
+                  lon: parseFloat(lon), // Number(lon),
+                  name: name
+                });
+              });
+            }
+          });
+        }
+        console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
+        setXTPInfoState({xtpData:JSON_DATA.infos});
+        console.log('setXTPInfoState DONE!!!!!!!');
+      } catch (error) {
+        console.error(error.message);
       }
-      console.log(['NOW do the setXTPInfoState MOCK_DATA.infos=',MOCK_DATA.infos]);
-      setXTPInfoState({xtpData:MOCK_DATA.infos});
-      console.log('setXTPInfoState DONE!!!!!!!');
     }
   }
   

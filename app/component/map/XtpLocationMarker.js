@@ -72,7 +72,7 @@ function XtpLocationMarker(props) {
   
   //const dist = distance(props.xtp, props.locationState);
   //console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
-  //console.log(['LocationMarker alternate_polylinee=',props.xtp.alternate_polyline]);
+  //console.log(['LocationMarker alternate_polyline=',props.xtp.alternate_polyline]);
   /*
   if (dist < props.xtp.activation_range) {
     setTimeout(() => {
