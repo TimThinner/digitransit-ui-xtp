@@ -90,6 +90,7 @@ export default {
   logo: 'hsl/reittiopas-logo.svg',
 
   useCookiesPrompt: true,
+  hideHeader: true,
   copyrightText: '© Copyright HSL',
 
   useRoutingFeedbackPrompt: true,
