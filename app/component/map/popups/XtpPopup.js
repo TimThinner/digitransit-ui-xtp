@@ -204,6 +204,9 @@ class XtpPopup extends React.Component {
     const dimw = this.getPicWidth(mapdim.w);
     const xtpClassNames = this.getPopupClasses(dimw);
     const btnClasses = this.getButtonClasses(dimw);
+    console.log(['xtpClassNames=',xtpClassNames]);
+    console.log(['btnClasses=',btnClasses]);
+    console.log(['dimw=',dimw]);
     const dimwpx = dimw+'px';
     return (
       <Popup
