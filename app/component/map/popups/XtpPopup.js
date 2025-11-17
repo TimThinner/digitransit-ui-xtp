@@ -34,8 +34,10 @@ class XtpPopup extends React.Component {
     handlePrev: PropTypes.func.isRequired,
     handleNext: PropTypes.func.isRequired,
     handleSetIndex: PropTypes.func.isRequired,
+    toggleSize: PropTypes.func.isRequired,
     toggleAuto: PropTypes.func.isRequired,
     autoOpen: PropTypes.bool.isRequired,
+    picSize: PropTypes.string.isRequired,
     locationState: locationShape.isRequired,
   };
   
@@ -45,7 +47,7 @@ class XtpPopup extends React.Component {
     this.state = {
       width: 0,
       height: 0,
-      size: 'S',
+      //size: 'S',
       zoom: this.props.leaflet.map.getZoom(),
     };
   }
@@ -90,7 +92,7 @@ class XtpPopup extends React.Component {
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
     window.removeEventListener('resize', this.updateDimensions);
   }
-  
+  /*
   handleClick = () => {
     if (this.state.size==='S') {
       this.setState(prevState => ({
@@ -104,7 +106,7 @@ class XtpPopup extends React.Component {
       }));
     }
   }
-  
+  */
   handleClose = () => {
     this.props.leaflet.map.closePopup();
     this.props.handleSetIndex(-1);
@@ -140,7 +142,8 @@ class XtpPopup extends React.Component {
   }
   
   getPicWidth = (mapdimw) => {
-    if (this.state.size==='S') {
+    //if (this.state.size==='S') {
+    if (this.props.picSize === 'S') {
       return 220;
     } else {
       if (mapdimw >= 0 && mapdimw < 340) {
@@ -227,7 +230,7 @@ class XtpPopup extends React.Component {
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
-              <img onClick={this.handleClick} src={this.props.xtpurl} width={dimw} alt="" />
+              <img onClick={this.props.toggleSize} src={this.props.xtpurl} width={dimw} alt="" />
               <div className="xtp-popup-left-button-wrapper"><button className={btnClasses} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
               <div className="xtp-popup-right-button-wrapper"><button className={btnClasses} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>

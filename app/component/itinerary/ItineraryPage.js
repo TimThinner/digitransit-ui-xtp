@@ -1035,7 +1035,7 @@ export default function ItineraryPage(props, context) {
     const MEDIA_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
     const JSON_DATA = {infos:[]};
     const request_data = {
-      "search_range":"500", // New parameter
+      "search_range":"100", // New parameter
       edges:[]
     };
     //const combinedEdges = getCombinedPlanEdges();
