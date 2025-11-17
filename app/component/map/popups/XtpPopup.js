@@ -34,7 +34,7 @@ class XtpPopup extends React.Component {
     handlePrev: PropTypes.func.isRequired,
     handleNext: PropTypes.func.isRequired,
     handleSetIndex: PropTypes.func.isRequired,
-    toggleSize: PropTypes.func.isRequired,
+    //toggleSize: PropTypes.func.isRequired,
     toggleAuto: PropTypes.func.isRequired,
     autoOpen: PropTypes.bool.isRequired,
     picSize: PropTypes.string.isRequired,
@@ -142,23 +142,18 @@ class XtpPopup extends React.Component {
   }
   
   getPicWidth = (mapdimw) => {
-    //if (this.state.size==='S') {
-    if (this.props.picSize === 'S') {
+    if (mapdimw >= 0 && mapdimw < 340) {
       return 220;
+    } else if (mapdimw >= 340 && mapdimw < 440) {
+      return 320;
+    } else if (mapdimw >= 440 && mapdimw < 540) {
+      return 420;
+    } else if (mapdimw >= 540 && mapdimw < 640) {
+      return 520;
+    } else if (mapdimw >= 640 && mapdimw < 740) {
+      return 620;
     } else {
-      if (mapdimw >= 0 && mapdimw < 340) {
-        return 220;
-      } else if (mapdimw >= 340 && mapdimw < 440) {
-        return 320;
-      } else if (mapdimw >= 440 && mapdimw < 540) {
-        return 420;
-      } else if (mapdimw >= 540 && mapdimw < 640) {
-        return 520;
-      } else if (mapdimw >= 640 && mapdimw < 740) {
-        return 620;
-      } else {
-        return 720;
-      }
+      return 720;
     }
   }
   
@@ -204,9 +199,9 @@ class XtpPopup extends React.Component {
     const dimw = this.getPicWidth(mapdim.w);
     const xtpClassNames = this.getPopupClasses(dimw);
     const btnClasses = this.getButtonClasses(dimw);
-    console.log(['xtpClassNames=',xtpClassNames]);
-    console.log(['btnClasses=',btnClasses]);
-    console.log(['dimw=',dimw]);
+    //console.log(['xtpClassNames=',xtpClassNames]);
+    //console.log(['btnClasses=',btnClasses]);
+    //console.log(['dimw=',dimw]);
     const dimwpx = dimw+'px';
     return (
       <Popup
@@ -233,7 +228,7 @@ class XtpPopup extends React.Component {
               <div className="xtp-map-popup-button-wrapper"><button onClick={this.handleClose}>Close</button></div>
             </div>
             <div className="xtp-image-container">
-              <img onClick={this.props.toggleSize} src={this.props.xtpurl} width={dimw} alt="" />
+              <img src={this.props.xtpurl} width={dimw} alt="" />
               <div className="xtp-popup-left-button-wrapper"><button className={btnClasses} disabled={!prev_state} onClick={this.props.handlePrev}>{p_title}</button></div>
               <div className="xtp-popup-right-button-wrapper"><button className={btnClasses} disabled={!next_state} onClick={this.props.handleNext}>{n_title}</button></div>
             </div>

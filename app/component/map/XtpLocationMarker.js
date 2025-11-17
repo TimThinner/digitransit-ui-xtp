@@ -170,7 +170,6 @@ function XtpLocationMarker(props) {
         pid={props.pid}
         handlePrev={props.xtpHandlePrev}
         handleNext={props.xtpHandleNext}
-        toggleSize={props.xtpToggleSize}
         toggleAuto={props.xtpToggleAuto}
         handleSetIndex={props.xtpHandleSetIndex}
         autoOpen={props.xtpForce.auto}
@@ -191,7 +190,6 @@ XtpLocationMarker.propTypes = {
   xtp_last_index: PropTypes.number,
   xtp_active_markers: PropTypes.arrayOf(xtpShape),
   pid: PropTypes.string,
-  xtpToggleSize: PropTypes.func.isRequired,
   xtpToggleAuto: PropTypes.func.isRequired,
   xtpHandlePrev: PropTypes.func.isRequired,
   xtpHandleNext: PropTypes.func.isRequired,

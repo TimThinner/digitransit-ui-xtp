@@ -48,12 +48,13 @@ const ItineraryPageMap = (
   const leafletObjs = [];
   const xtpActiveMarkers = [];
   
-  const [xtpForce, setXtpForce] = useState({auto:true,index:0,size:'S'});
+  const [xtpForce, setXtpForce] = useState({auto:true,index:0});
   
   // Add size ('S') as global setting for all pictures in all XtpPopups.
   // If size is 'S' => all pics are small.
   // If size is 'L' => all pics are large.
   // This was in each XtpPopup, so that user could set each pic size individually.
+  /*
   const xtpToggleSize = () => {
     if (xtpForce.size === 'S') {
       setXtpForce({...xtpForce,size:'L'});
@@ -62,7 +63,7 @@ const ItineraryPageMap = (
     }
     setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
   }
-  
+  */
   const xtpToggleAuto = () => {
     if (xtpForce.auto) {
       setXtpForce({...xtpForce,auto:false});
@@ -200,7 +201,6 @@ const ItineraryPageMap = (
         xtp_last_index={xtp_last_index}
         xtp_active_markers={xtpActiveMarkers}
         pid={pid}
-        xtpToggleSize={xtpToggleSize}
         xtpToggleAuto={xtpToggleAuto}
         xtpHandlePrev={xtpHandlePrev}
         xtpHandleNext={xtpHandleNext}
