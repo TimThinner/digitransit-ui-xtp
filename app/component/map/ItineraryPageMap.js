@@ -282,7 +282,7 @@ ItineraryPageMap.defaultProps = {
   showActiveOnly: false,
   showVehicles: false,
   xtpPoints: [],
-  mapRef: unefined,
+  mapRef: undefined,
   showDurationBubble: false,
   itinerary: undefined,
   showBackButton: true,
