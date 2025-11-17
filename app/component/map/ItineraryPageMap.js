@@ -32,7 +32,6 @@ const ItineraryPageMap = (
     to,
     viaPoints,
     xtpPoints,
-    mapRef,
     breakpoint,
     showVehicles,
     topics,
@@ -61,8 +60,7 @@ const ItineraryPageMap = (
     } else {
       setXtpForce({...xtpForce,size:'S'});
     }
-    console.log(['mapRef=',mapRef]);
-    setTimeout(() => mapRef?.map?.invalidateSize(), 200);
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
   }
   
   const xtpToggleAuto = () => {
@@ -268,7 +266,6 @@ ItineraryPageMap.propTypes = {
   from: locationShape.isRequired,
   to: locationShape.isRequired,
   xtpPoints: PropTypes.arrayOf(xtpShape),
-  mapRef: PropTypes.object,
   viaPoints: PropTypes.arrayOf(locationShape).isRequired,
   showDurationBubble: PropTypes.bool,
   itinerary: itineraryShape,
@@ -282,7 +279,6 @@ ItineraryPageMap.defaultProps = {
   showActiveOnly: false,
   showVehicles: false,
   xtpPoints: [],
-  mapRef: undefined,
   showDurationBubble: false,
   itinerary: undefined,
   showBackButton: true,
