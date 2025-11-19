@@ -1029,17 +1029,59 @@ export default function ItineraryPage(props, context) {
       makeWeatherQuery();
     }
   }, [params.from, query.time]);
-  
-  
-  
-  
-  
-  
+  /*
+          makeAltPolylineQuery({
+              req: alt_polyline_request[alt_hash],
+              info: info,
+              json: JSON_DATA
+            });
+  */
+  async function makeAltPolylineQuery(query_params) {
+    
+    const req_data = query_params.req;
+    const info = query_params.info;
+    const json_data = query_params.json;
+    const ei = info.edgeIndex;
+    const li = info.legIndex;
+    
+    const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
+    console.log('====================   FETCH POLYLINE  ============================');
+    const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
+      method: "POST",
+      body: JSON.stringify(req_data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const alt_resp = await alt_polyline_response.json();
+    console.log(['alt_resp=',alt_resp]);
+    const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
+    console.log(['alt_polyline=',alt_polyline]);
+    //alt_polyline = info.alternatePolyline;
+    if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
+      info.guides.forEach(guide=>{
+        const type = guide.type ? guide.type : 'photo';
+        const lat = guide.pointLocation.latitude; // This is a string!
+        const lon = guide.pointLocation.longitude; // This is a string!
+        const name = guide.pointLocation.streetAddress; // "not defined"
+        json_data.infos.push({
+          edge_index: ei,
+          leg_index: li,
+          alternate_polyline: alt_polyline,
+          activation_range: guide.activationRange,
+          type: type,
+          url: guide.guidanceFileURL,
+          lat: parseFloat(lat), // Number(lat),
+          lon: parseFloat(lon), // Number(lon),
+          name: name
+        });
+      });
+    }
+  }
   
   async function makeXTPInfoQuery() {
     //const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const SEARCH_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
-    const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
     const JSON_DATA = {infos:[]};
     const request_data = {
       "search_range":"500", // New parameter
@@ -1106,39 +1148,12 @@ export default function ItineraryPage(props, context) {
             const li = info.legIndex;
             // is it possible to fetch alternatePolyline here?
             const alt_hash = 'edge_index_'+ei+'_leg_index_'+li;
-            if (alt_polyline_request[alt_hash]) { // should always be true
-              const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
-                method: "POST",
-                body: JSON.stringify(alt_polyline_request[alt_hash]),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              const alt_resp = await alt_polyline_response.json();
-              console.log(['alt_resp=',alt_resp]);
-              const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
-              console.log(['alt_polyline=',alt_polyline]);
-              //alt_polyline = info.alternatePolyline;
-              if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
-                info.guides.forEach(guide=>{
-                  const type = guide.type ? guide.type : 'photo';
-                  const lat = guide.pointLocation.latitude; // This is a string!
-                  const lon = guide.pointLocation.longitude; // This is a string!
-                  const name = guide.pointLocation.streetAddress; // "not defined"
-                  JSON_DATA.infos.push({
-                    edge_index: ei,
-                    leg_index: li,
-                    alternate_polyline: alt_polyline,
-                    activation_range: guide.activationRange,
-                    type: type,
-                    url: guide.guidanceFileURL,
-                    lat: parseFloat(lat), // Number(lat),
-                    lon: parseFloat(lon), // Number(lon),
-                    name: name
-                  });
-                });
-              }
-            }
+            //if (alt_polyline_request[alt_hash]) { // should always be true
+            makeAltPolylineQuery({
+              req: alt_polyline_request[alt_hash],
+              info: info,
+              json: JSON_DATA
+            });
           });
         }
         console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
