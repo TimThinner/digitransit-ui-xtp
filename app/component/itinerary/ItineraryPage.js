@@ -1030,14 +1030,22 @@ export default function ItineraryPage(props, context) {
     }
   }, [params.from, query.time]);
   
+  
+  
+  
+  
+  
+  
   async function makeXTPInfoQuery() {
     //const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
-    const MEDIA_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
+    const SEARCH_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
+    const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
     const JSON_DATA = {infos:[]};
     const request_data = {
       "search_range":"500", // New parameter
       edges:[]
     };
+    const alt_polyline_request = {};
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
     console.log(['makeXTPInfoQuery state.plan=',state.plan]);
@@ -1048,7 +1056,7 @@ export default function ItineraryPage(props, context) {
         const legs = [];
         edge.node.legs.forEach((leg,j) => {
           console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
-          const decoded = polyline.decode(leg.legGeometry.points);
+          //const decoded = polyline.decode(leg.legGeometry.points);
           legs.push({
             leg_index: j,
             from: {
@@ -1066,13 +1074,21 @@ export default function ItineraryPage(props, context) {
               decoded: [] //decoded
             }
           });
+          const alt_hash = 'edge_index_'+i+'_leg_index_'+j;
+          alt_polyline_request[alt_hash] = {
+            start_lat: leg.from.lat,
+            start_lon: leg.from.lon,
+            end_lat: leg.to.lat,
+            end_lon: leg.to.lon,
+            max_distance_m: 100
+          };
         });
         request_data.edges.push({edge_index:i,legs:legs});
       });
       console.log(['XTP-INFO REQUEST POST request_data=',request_data]);
       try {
         //const data = await (await fetch(JSON_URL)).json();
-        const response = await fetch(MEDIA_URL, {
+        const response = await fetch(SEARCH_URL, {
           method: "POST",
           body: JSON.stringify(request_data),
           headers: {
@@ -1088,25 +1104,40 @@ export default function ItineraryPage(props, context) {
           resp.infos.forEach(info=>{
             const ei = info.edgeIndex;
             const li = info.legIndex;
-            const apl = info.alternatePolyline;
-            if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
-              info.guides.forEach(guide=>{
-                const type = guide.type ? guide.type : 'photo';
-                const lat = guide.pointLocation.latitude; // This is a string!
-                const lon = guide.pointLocation.longitude; // This is a string!
-                const name = guide.pointLocation.streetAddress; // "not defined"
-                JSON_DATA.infos.push({
-                  edge_index: ei,
-                  leg_index: li,
-                  alternate_polyline: apl,
-                  activation_range: guide.activationRange,
-                  type: type,
-                  url: guide.guidanceFileURL,
-                  lat: parseFloat(lat), // Number(lat),
-                  lon: parseFloat(lon), // Number(lon),
-                  name: name
-                });
+            // is it possible to fetch alternatePolyline here?
+            const alt_hash = 'edge_index_'+ei+'_leg_index_'+li;
+            if (alt_polyline_request[alt_hash]) { // should always be true
+              const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
+                method: "POST",
+                body: JSON.stringify(alt_polyline_request[alt_hash]),
+                headers: {
+                  "Content-Type": "application/json",
+                },
               });
+              const alt_resp = await alt_polyline_response.json();
+              console.log(['alt_resp=',alt_resp]);
+              const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
+              console.log(['alt_polyline=',alt_polyline]);
+              //alt_polyline = info.alternatePolyline;
+              if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
+                info.guides.forEach(guide=>{
+                  const type = guide.type ? guide.type : 'photo';
+                  const lat = guide.pointLocation.latitude; // This is a string!
+                  const lon = guide.pointLocation.longitude; // This is a string!
+                  const name = guide.pointLocation.streetAddress; // "not defined"
+                  JSON_DATA.infos.push({
+                    edge_index: ei,
+                    leg_index: li,
+                    alternate_polyline: alt_polyline,
+                    activation_range: guide.activationRange,
+                    type: type,
+                    url: guide.guidanceFileURL,
+                    lat: parseFloat(lat), // Number(lat),
+                    lon: parseFloat(lon), // Number(lon),
+                    name: name
+                  });
+                });
+              }
             }
           });
         }
@@ -1119,6 +1150,17 @@ export default function ItineraryPage(props, context) {
     }
   }
   
+  
+  
+  /*
+  async function makeRequest(urls) {
+    // all 100 requests run in parallel, but we wait for all of 
+    // them to finish via await and return all results in an array
+    return await Promise.all(
+        urls.map((url) => fetch(url).then((response) => response.json()));
+    );
+  }
+  */
   useEffect(() => {
     console.log('useEffect state.plan HAS CHANGED => makeXTPInfoQuery');
     makeXTPInfoQuery();
