@@ -1029,18 +1029,15 @@ export default function ItineraryPage(props, context) {
       makeWeatherQuery();
     }
   }, [params.from, query.time]);
-  /*
-          makeAltPolylineQuery({
-              req: alt_polyline_request[alt_hash],
-              info: info,
-              json: JSON_DATA
-            });
-  */
+  
   async function makeAltPolylineQuery(query_params) {
+    const polylines  = query_params.polylines;
+    const edge_index = query_params.edge_index;
+    const leg_index  = query_params.leg_index;
     
-    const request = query_params.request;
-    const polyline = query_params.polyline;
-    
+    const alt_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
+    const request = polylines[alt_hash].request;
+
     const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
     console.log('====================   FETCH POLYLINE  ============================');
     try {
@@ -1055,8 +1052,39 @@ export default function ItineraryPage(props, context) {
       console.log(['alt_resp=',alt_resp]);
       const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
       console.log(['alt_polyline=',alt_polyline]);
-      polyline.alt_polyline = alt_polyline;
-      
+      polylines[alt_hash]['response'] = alt_polyline;
+      polylines[alt_hash]['fetched'] = true;
+
+      let ready = true;
+      Object.keys(polylines).every(key=>{
+        if (polylines[key]['fetched'] === false) {
+          ready = false;
+          return false; // break out from the every-loop.
+        }
+        return true; // continue with next item.
+      });
+      if (ready) {
+        const new_data = [];
+        const xtpPoints = xtpInfoState.xtpData;
+        xtpPoints.forEach(xtpp => {
+          const p_hash = 'edge_index_'+xtpp.edge_index+'_leg_index_'+xtpp.leg_index;
+          const alt_polyline = polylines[p_hash]['response'];
+          new_data.push({
+            edge_index: xtpp.edge_index,
+            leg_index: xtpp.leg_index,
+            alternate_polyline: alt_polyline,
+            activation_range: xtpp.activation_range,
+            type: xtpp.type,
+            url: xtpp.url,
+            lat: xtpp.lat,
+            lon: xtpp.lon,
+            name: xtpp.name
+          });
+        });
+        console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
+        setXTPInfoState({xtpData:new_data});
+        console.log('setXTPInfoState DONE!!!!!!!');
+      }
     } catch (error) {
       console.log(['error.message=',error.message]);
     }
@@ -1070,7 +1098,7 @@ export default function ItineraryPage(props, context) {
       "search_range":"500", // New parameter
       edges:[]
     };
-    const alt_polyline_request = {};
+    const polylines = {};
     //const combinedEdges = getCombinedPlanEdges();
     //const plan = mapHashToPlan();
     console.log(['makeXTPInfoQuery state.plan=',state.plan]);
@@ -1100,12 +1128,16 @@ export default function ItineraryPage(props, context) {
             }
           });
           const alt_hash = 'edge_index_'+i+'_leg_index_'+j;
-          alt_polyline_request[alt_hash] = {
-            start_lat: leg.from.lat,
-            start_lon: leg.from.lon,
-            end_lat: leg.to.lat,
-            end_lon: leg.to.lon,
-            max_distance_m: 200
+          polylines[alt_hash] = {
+            request: {
+              start_lat: leg.from.lat,
+              start_lon: leg.from.lon,
+              end_lat: leg.to.lat,
+              end_lon: leg.to.lon,
+              max_distance_m: 200
+            },
+            response: '',
+            fetched: false
           };
         });
         request_data.edges.push({edge_index:i,legs:legs});
@@ -1128,10 +1160,11 @@ export default function ItineraryPage(props, context) {
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
             
-            const polyline = {alt_polyline:''};
-            const alt_hash = 'edge_index_'+info.edgeIndex+'_leg_index_'+info.legIndex;
-            makeAltPolylineQuery({request:alt_polyline_request[alt_hash], polyline:polyline});
-            console.log(['makeAltPolylineQuery DONE polyline.alt_polyline=',polyline.alt_polyline]);
+            makeAltPolylineQuery({
+              polylines: polylines,
+              edge_index: info.edgeIndex,
+              leg_index: info.legIndex
+            });
             
             if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
               info.guides.forEach(guide=>{
@@ -1142,7 +1175,7 @@ export default function ItineraryPage(props, context) {
                 JSON_DATA.infos.push({
                   edge_index: info.edgeIndex,
                   leg_index: info.legIndex,
-                  alternate_polyline: polyline.alt_polyline,
+                  alternate_polyline: '',
                   activation_range: guide.activationRange,
                   type: type,
                   url: guide.guidanceFileURL,
