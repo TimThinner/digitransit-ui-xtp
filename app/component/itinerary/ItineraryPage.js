@@ -1038,44 +1038,27 @@ export default function ItineraryPage(props, context) {
   */
   async function makeAltPolylineQuery(query_params) {
     
-    const req_data = query_params.req;
-    const info = query_params.info;
-    const json_data = query_params.json;
-    const ei = info.edgeIndex;
-    const li = info.legIndex;
+    const request = query_params.request;
+    const polyline = query_params.polyline;
     
     const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
     console.log('====================   FETCH POLYLINE  ============================');
-    const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
-      method: "POST",
-      body: JSON.stringify(req_data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const alt_resp = await alt_polyline_response.json();
-    console.log(['alt_resp=',alt_resp]);
-    const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
-    console.log(['alt_polyline=',alt_polyline]);
-    //alt_polyline = info.alternatePolyline;
-    if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
-      info.guides.forEach(guide=>{
-        const type = guide.type ? guide.type : 'photo';
-        const lat = guide.pointLocation.latitude; // This is a string!
-        const lon = guide.pointLocation.longitude; // This is a string!
-        const name = guide.pointLocation.streetAddress; // "not defined"
-        json_data.infos.push({
-          edge_index: ei,
-          leg_index: li,
-          alternate_polyline: alt_polyline,
-          activation_range: guide.activationRange,
-          type: type,
-          url: guide.guidanceFileURL,
-          lat: parseFloat(lat), // Number(lat),
-          lon: parseFloat(lon), // Number(lon),
-          name: name
-        });
+    try {
+      const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
+        method: "POST",
+        body: JSON.stringify(request),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      const alt_resp = await alt_polyline_response.json();
+      console.log(['alt_resp=',alt_resp]);
+      const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
+      console.log(['alt_polyline=',alt_polyline]);
+      polyline.alt_polyline = alt_polyline;
+      
+    } catch (error) {
+      console.log(['error.message=',error.message]);
     }
   }
   
@@ -1122,7 +1105,7 @@ export default function ItineraryPage(props, context) {
             start_lon: leg.from.lon,
             end_lat: leg.to.lat,
             end_lon: leg.to.lon,
-            max_distance_m: 100
+            max_distance_m: 200
           };
         });
         request_data.edges.push({edge_index:i,legs:legs});
@@ -1144,29 +1127,41 @@ export default function ItineraryPage(props, context) {
         console.log(['response resp=',resp]);
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
-            const ei = info.edgeIndex;
-            const li = info.legIndex;
-            // is it possible to fetch alternatePolyline here?
-            const alt_hash = 'edge_index_'+ei+'_leg_index_'+li;
-            //if (alt_polyline_request[alt_hash]) { // should always be true
-            makeAltPolylineQuery({
-              req: alt_polyline_request[alt_hash],
-              info: info,
-              json: JSON_DATA
-            });
+            
+            const polyline = {alt_polyline:''};
+            const alt_hash = 'edge_index_'+info.edgeIndex+'_leg_index_'+info.legIndex;
+            makeAltPolylineQuery({request:alt_polyline_request[alt_hash], polyline:polyline});
+            console.log(['makeAltPolylineQuery DONE polyline.alt_polyline=',polyline.alt_polyline]);
+            
+            if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
+              info.guides.forEach(guide=>{
+                const type = guide.type ? guide.type : 'photo';
+                const lat = guide.pointLocation.latitude; // This is a string!
+                const lon = guide.pointLocation.longitude; // This is a string!
+                const name = guide.pointLocation.streetAddress; // "not defined"
+                JSON_DATA.infos.push({
+                  edge_index: info.edgeIndex,
+                  leg_index: info.legIndex,
+                  alternate_polyline: polyline.alt_polyline,
+                  activation_range: guide.activationRange,
+                  type: type,
+                  url: guide.guidanceFileURL,
+                  lat: parseFloat(lat), // Number(lat),
+                  lon: parseFloat(lon), // Number(lon),
+                  name: name
+                });
+              });
+            }
           });
+          console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
+          setXTPInfoState({xtpData:JSON_DATA.infos});
+          console.log('setXTPInfoState DONE!!!!!!!');
         }
-        console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
-        setXTPInfoState({xtpData:JSON_DATA.infos});
-        console.log('setXTPInfoState DONE!!!!!!!');
       } catch (error) {
         console.log(['error.message=',error.message]);
       }
     }
   }
-  
-  
-  
   /*
   async function makeRequest(urls) {
     // all 100 requests run in parallel, but we wait for all of 
