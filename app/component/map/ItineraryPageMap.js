@@ -95,7 +95,7 @@ const ItineraryPageMap = (
     }
   }
   
-  const get_alternate_polyline(active, legi) {
+  const get_alternate_polyline = (active, legi) => {
     let ap = '';
     xtpPoints.every(xtp => {
       if (active === xtp.edge_index && legi === xtp.leg_index) {
@@ -107,7 +107,7 @@ const ItineraryPageMap = (
     return ap;
   }
 
-  const clone_legs(old_legs, active) {
+  const clone_legs = (old_legs, active) => {
     const new_legs = []
     old_legs.forEach((leg, legi)=>{
       const new_leg = {};

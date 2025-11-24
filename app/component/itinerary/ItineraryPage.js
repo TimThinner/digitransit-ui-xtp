@@ -1030,63 +1030,81 @@ export default function ItineraryPage(props, context) {
     }
   }, [params.from, query.time]);
   
-  async function makeAltPolylineQuery(query_params) {
-    const polylines  = query_params.polylines;
-    const edge_index = query_params.edge_index;
-    const leg_index  = query_params.leg_index;
-    const infos      = query_params.infos;
+  function setStateIfAllFetched(params) {
+    const polylines  = params.polylines;
+    const infos      = params.infos;
     
-    const alt_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
-    const request = polylines[alt_hash].request;
-
-    const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
-    console.log('====================   FETCH POLYLINE  ============================');
-    try {
-      const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
-        method: "POST",
-        body: JSON.stringify(request),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const alt_resp = await alt_polyline_response.json();
-      console.log(['alt_resp=',alt_resp]);
-      const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
-      console.log(['alt_polyline=',alt_polyline]);
-      polylines[alt_hash]['response'] = alt_polyline;
-      polylines[alt_hash]['fetched'] = true;
-
-      let ready = true;
-      Object.keys(polylines).every(key=>{
-        if (polylines[key]['fetched'] === false) {
-          ready = false;
-          return false; // break out from the every-loop.
-        }
-        return true; // continue with next item.
-      });
-      if (ready) {
-        const new_data = [];
-        infos.forEach(info => {
-          const p_hash = 'edge_index_'+info.edge_index+'_leg_index_'+info.leg_index;
-          const alt_polyline = polylines[p_hash]['response'];
-          new_data.push({
-            edge_index: info.edge_index,
-            leg_index: info.leg_index,
-            alternate_polyline: alt_polyline,
-            activation_range: info.activation_range,
-            type: info.type,
-            url: info.url,
-            lat: info.lat,
-            lon: info.lon,
-            name: info.name
-          });
-        });
-        console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
-        setXTPInfoState({xtpData:new_data});
-        console.log('setXTPInfoState DONE!!!!!!!');
+    let ready = true;
+    Object.keys(polylines).every(key=>{
+      if (polylines[key]['fetched'] === false) {
+        ready = false;
+        return false; // break out from the every-loop.
       }
-    } catch (error) {
-      console.log(['error.message=',error.message]);
+      return true; // continue with next item.
+    });
+    if (ready) {
+      const new_data = [];
+      infos.forEach(info => {
+        const p_hash = 'edge_index_'+info.edge_index+'_leg_index_'+info.leg_index;
+        const alt_polyline = polylines[p_hash]['response'];
+        new_data.push({
+          edge_index: info.edge_index,
+          leg_index: info.leg_index,
+          alternate_polyline: alt_polyline,
+          activation_range: info.activation_range,
+          type: info.type,
+          url: info.url,
+          lat: info.lat,
+          lon: info.lon,
+          name: info.name
+        });
+      });
+      console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
+      setXTPInfoState({xtpData:new_data});
+      console.log('setXTPInfoState DONE!!!!!!!');
+    }
+  }
+  
+  async function makeAltPolylineQuery(params) {
+    const polylines  = params.polylines;
+    const edge_index = params.edge_index;
+    const leg_index  = params.leg_index;
+    const infos      = params.infos;
+    
+    // NOTE: There are many cases where multiple guides are attached TO THE SAME LEG => 
+    // NO NEED TO fetch alternate polyline if it has SAME hash.
+
+    const alt_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
+    if (polylines[alt_hash]['already_in_queue']) {
+      
+      console.log('=== NO NED TO FETCH (DUPLICATE). CHECK IF ALL FETCHED =====');
+      setStateIfAllFetched({polylines:polylines,infos:infos});
+      
+    } else {
+      polylines[alt_hash]['already_in_queue'] = true;
+      const request = polylines[alt_hash].request;
+      const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
+      console.log('====================   FETCH POLYLINE  ============================');
+      try {
+        const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
+          method: "POST",
+          body: JSON.stringify(request),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const alt_resp = await alt_polyline_response.json();
+        console.log(['alt_resp=',alt_resp]);
+        const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
+        console.log(['alt_polyline=',alt_polyline]);
+        polylines[alt_hash]['response'] = alt_polyline;
+        polylines[alt_hash]['fetched'] = true;
+
+        setStateIfAllFetched({polylines:polylines,infos:infos});
+
+      } catch (error) {
+        console.log(['error.message=',error.message]);
+      }
     }
   }
   
@@ -1137,7 +1155,8 @@ export default function ItineraryPage(props, context) {
               max_distance_m: 200
             },
             response: '',
-            fetched: false
+            fetched: false,
+            already_in_queue: false
           };
         });
         request_data.edges.push({edge_index:i,legs:legs});
@@ -1162,7 +1181,7 @@ export default function ItineraryPage(props, context) {
             // makeAltPolylineQuery has ASYNCHRONOUS data fetch call
             // and AFTER ALL calls are done, the altenate polylines are
             // copied to infos (infos array WILL contain all infos before
-            // polylines
+            // polylines.
             makeAltPolylineQuery({
               polylines: polylines,
               edge_index: info.edgeIndex,
