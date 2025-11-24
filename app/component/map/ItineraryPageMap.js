@@ -95,6 +95,39 @@ const ItineraryPageMap = (
     }
   }
   
+  const get_alternate_polyline(active, legi) {
+    let ap = '';
+    xtpPoints.every(xtp => {
+      if (active === xtp.edge_index && legi === xtp.leg_index) {
+        ap = xtp.alternate_polyline;
+        return false; // break out from the every-loop.
+      }
+      return true; // continue with next item
+    });
+    return ap;
+  }
+
+  const clone_legs(old_legs, active) {
+    const new_legs = []
+    old_legs.forEach((leg, legi)=>{
+      const new_leg = {};
+      Object.keys(leg).forEach(key=>{
+        if (key !== 'legGeometry') {
+          new_leg[key] = leg[key] // copy as it is.
+        } else {
+          const altpolyline = get_alternate_polyline(active, legi);
+          if (altpolyline && altpolyline.length > 0) {
+            new_leg['legGeometry'] = { points:altpolyline };
+          } else {
+            new_leg['legGeometry'] = leg['legGeometry']; // use old legGeometry
+          }
+        }
+        new_legs.push(new_leg);
+      });
+    });
+    return new_legs;
+  }
+  
   if (showVehicles) {
     leafletObjs.push(
       <VehicleMarkerContainer key="vehicles" useLargeIcon topics={topics} />,
@@ -103,12 +136,14 @@ const ItineraryPageMap = (
 
   if (itinerary) {
     console.log(['itinerary => ItineraryLine itinerary.legs=',itinerary.legs]);
+    const alternate_legs = clone_legs(itinerary.legs, active);
+    console.log(['alternate_legs='alternate_legs]);
     leafletObjs.push(
       <ItineraryLine
         key={`line_${active}`}
         hash={active}
         streetMode={hash}
-        legs={itinerary.legs}
+        legs={alternate_legs} //{itinerary.legs}
         showIntermediateStops
         showDurationBubble={showDurationBubble}
         realtimeTransfers={realtimeTransfers}
@@ -119,11 +154,13 @@ const ItineraryPageMap = (
       planEdges.forEach((edge, i) => {
         if (i !== active) {
           console.log(['!showActiveOnly => ItineraryLine edge.node.legs=',edge.node.legs]);
+          const alternate_legs = clone_legs(edge.node.legs, i);
+          console.log(['alternate_legs='alternate_legs]);
           leafletObjs.push(
             <ItineraryLine
               key={`line_${i}`}
               hash={i}
-              legs={edge.node.legs}
+              legs={alternate_legs} // {edge.node.legs}
               passive
             />,
           );
@@ -132,12 +169,14 @@ const ItineraryPageMap = (
     }
     if (active < planEdges.length) {
       console.log(['active < planEdges.length => planEdges[active].node.legs=',planEdges[active].node.legs]);
+      const alternate_legs = clone_legs(planEdges[active].node.legs, active);
+      console.log(['alternate_legs='alternate_legs]);
       leafletObjs.push(
         <ItineraryLine
           key={`line_${active}`}
           hash={active}
           streetMode={hash}
-          legs={planEdges[active].node.legs}
+          legs={alternate_legs} // {planEdges[active].node.legs}
           showIntermediateStops
           showDurationBubble={showDurationBubble}
           realtimeTransfers={realtimeTransfers}
