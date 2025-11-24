@@ -364,7 +364,8 @@ export function getPlanParams(
   let egress = access;
   let transfer = ['WALK'];
   let direct = null;
-  let numItineraries = directOnly ? 1 : 5;
+  //let numItineraries = directOnly ? 1 : 5;
+  let numItineraries = 1;
   let carReluctance = null;
   let noIterationsForShortTrips = false;
   // A null value uses the default amount of maximum iterations.
