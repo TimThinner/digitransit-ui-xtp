@@ -174,7 +174,7 @@ export default function ItineraryPage(props, context) {
     settingsChanged: 0,
   });
   const [weatherState, setWeatherState] = useState({ loading: false });
-  const [xtpInfoState, setXTPInfoState] = useState({xtpData:[]});
+  const [xtpInfoState, setXTPInfoState] = useState([]);
   
   const [topicsState, setTopicsState] = useState(null);
   const [mapState, setMapState] = useState({});
@@ -1060,7 +1060,7 @@ export default function ItineraryPage(props, context) {
         });
       });
       console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
-      setXTPInfoState({xtpData:new_data});
+      setXTPInfoState(new_data);
       console.log('setXTPInfoState DONE!!!!!!!');
     }
   }
@@ -1210,8 +1210,11 @@ export default function ItineraryPage(props, context) {
             }
           });
           //console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
-          //setXTPInfoState({xtpData:JSON_DATA.infos});
+          //setXTPInfoState(JSON_DATA.infos);
           //console.log('setXTPInfoState DONE!!!!!!!');
+        } else {
+          // No xtpPoints found => Must reset the state!
+          setXTPInfoState([]);
         }
       } catch (error) {
         console.log(['error.message=',error.message]);
@@ -1549,7 +1552,7 @@ export default function ItineraryPage(props, context) {
   const from = otpToLocation(params.from);
   const to = otpToLocation(params.to);
   const viaPoints = getIntermediatePlaces(query);
-  const xtpPoints = xtpInfoState.xtpData;
+  const xtpPoints = xtpInfoState;
   
   console.log(['Just before renderMap xtpPoints=',xtpPoints]);
 
