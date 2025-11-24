@@ -137,7 +137,7 @@ const ItineraryPageMap = (
   if (itinerary) {
     console.log(['itinerary => ItineraryLine itinerary.legs=',itinerary.legs]);
     const alternate_legs = clone_legs(itinerary.legs, active);
-    console.log(['alternate_legs='alternate_legs]);
+    console.log(['alternate_legs=',alternate_legs]);
     leafletObjs.push(
       <ItineraryLine
         key={`line_${active}`}
@@ -155,7 +155,7 @@ const ItineraryPageMap = (
         if (i !== active) {
           console.log(['!showActiveOnly => ItineraryLine edge.node.legs=',edge.node.legs]);
           const alternate_legs = clone_legs(edge.node.legs, i);
-          console.log(['alternate_legs='alternate_legs]);
+          console.log(['alternate_legs=',alternate_legs]);
           leafletObjs.push(
             <ItineraryLine
               key={`line_${i}`}
@@ -170,7 +170,7 @@ const ItineraryPageMap = (
     if (active < planEdges.length) {
       console.log(['active < planEdges.length => planEdges[active].node.legs=',planEdges[active].node.legs]);
       const alternate_legs = clone_legs(planEdges[active].node.legs, active);
-      console.log(['alternate_legs='alternate_legs]);
+      console.log(['alternate_legs=',alternate_legs]);
       leafletObjs.push(
         <ItineraryLine
           key={`line_${active}`}
