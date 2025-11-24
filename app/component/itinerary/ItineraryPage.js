@@ -1034,6 +1034,7 @@ export default function ItineraryPage(props, context) {
     const polylines  = query_params.polylines;
     const edge_index = query_params.edge_index;
     const leg_index  = query_params.leg_index;
+    const infos      = query_params.infos;
     
     const alt_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
     const request = polylines[alt_hash].request;
@@ -1065,20 +1066,19 @@ export default function ItineraryPage(props, context) {
       });
       if (ready) {
         const new_data = [];
-        const xtpPoints = xtpInfoState.xtpData;
-        xtpPoints.forEach(xtpp => {
-          const p_hash = 'edge_index_'+xtpp.edge_index+'_leg_index_'+xtpp.leg_index;
+        infos.forEach(info => {
+          const p_hash = 'edge_index_'+info.edge_index+'_leg_index_'+info.leg_index;
           const alt_polyline = polylines[p_hash]['response'];
           new_data.push({
-            edge_index: xtpp.edge_index,
-            leg_index: xtpp.leg_index,
+            edge_index: info.edge_index,
+            leg_index: info.leg_index,
             alternate_polyline: alt_polyline,
-            activation_range: xtpp.activation_range,
-            type: xtpp.type,
-            url: xtpp.url,
-            lat: xtpp.lat,
-            lon: xtpp.lon,
-            name: xtpp.name
+            activation_range: info.activation_range,
+            type: info.type,
+            url: info.url,
+            lat: info.lat,
+            lon: info.lon,
+            name: info.name
           });
         });
         console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
@@ -1159,11 +1159,15 @@ export default function ItineraryPage(props, context) {
         console.log(['response resp=',resp]);
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
-            
+            // makeAltPolylineQuery has ASYNCHRONOUS data fetch call
+            // and AFTER ALL calls are done, the altenate polylines are
+            // copied to infos (infos array WILL contain all infos before
+            // polylines
             makeAltPolylineQuery({
               polylines: polylines,
               edge_index: info.edgeIndex,
-              leg_index: info.legIndex
+              leg_index: info.legIndex,
+              infos: JSON_DATA.infos
             });
             
             if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
@@ -1186,9 +1190,9 @@ export default function ItineraryPage(props, context) {
               });
             }
           });
-          console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
-          setXTPInfoState({xtpData:JSON_DATA.infos});
-          console.log('setXTPInfoState DONE!!!!!!!');
+          //console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
+          //setXTPInfoState({xtpData:JSON_DATA.infos});
+          //console.log('setXTPInfoState DONE!!!!!!!');
         }
       } catch (error) {
         console.log(['error.message=',error.message]);
