@@ -1033,7 +1033,9 @@ export default function ItineraryPage(props, context) {
   function setStateIfAllFetched(params) {
     const polylines  = params.polylines;
     const infos      = params.infos;
-    
+
+    console.log(['SET OR NOT? polylines=',polylines,'infos=',infos]);
+
     let ready = true;
     Object.keys(polylines).every(key=>{
       if (polylines[key]['fetched'] === false) {
