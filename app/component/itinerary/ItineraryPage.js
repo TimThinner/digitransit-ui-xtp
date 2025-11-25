@@ -1043,6 +1043,7 @@ export default function ItineraryPage(props, context) {
       return true; // continue with next item.
     });
     if (ready) {
+      console.log(['WE ARE READY TO SET STATE => infos=',infos]);
       const new_data = [];
       infos.forEach(info => {
         const p_hash = 'edge_index_'+info.edge_index+'_leg_index_'+info.leg_index;
@@ -1062,6 +1063,8 @@ export default function ItineraryPage(props, context) {
       console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
       setXTPInfoState(new_data);
       console.log('setXTPInfoState DONE!!!!!!!');
+    } else {
+      console.log('setStateIfAllFetched NOT READY ... WAIT!');
     }
   }
   
@@ -1182,17 +1185,6 @@ export default function ItineraryPage(props, context) {
         console.log(['response resp=',resp]);
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
-            // makeAltPolylineQuery has ASYNCHRONOUS data fetch call
-            // and AFTER ALL calls are done, the altenate polylines are
-            // copied to infos (infos array WILL contain all infos before
-            // polylines.
-            makeAltPolylineQuery({
-              polylines: polylines,
-              edge_index: info.edgeIndex,
-              leg_index: info.legIndex,
-              infos: JSON_DATA.infos
-            });
-            
             if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
               info.guides.forEach(guide=>{
                 const type = guide.type ? guide.type : 'photo';
@@ -1212,6 +1204,16 @@ export default function ItineraryPage(props, context) {
                 });
               });
             }
+            // makeAltPolylineQuery has ASYNCHRONOUS data fetch call
+            // and AFTER ALL calls are done, the altenate polylines are
+            // copied to infos (infos array WILL contain all infos before
+            // polylines.
+            makeAltPolylineQuery({
+              polylines: polylines,
+              edge_index: info.edgeIndex,
+              leg_index: info.legIndex,
+              infos: JSON_DATA.infos
+            });
           });
           //console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
           //setXTPInfoState(JSON_DATA.infos);
