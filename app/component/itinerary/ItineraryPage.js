@@ -1038,7 +1038,7 @@ export default function ItineraryPage(props, context) {
 
     let ready = true;
     Object.keys(polylines).every(key=>{
-      if (polylines[key]['fetched'] === false) {
+      if (polylines[key]['relevant'] === true && polylines[key]['fetched'] === false) {
         ready = false;
         return false; // break out from the every-loop.
       }
@@ -1080,6 +1080,9 @@ export default function ItineraryPage(props, context) {
     // NO NEED TO fetch alternate polyline if it has SAME hash.
 
     const alt_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
+    // NOTE: This olyline is marked "relevant". Only relevant ones need to be "fetched".
+    polylines[alt_hash]['relevant'] = true;
+    
     if (polylines[alt_hash]['already_in_queue']) {
       
       console.log('=== NO NED TO FETCH (DUPLICATE). CHECK IF ALL FETCHED =====');
@@ -1164,6 +1167,7 @@ export default function ItineraryPage(props, context) {
               max_distance_m: 200
             },
             response: '',
+            relevant: false,
             fetched: false,
             already_in_queue: false
           };
@@ -1187,6 +1191,9 @@ export default function ItineraryPage(props, context) {
         console.log(['response resp=',resp]);
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
+            //const edge_index = info.edgeIndex;
+            //const leg_index = info.legIndex;
+            //const found_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
             if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
               info.guides.forEach(guide=>{
                 const type = guide.type ? guide.type : 'photo';
@@ -1208,8 +1215,10 @@ export default function ItineraryPage(props, context) {
             }
             // makeAltPolylineQuery has ASYNCHRONOUS data fetch call
             // and AFTER ALL calls are done, the altenate polylines are
-            // copied to infos (infos array WILL contain all infos before
-            // polylines.
+            // copied to infos
+            // NOTE: All legs are NOT returned in MediaServer response (in infos)
+            // => we must mark which ones are relevant for alternate polyline fetching
+            //polylines[found_hash]['relevant'] = true;
             makeAltPolylineQuery({
               polylines: polylines,
               edge_index: info.edgeIndex,
