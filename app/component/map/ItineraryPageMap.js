@@ -46,7 +46,7 @@ const ItineraryPageMap = (
 ) => {
   const { hash } = match.params;
   const leafletObjs = [];
-  const xtpActiveMarkers = [];
+  const xtpActivePoints = [];
   
   const [xtpForce, setXtpForce] = useState({auto:true,index:0});
   
@@ -83,7 +83,7 @@ const ItineraryPageMap = (
   const xtpHandleNext = () => {
     const index = xtpForce.index;
     console.log(['HANDLE next index=',index]);
-    if (index < xtpActiveMarkers.length-1) {
+    if (index < xtpActivePoints.length-1) {
       setXtpForce({...xtpForce,index:index+1});
     }
   }
@@ -138,8 +138,8 @@ const ItineraryPageMap = (
             new_leg['legGeometry'] = leg['legGeometry']; // use old legGeometry
           }
         }
-        new_legs.push(new_leg);
       });
+      new_legs.push(new_leg);
     });
     return new_legs;
   }
@@ -227,23 +227,29 @@ const ItineraryPageMap = (
       <LocationMarker key="fromMarker" position={from} type="from" />,
     );
   }
+  
   if (to.lat && to.lon) {
     leafletObjs.push(<LocationMarker key="toMarker" position={to} type="to" />);
   }
+  
+  viaPoints.forEach((via, i) => {
+    leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);
+  });
+
   /*
   active is the active edge => when we show camera-icons, we must show only those 
   where active === edge_index
-  Send also the whole list of xtpActiveMarkers to each XtpLocationMarker.
+  Send also the whole list of xtpActivePoints to each XtpLocationMarker.
   XtpLocationMarker has the knowledge of user location => it is able to detect which 
   marker is closest to user location, see autoOpen.
   */
   xtpPoints.forEach((xtp) => {
     if (active === xtp.edge_index) {
-      xtpActiveMarkers.push(xtp);
+      xtpActivePoints.push(xtp);
     }
   });
-  const xtp_last_index = xtpActiveMarkers.length-1;
-  xtpActiveMarkers.forEach((xtp, i) => {
+  const xtp_last_index = xtpActivePoints.length-1;
+  xtpActivePoints.forEach((xtp, i) => {
     //console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
     const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
@@ -254,7 +260,7 @@ const ItineraryPageMap = (
         type="xtp"
         xtp={xtp}
         xtp_last_index={xtp_last_index}
-        xtp_active_markers={xtpActiveMarkers}
+        xtp_active_markers={xtpActivePoints}
         pid={pid}
         xtpToggleAuto={xtpToggleAuto}
         xtpHandlePrev={xtpHandlePrev}
@@ -263,10 +269,6 @@ const ItineraryPageMap = (
         xtpForce={xtpForce}
       />
     );
-  });
-  
-  viaPoints.forEach((via, i) => {
-    leafletObjs.push(<LocationMarker key={`via_${i}`} position={via} />);
   });
 
   let locationPopup = 'none';
