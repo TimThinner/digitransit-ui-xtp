@@ -94,7 +94,19 @@ const ItineraryPageMap = (
       setXtpForce({...xtpForce,index:new_index});
     }
   }
-  
+
+  const xtpPointsHasEdge = (edge_index) => {
+    let found = false;
+    xtpPoints.every(xtp => {
+      if (edge_index === xtp.edge_index) {
+        found = true;
+        return false; // break out from the every-loop.
+      }
+      return true; // continue with next item
+    });
+    return found;
+  }
+
   const get_alternate_polyline = (active, legi) => {
     let ap = '';
     xtpPoints.every(xtp => {
@@ -106,7 +118,11 @@ const ItineraryPageMap = (
     });
     return ap;
   }
-
+  // instead of cloning legs always, maybe it is better to
+  // check if xtpPoints has values for this edge.
+  // This can be easily checked:
+  // if (xtpPointsHasEdge(active)) { ...
+  // 
   const clone_legs = (old_legs, active) => {
     const new_legs = []
     old_legs.forEach((leg, legi)=>{
@@ -136,14 +152,14 @@ const ItineraryPageMap = (
 
   if (itinerary) {
     console.log(['itinerary => ItineraryLine itinerary.legs=',itinerary.legs]);
-    const alternate_legs = clone_legs(itinerary.legs, active);
-    console.log(['alternate_legs=',alternate_legs]);
+    const alt_legs = xtpPointsHasEdge(active) ? clone_legs(itinerary.legs, active) : itinerary.legs;
+    console.log(['alt_legs=',alt_legs]);
     leafletObjs.push(
       <ItineraryLine
         key={`line_${active}`}
         hash={active}
         streetMode={hash}
-        legs={alternate_legs} //{itinerary.legs}
+        legs={alt_legs} //{itinerary.legs}
         showIntermediateStops
         showDurationBubble={showDurationBubble}
         realtimeTransfers={realtimeTransfers}
@@ -154,13 +170,13 @@ const ItineraryPageMap = (
       planEdges.forEach((edge, i) => {
         if (i !== active) {
           console.log(['!showActiveOnly => ItineraryLine edge.node.legs=',edge.node.legs]);
-          const alternate_legs = clone_legs(edge.node.legs, i);
-          console.log(['alternate_legs=',alternate_legs]);
+          const alt_legs = xtpPointsHasEdge(i) ? clone_legs(edge.node.legs, i) : edge.node.legs;
+          console.log(['alt_legs=',alt_legs]);
           leafletObjs.push(
             <ItineraryLine
               key={`line_${i}`}
               hash={i}
-              legs={alternate_legs} // {edge.node.legs}
+              legs={alt_legs} // {edge.node.legs}
               passive
             />,
           );
@@ -169,14 +185,14 @@ const ItineraryPageMap = (
     }
     if (active < planEdges.length) {
       console.log(['active < planEdges.length => planEdges[active].node.legs=',planEdges[active].node.legs]);
-      const alternate_legs = clone_legs(planEdges[active].node.legs, active);
-      console.log(['alternate_legs=',alternate_legs]);
+      const alt_legs = xtpPointsHasEdge(active) ? clone_legs(planEdges[active].node.legs, active) : planEdges[active].node.legs;
+      console.log(['alt_legs=',alt_legs]);
       leafletObjs.push(
         <ItineraryLine
           key={`line_${active}`}
           hash={active}
           streetMode={hash}
-          legs={alternate_legs} // {planEdges[active].node.legs}
+          legs={alt_legs} // {planEdges[active].node.legs}
           showIntermediateStops
           showDurationBubble={showDurationBubble}
           realtimeTransfers={realtimeTransfers}
