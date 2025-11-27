@@ -1688,18 +1688,18 @@ div.leaflet-control-scale-line {
   position: absolute;
   top: 0px;
   left: 0;
-  transform: translateX(-30px);
+  transform: translateX(-50px);
 }
 .xtp-popup-right-button-wrapper {
   position: absolute;
   top: 0px;
   right: 0;
-  transform: translateX(30px);
+  transform: translateX(50px);
 }
 .xtp-popup-navi-button,
 .xtp-popup-navi-button:hover {
   height: 165px;
-  width: 40px;
+  width: 60px;
   background: rgba(255,255,255,0.75);
   color: #000;
   font-size:24px;

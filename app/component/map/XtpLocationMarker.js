@@ -90,9 +90,11 @@ function XtpLocationMarker(props) {
   // name: PropTypes.string,
   const within_activation_range = [];
   props.xtp_active_markers.forEach((am_xtp, i) => {
+    // HACK: If activation_range is very small (<40) force it to 40 metres.
+    const A_RANGE = am_xtp.activation_range < 40 ? 40 : am_xtp.activation_range;
     //console.log(['props.locationState lat=',props.locationState.lat,'lon=',props.locationState.lon]);
     const dist = distance(am_xtp, props.locationState);
-    if (dist <= am_xtp.activation_range) {
+    if (dist <= A_RANGE) {
       const pid = 'xtp_'+i;
       within_activation_range.push({pid:pid,dist:dist});
     }
