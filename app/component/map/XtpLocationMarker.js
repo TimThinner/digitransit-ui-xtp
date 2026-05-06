@@ -2,6 +2,8 @@ import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 // import React, { useRef } from 'react';
+import { connectToStores } from 'fluxible-addons-react';
+import distance from '@digitransit-search-util/digitransit-search-util-distance';
 import { 
   xtpShape,
   locationShape,
@@ -11,8 +13,6 @@ import XtpIconMarker from './XtpIconMarker';
 import XtpPopup from './popups/XtpPopup';
 // New imports to add locationState into this component
 import PositionStore from '../../store/PositionStore';
-import { connectToStores } from 'fluxible-addons-react';
-import distance from '@digitransit-search-util/digitransit-search-util-distance';
 // import useWindowSize from '../../hooks/useWindowSize';
 /*
 key
@@ -154,7 +154,7 @@ function XtpLocationMarker(props) {
         className: cx(validType, props.className, props.pid),
         element: (
           <Icon
-            img={`icon_mapMarker-xtp-map`}
+            img={"icon_mapMarker-xtp-map"}
             color={props.disabled ? '#bbbbbb' : null}
           />
         ),
