@@ -101,7 +101,7 @@ function CarParkLeg(props, { config }) {
               itinerary-icon bike_park
               now, but test custom styles later.*/}
             {props.xtp_leg_icon && (
-              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+              <Icon img="icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
             )}
           </div>
           <ItineraryMapAction

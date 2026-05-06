@@ -333,7 +333,7 @@ export default function BicycleLeg(
                   itinerary-icon bike_park
                   now, but test custom styles later.*/}
                 {xtp_leg_icon && (
-                  <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+                  <Icon img="icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
                 )}
               </div>
               <ItineraryMapAction
@@ -399,7 +399,7 @@ export default function BicycleLeg(
                 itinerary-icon bike_park
                 now, but test custom styles later.*/}
               {xtp_leg_icon && (
-                <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+                <Icon img="icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
               )}
             </div>
             <ItineraryMapAction

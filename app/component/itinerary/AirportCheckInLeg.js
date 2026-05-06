@@ -46,7 +46,7 @@ export default function AirportCheckInLeg(props, { config }) {
           <div className="xtp-icon-container">
             {/*Show XTP Info (cameraicon)*/}
             {props.xtp_leg_icon && (
-              <Icon img="icon-icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+              <Icon img="icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
             )}
           </div>
           <ItineraryMapAction target={name || ''} focusAction={focusAction} />

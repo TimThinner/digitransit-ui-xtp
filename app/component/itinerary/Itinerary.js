@@ -2,12 +2,9 @@ import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React, { createRef, useLayoutEffect, useState } from 'react';
 import { useFragment } from 'react-relay';
-
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useRouter } from 'found';
 import { legShape, locationShape, itineraryShape, xtpShape } from '../../util/shapes';
-
-
 import Icon from '../Icon';
 import Feedback from './Feedback';
 import Duration from './Duration';
@@ -1005,7 +1002,7 @@ const Itinerary = ({
                 <div className="itinerary-xtp-icon-container">
                 {/*Show XTP Info (cameraicon) if edge_index === props.hash*/}
                 {showXTPInfoIcon && (
-                  <Icon img="icon-icon_mapMarker-xtp-map" className="xtp-camera" />
+                  <Icon img="icon_mapMarker-xtp-map" className="xtp-camera" />
                 )}
                 </div>
               </div>

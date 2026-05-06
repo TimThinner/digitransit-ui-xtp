@@ -154,7 +154,7 @@ function XtpLocationMarker(props) {
         className: cx(validType, props.className, props.pid),
         element: (
           <Icon
-            img={`icon-icon_mapMarker-xtp-map`}
+            img={`icon_mapMarker-xtp-map`}
             color={props.disabled ? '#bbbbbb' : null}
           />
         ),
