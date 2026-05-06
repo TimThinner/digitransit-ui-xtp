@@ -1,3 +1,4 @@
+/* eslint-disable camelcase prettier */
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -333,7 +334,10 @@ export default function BicycleLeg(
                   itinerary-icon bike_park
                   now, but test custom styles later.*/}
                 {xtp_leg_icon && (
-                  <Icon img="icon_mapMarker-xtp-map" className="itinerary-icon bike_park" />
+                  <Icon 
+                    img="icon_mapMarker-xtp-map"
+                    className="itinerary-icon bike_park"
+                  />
                 )}
               </div>
               <ItineraryMapAction

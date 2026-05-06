@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import PropTypes from 'prop-types';
 import React, { memo, useEffect, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'react-intl';

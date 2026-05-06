@@ -908,7 +908,7 @@ const Itinerary = ({
     !containsScooterLeg;
   
   /* Show the "camera" icon if this edge is listed in xtpPoints. */
-  const showXTPInfoIcon = xtpPoints ? xtpPoints.find((item) => item.edge_index === props.hash) : null;
+  const showXTPInfoIcon = xtpPoints ? xtpPoints.find((item) => item.edge_index === props.hash) : false;
   
   const itineraryContainerOverflowRef = createRef();
   const [showOverflowIcon, setShowOverflowIcon] = useState(false);

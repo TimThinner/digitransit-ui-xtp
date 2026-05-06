@@ -102,7 +102,6 @@ function mockPositionChange(actionContext) {
         heading: 0,
       },
     };
-    //console.log(['mockPositionChange newPos=',newPos]);
     geoCallback(actionContext, newPos);
   }
 }
