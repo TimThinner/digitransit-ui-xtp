@@ -1,25 +1,23 @@
 import PropTypes from 'prop-types';
-//import React, { useState } from 'react';
-//import React, { useRef, useState, useEffect } from 'react';
+// import React, { useState } from 'react';
+// import React, { useRef, useState, useEffect } from 'react';
 import React from 'react';
-import { locationShape } from '../../../util/shapes';
-import Card from '../../Card';
-import Toggle from '../../Toggle';
 import { withLeaflet } from 'react-leaflet/es/context'; // New for Leaflet access.
 import Popup from 'react-leaflet/es/Popup';
+import { locationShape } from '../../../util/shapes';
+import Card from '../../Card';
+// import Toggle from '../../Toggle';
 /*
   pid = 'xtp_0', 'xtp_1', etc.
 */
-//export default function XtpPopup({ pid, lat, lon, xtpurl }) {
-
+// export default function XtpPopup({ pid, lat, lon, xtpurl }) {
 // See similar example at function SelectStopRow  !!!!!
-
 class XtpPopup extends React.Component {
   static displayName = 'XtpPopup';
   static propTypes = {
     leaflet: PropTypes.shape({
       map: PropTypes.shape({
-        //openPopup: PropTypes.func.isRequired,
+        // openPopup: PropTypes.func.isRequired,
         closePopup: PropTypes.func.isRequired,
         getZoom: PropTypes.func.isRequired,
         on: PropTypes.func.isRequired,
@@ -34,7 +32,7 @@ class XtpPopup extends React.Component {
     handlePrev: PropTypes.func.isRequired,
     handleNext: PropTypes.func.isRequired,
     handleSetIndex: PropTypes.func.isRequired,
-    //toggleSize: PropTypes.func.isRequired,
+    // toggleSize: PropTypes.func.isRequired,
     toggleAuto: PropTypes.func.isRequired,
     autoOpen: PropTypes.bool.isRequired,
     picSize: PropTypes.string.isRequired,
@@ -42,12 +40,12 @@ class XtpPopup extends React.Component {
   };
   
   constructor(props) {
-    console.log(['constructor props=',props]);
+    // console.log(['constructor props=',props]);
     super(props);
     this.state = {
       width: 0,
       height: 0,
-      //size: 'S',
+      // size: 'S',
       zoom: this.props.leaflet.map.getZoom(),
     };
   }
@@ -59,7 +57,7 @@ class XtpPopup extends React.Component {
       dim.w = e.clientWidth;
       dim.h = e.clientHeight;
     });
-    //console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
+    // console.log(['GET MAP DIMENSIONS elems=',elems,'dim.w=',dim.w,'dim.h=',dim.h]);
     return dim;
   }
   
@@ -188,7 +186,7 @@ class XtpPopup extends React.Component {
   }
   
   render() {
-    //console.log(['Create Popup this.props.pid=',this.props.pid]);
+    // console.log(['Create Popup this.props.pid=',this.props.pid]);
     const a_title = this.props.autoOpen ? 'Auto ON' : 'Auto OFF';
     const toggleModeClassName = this.getToggleModeClass();
     const prev_state = this.getPrevButtonState();
@@ -199,9 +197,9 @@ class XtpPopup extends React.Component {
     const dimw = this.getPicWidth(mapdim.w);
     const xtpClassNames = this.getPopupClasses(dimw);
     const btnClasses = this.getButtonClasses(dimw);
-    //console.log(['xtpClassNames=',xtpClassNames]);
-    //console.log(['btnClasses=',btnClasses]);
-    //console.log(['dimw=',dimw]);
+    // console.log(['xtpClassNames=',xtpClassNames]);
+    // console.log(['btnClasses=',btnClasses]);
+    // console.log(['dimw=',dimw]);
     const dimwpx = dimw+'px';
     return (
       <Popup
