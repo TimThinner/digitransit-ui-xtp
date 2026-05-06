@@ -13,17 +13,33 @@ const maxLon = 27.373531;
 export default configMerger(walttiConfig, {
   CONFIG,
 
-  appBarLink: { name: 'Rovaniemi', href: 'http://www.rovaniemi.fi/' },
+  appBarLink: {
+    name: 'Linkkari',
+    href: 'http://linkkari.fi/',
+    altLink: {
+      sv: {
+        name: 'Linkkari',
+        href: 'http://linkkari.fi/in-English',
+      },
+      en: {
+        name: 'Linkkari',
+        href: 'http://linkkari.fi/in-English',
+      },
+    },
+  },
 
   colors: {
     primary: '#34B233',
-    iconColors: {
-      'mode-bus': '#34B233',
-    },
+    bus: '#34B233',
   },
   socialMedia: {
     title: APP_TITLE,
     description: APP_DESCRIPTION,
+    image: {
+      url: 'img/social-share-rovaniemi.png',
+      width: 504,
+      height: 426,
+    },
   },
 
   title: APP_TITLE,
@@ -80,9 +96,6 @@ export default configMerger(walttiConfig, {
       },
     ],
   },
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
   zoneIdMapping: {
     1: 'A',
     2: 'B',

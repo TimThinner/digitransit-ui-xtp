@@ -1,7 +1,6 @@
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { intlShape } from 'react-intl';
 import { ReactRelayContext } from 'react-relay';
 import GridLayer from 'react-leaflet/es/GridLayer';
 import SphericalMercator from '@mapbox/sphericalmercator';
@@ -17,13 +16,11 @@ import LocationPopup from '../popups/LocationPopup';
 import TileContainer from './TileContainer';
 import { isFeatureLayerEnabled } from '../../../util/mapLayerUtils';
 import RealTimeInformationStore from '../../../store/RealTimeInformationStore';
-import PreferencesStore from '../../../store/PreferencesStore';
 import { addAnalyticsEvent } from '../../../util/analyticsUtils';
 import { getClientBreakpoint } from '../../../util/withBreakpoint';
 import {
+  stopPagePath,
   PREFIX_BIKESTATIONS,
-  PREFIX_STOPS,
-  PREFIX_TERMINALS,
   PREFIX_CARPARK,
   PREFIX_BIKEPARK,
   PREFIX_RENTALVEHICLES,
@@ -45,7 +42,6 @@ class TileLayerContainer extends GridLayer {
     tileSize: PropTypes.number.isRequired,
     zoomOffset: PropTypes.number.isRequired,
     locationPopup: PropTypes.string, // all, none, reversegeocoding, origindestination
-    allowViaPoint: PropTypes.bool, // temporary, until OTP2 handles arbitrary via points
     onSelectLocation: PropTypes.func,
     mergeStops: PropTypes.bool,
     mapLayers: mapLayerShape.isRequired,
@@ -65,23 +61,20 @@ class TileLayerContainer extends GridLayer {
     stopsToShow: PropTypes.arrayOf(PropTypes.string),
     objectsToHide: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string)),
     vehicles: PropTypes.objectOf(vehicleShape),
-    lang: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
     onSelectLocation: undefined,
     locationPopup: undefined,
-    allowViaPoint: false,
     objectsToHide: { vehicleRentalStations: [] },
     highlightedStops: undefined,
     stopsToShow: undefined,
     vehicles: undefined,
-    mergeStops: false,
+    mergeStops: true,
   };
 
   static contextTypes = {
     getStore: PropTypes.func.isRequired,
-    intl: intlShape.isRequired,
     config: configShape.isRequired,
     match: matchShape.isRequired,
     router: routerShape.isRequired,
@@ -151,7 +144,7 @@ class TileLayerContainer extends GridLayer {
           tile.el.layers &&
           tile.el.layers.forEach(layer => {
             if (layer.onTimeChange) {
-              layer.onTimeChange(this.props.lang);
+              layer.onTimeChange(this.context.config.language);
             }
           }),
       );
@@ -187,7 +180,7 @@ class TileLayerContainer extends GridLayer {
       this.props.vehicles,
       this.props.stopsToShow,
       this.props.objectsToHide,
-      this.props.lang,
+      this.context.config.language,
     );
     tile.onSelectableTargetClicked = (
       selectableTargets,
@@ -240,13 +233,11 @@ class TileLayerContainer extends GridLayer {
         selectableTargets.length === 1 &&
         selectableTargets[0].layer === 'stop'
       ) {
-        const prefix = selectableTargets[0].feature.properties.stops
-          ? PREFIX_TERMINALS
-          : PREFIX_STOPS;
         this.context.router.push(
-          `/${prefix}/${encodeURIComponent(
+          stopPagePath(
+            selectableTargets[0].feature.properties.stops,
             selectableTargets[0].feature.properties.gtfsId,
-          )}`,
+          ),
         );
         return;
       }
@@ -355,10 +346,7 @@ class TileLayerContainer extends GridLayer {
     let contents;
     const breakpoint = getClientBreakpoint();
     let showPopup = true;
-    const locationPopup =
-      this.props.allowViaPoint || this.props.locationPopup !== 'all'
-        ? this.props.locationPopup
-        : 'origindestination';
+    const { locationPopup } = this.props;
 
     if (typeof this.state.selectableTargets !== 'undefined') {
       if (this.state.selectableTargets.length === 1) {
@@ -378,7 +366,6 @@ class TileLayerContainer extends GridLayer {
             <MarkerSelectPopup
               selectRow={this.selectRow}
               options={this.state.selectableTargets}
-              colors={this.context.config.colors}
             />
           );
         } else if (
@@ -428,7 +415,6 @@ class TileLayerContainer extends GridLayer {
             <MarkerSelectPopup
               selectRow={this.selectRow}
               options={this.state.selectableTargets}
-              colors={this.context.config.colors}
               zoom={this.state.zoom}
             />
           </Popup>
@@ -474,10 +460,9 @@ const connectedComponent = withLeaflet(
         )}
       </ReactRelayContext.Consumer>
     ),
-    [RealTimeInformationStore, PreferencesStore],
+    [RealTimeInformationStore],
     context => ({
       vehicles: context.getStore(RealTimeInformationStore).vehicles,
-      lang: context.getStore(PreferencesStore).getLanguage(),
     }),
   ),
 );

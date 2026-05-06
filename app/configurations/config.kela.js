@@ -49,7 +49,9 @@ export default {
       },
     ],
   },
-
+  carBoardingModes: {
+    FERRY: { showNotification: false },
+  },
   transportModes: {
     citybike: {
       availableForSelection: false,
@@ -90,9 +92,6 @@ export default {
     showEmbeddedSearch: false,
     countrySelection: [],
   },
-
-  availableLanguages: ['fi', 'sv', 'en'],
-  defaultLanguage: 'fi',
 
   socialMedia: {
     title: APP_TITLE,
@@ -147,14 +146,9 @@ export default {
       },
     ],
   },
-  staticMessagesUrl: process.env.STATIC_MESSAGE_URL,
 
-  showNearYouButtons: false,
-  showVehiclesOnStopPage: false,
-  showVehiclesOnItineraryPage: false,
   includeCarSuggestions: true,
-  // Notice! Turning on this setting forces the search for car routes (for the CO2 comparison only).
-  showCO2InItinerarySummary: false,
   useAssembledGeoJsonZones: 'isOnByDefault',
   locationSearchTargetsFromOTP: [], // remove stop/station location search
+  viaPointsEnabled: false,
 };

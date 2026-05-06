@@ -62,34 +62,6 @@
       height: 24px;
       width: 24px;
     }
-
-    .bus-stop {
-      color: $bus-color;
-    }
-
-    .tram-stop {
-      color: $tram-color;
-    }
-
-    .subway-stop {
-      color: $metro-color;
-    }
-
-    .rail-stop {
-      color: $rail-color;
-    }
-
-    .ferry-stop {
-      color: $ferry-color;
-    }
-
-    .funicular-stop {
-      color: $funicular-color;
-    }
-
-    .speedtram-stop {
-      color: $speedtram-color;
-    }
   }
 
   .choose-row-center-column {
@@ -118,7 +90,7 @@
   .choose-row-address,
   .choose-row-platform {
     font-size: 11px;
-    font-weight: normal;
+    font-weight: $font-weight-book;
     font-stretch: normal;
     font-style: normal;
     line-height: 1.82;
@@ -143,7 +115,7 @@
   }
 
   .choose-row-right-column {
-    color: $primary-color;
+    color: $theme-primary-color;
     margin: 0 4px 0 20px;
 
     .icon-container > svg {

@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { createFragmentContainer, graphql } from 'react-relay';
-import { intlShape, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { stopTimeShape, configShape } from '../util/shapes';
 import Icon from './Icon';
 import DepartureRow from './DepartureRow';
@@ -12,7 +12,10 @@ import {
   startRealTimeClient,
   changeRealTimeClientTopics,
 } from '../action/realTimeClientAction';
-import { getHeadsignFromRouteLongName } from '../util/legUtils';
+import {
+  getHeadsignFromRouteLongName,
+  isPlatformChanged,
+} from '../util/legUtils';
 
 const getDropoffMessage = (hasOnlyDropoff, hasNoStop) => {
   if (hasNoStop) {
@@ -92,7 +95,7 @@ class DepartureListContainer extends Component {
   };
 
   static contextTypes = {
-    intl: intlShape.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -206,6 +209,13 @@ class DepartureListContainer extends Component {
   };
 
   getHeadsign = departure => {
+    if (departure.canceled && departure.isLastStop) {
+      return this.context.intl.formatMessage({
+        id: 'route-destination-endpoint',
+        defaultMessage: 'Arrives / Terminus',
+      });
+    }
+
     if (departure.isArrival) {
       if (departure.isLastStop) {
         return this.context.intl.formatMessage({
@@ -336,10 +346,7 @@ class DepartureListContainer extends Component {
         realtime: departure.realtime,
         bottomRow: dropoffMessage ? (
           <div className="drop-off-container">
-            <Icon
-              img="icon-icon_info"
-              color={this.context.config.colors.primary}
-            />
+            <Icon img="icon_info" color={this.context.config.colors.primary} />
             <FormattedMessage
               id={dropoffMessage}
               defaultMessage="Drop-off only"
@@ -365,6 +372,7 @@ class DepartureListContainer extends Component {
               ? 'no-border'
               : ''
           }
+          platformUpdated={isPlatformChanged(departure)}
         />
       );
 
@@ -419,7 +427,7 @@ DepartureListContainer.contextTypes = {
   executeAction: PropTypes.func.isRequired,
   getStore: PropTypes.func.isRequired,
   config: configShape.isRequired,
-  intl: intlShape.isRequired,
+  intl: PropTypes.object.isRequired, // eslint-disable-line
 };
 
 const containerComponent = createFragmentContainer(DepartureListContainer, {
@@ -469,6 +477,21 @@ const containerComponent = createFragmentContainer(DepartureListContainer, {
           stops {
             gtfsId
             code
+          }
+        }
+        stoptimes {
+          scheduledDeparture
+          stop {
+            gtfsId
+            platformCode
+          }
+        }
+        stoptimesForDate {
+          serviceDay
+          scheduledDeparture
+          stop {
+            gtfsId
+            platformCode
           }
         }
       }

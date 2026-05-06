@@ -1,10 +1,10 @@
 /* eslint-disable camelcase */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from 'react';
-import { intlShape } from 'react-intl';
 import { matchShape } from 'found';
 import { Helmet } from 'react-helmet';
 import SiteHeader from '@hsl-fi/site-header';
+import { useIntl } from 'react-intl';
 import { favouriteShape, configShape } from '../util/shapes';
 import { clearOldSearches, clearFutureRoutes } from '../util/storeUtils';
 import { getJson } from '../util/xhrPromise';
@@ -18,7 +18,8 @@ const clearStorages = context => {
 const notificationAPI = '/api/user/notifications';
 
 const AppBarHsl = ({ lang, user, favourites }, context) => {
-  const { config, match, intl } = context;
+  const intl = useIntl();
+  const { config, match } = context;
   const { location } = match;
 
   const notificationApiUrls = {
@@ -29,7 +30,7 @@ const AppBarHsl = ({ lang, user, favourites }, context) => {
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
-    if (config.URL.BANNERS && config.NODE_ENV !== 'test') {
+    if (config.URL.BANNERS && process.env.NODE_ENV !== 'test') {
       getJson(`${config.URL.BANNERS}&language=${lang}`)
         .then(data => setBanners(data))
         .catch(() => setBanners([]));
@@ -37,7 +38,7 @@ const AppBarHsl = ({ lang, user, favourites }, context) => {
   }, [lang]);
 
   useEffect(() => {
-    if (config.URL.FONTCOUNTER && config.NODE_ENV === 'production') {
+    if (config.URL.FONTCOUNTER && process.env.NODE_ENV === 'production') {
       fetch(config.URL.FONTCOUNTER, {
         mode: 'no-cors',
       });
@@ -146,7 +147,6 @@ AppBarHsl.contextTypes = {
   match: matchShape.isRequired,
   config: configShape.isRequired,
   getStore: PropTypes.func.isRequired,
-  intl: intlShape.isRequired,
 };
 
 AppBarHsl.propTypes = {

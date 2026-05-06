@@ -1,8 +1,9 @@
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import { useDeepLink } from '../../util/vehicleRentalUtils';
+import { openDeepLink } from '../../util/vehicleRentalUtils';
+import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import Icon from '../Icon';
 import ExternalLink from '../ExternalLink';
 
@@ -23,9 +24,16 @@ export default function TaxiLinkContainer({
   );
 
   const url = bookingUrl.startsWith('http') ? bookingUrl : infoUrl;
-  const onClick = url.startsWith('http')
-    ? () => {}
-    : () => useDeepLink(url, infoUrl);
+  const onClick = () => {
+    addAnalyticsEvent({
+      category: 'Itinerary',
+      action: 'ClickTaxiOperatorLink',
+      name: operatorName,
+    });
+    if (!url.startsWith('http')) {
+      openDeepLink(url, infoUrl);
+    }
+  };
 
   return (
     <div>
@@ -52,7 +60,7 @@ export default function TaxiLinkContainer({
             href={url}
             onClick={onClick}
           >
-            <Icon img="icon-icon_external-link-box" height={1} width={1} />
+            <Icon img="icon_external-link-box" height={1} width={1} />
           </ExternalLink>
         </div>
       </div>
@@ -65,10 +73,6 @@ TaxiLinkContainer.propTypes = {
   infoUrl: PropTypes.string,
   bookingUrl: PropTypes.string.isRequired,
   icon: PropTypes.string.isRequired,
-};
-
-TaxiLinkContainer.contextTypes = {
-  intl: intlShape.isRequired,
 };
 
 TaxiLinkContainer.defaultProps = {

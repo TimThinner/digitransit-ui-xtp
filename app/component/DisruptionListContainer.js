@@ -2,7 +2,7 @@ import cx from 'classnames';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { createFragmentContainer, graphql } from 'react-relay';
 import AlertList from './AlertList';
 import Icon from './Icon';
@@ -37,10 +37,13 @@ const splitAlertByRouteModeAndColor = alert => {
   });
 };
 
-function DisruptionListContainer(
-  { breakpoint, currentTime, viewer, onClickLink },
-  { intl },
-) {
+function DisruptionListContainer({
+  breakpoint,
+  currentTime,
+  viewer,
+  onClickLink,
+}) {
+  const intl = useIntl();
   const validAlerts = viewer?.alerts
     ?.filter(alert => isAlertValid(alert, currentTime))
     .filter(alert =>
@@ -103,10 +106,7 @@ function DisruptionListContainer(
         >
           <div className="stop-tab-singletab-container">
             <div>
-              <Icon
-                className="stop-page-tab_icon caution"
-                img="icon-icon_caution"
-              />
+              <Icon className="stop-page-tab_icon caution" img="icon_caution" />
             </div>
             <div>
               {`${intl.formatMessage({
@@ -128,7 +128,10 @@ function DisruptionListContainer(
         >
           <div className="stop-tab-singletab-container">
             <div>
-              <Icon className="stop-page-tab_icon info" img="icon-icon_info" />
+              <Icon
+                className="stop-page-tab_icon disruption-info"
+                img="icon_info"
+              />
             </div>
             <div>
               {`${intl.formatMessage({
@@ -173,10 +176,6 @@ function DisruptionListContainer(
     </div>
   );
 }
-
-DisruptionListContainer.contextTypes = {
-  intl: intlShape,
-};
 
 DisruptionListContainer.propTypes = {
   breakpoint: PropTypes.string,

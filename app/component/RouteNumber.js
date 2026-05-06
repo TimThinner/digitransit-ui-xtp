@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useIntl } from 'react-intl';
 import cx from 'classnames';
-import { intlShape } from 'react-intl';
 import { configShape } from '../util/shapes';
+import { transitIconName } from '../util/modeUtils';
 import IconWithBigCaution from './IconWithBigCaution';
 import IconWithIcon from './IconWithIcon';
 import Icon from './Icon';
@@ -11,6 +12,7 @@ import { TransportMode } from '../constants';
 const LONG_ROUTE_NUMBER_LENGTH = 6;
 
 function RouteNumber(props, context) {
+  const intl = useIntl();
   const mode = props.mode.toLowerCase();
   const { alertSeverityLevel, color, withBicycle, withCar } = props;
   const isScooter = mode === TransportMode.Scooter.toLowerCase();
@@ -62,16 +64,7 @@ function RouteNumber(props, context) {
     badgeText,
     badgeTextFill,
   ) => {
-    if (isCallAgency) {
-      return (
-        <IconWithIcon
-          color={color}
-          className={`${mode} call`}
-          img={icon || `icon-icon_${mode}`}
-          subIcon="icon-icon_call"
-        />
-      );
-    }
+    const iconName = icon || transitIconName(mode, false);
 
     if (hasDisruption || !!alertSeverityLevel) {
       return (
@@ -80,20 +73,17 @@ function RouteNumber(props, context) {
             alertSeverityLevel={alertSeverityLevel}
             color={color}
             className={mode}
-            img={icon || `icon-icon_${mode}`}
+            img={iconName}
             omitViewBox
           />
           {withBicycle && (
             <Icon
-              img="icon-icon_bicycle_walk"
+              img="icon_bicycle_walk"
               className="itinerary-icon_with-bicycle"
             />
           )}
           {withCar && (
-            <Icon
-              img="icon-icon_car-withoutBox"
-              className="itinerary-icon_with-car"
-            />
+            <Icon img="icon_car" className="itinerary-icon_with-car" />
           )}
         </React.Fragment>
       );
@@ -105,29 +95,27 @@ function RouteNumber(props, context) {
           badgeText={badgeText}
           badgeTextFill={badgeTextFill}
           color={color}
-          className={cx(mode, {
-            [['secondary']]:
-              mode === 'citybike' &&
-              props.icon &&
-              props.icon.includes('secondary'), // Vantaa citybike station
-          })}
-          img={icon || `icon-icon_${mode}`}
+          className={cx(
+            mode,
+            {
+              [['secondary']]:
+                mode === 'citybike' && props.icon?.includes('secondary'), // Vantaa citybike station
+            },
+            props.appendClass,
+          )}
+          img={iconName}
           subIcon=""
           mode={mode}
-          omitViewBox
+          omitViewBox={!isCallAgency}
+          backgroundShape={isCallAgency ? 'square' : undefined}
         />
         {withBicycle && (
           <Icon
-            img="icon-icon_bicycle_walk"
+            img="icon_bicycle_walk"
             className="itinerary-icon_with-bicycle"
           />
         )}
-        {withCar && (
-          <Icon
-            img="icon-icon_car-withoutBox"
-            className="itinerary-icon_with-car"
-          />
-        )}
+        {withCar && <Icon img="icon_car" className="itinerary-icon_with-car" />}
       </React.Fragment>
     );
   };
@@ -140,7 +128,7 @@ function RouteNumber(props, context) {
     >
       <span
         className={cx('vcenter-children', props.className)}
-        aria-label={context.intl.formatMessage({
+        aria-label={intl.formatMessage({
           id: mode,
           defaultMessage: 'Vehicle',
         })}
@@ -189,7 +177,7 @@ function RouteNumber(props, context) {
                 mode,
                 { long: longText },
               )}
-              style={{ color: !props.withBar && getColor() }}
+              style={{ color: !props.withBar ? getColor() : null }}
             >
               {filteredText}
             </span>
@@ -207,13 +195,13 @@ function RouteNumber(props, context) {
             </div>
           )}
         {isScooter && !props.vertical && (
-          <Icon img="icon-icon_smartphone" className="phone-icon" />
+          <Icon img="icon_smartphone" className="phone-icon" />
         )}
       </span>
       {props.occupancyStatus && (
         <span className="occupancy-icon-container">
           <Icon
-            img={`icon-icon_${props.occupancyStatus}`}
+            img={`icon_${props.occupancyStatus}`}
             height={1.5}
             width={1.5}
             color="white"
@@ -225,7 +213,10 @@ function RouteNumber(props, context) {
 
   return props.withBar ? (
     <div className={cx('bar-container', { long: hasNoShortName })}>
-      <div className={cx('bar', mode)} style={{ backgroundColor: getColor() }}>
+      <div
+        className={cx('bar', mode, props.appendClass)}
+        style={{ backgroundColor: getColor() }}
+      >
         {rNumber}
       </div>
     </div>
@@ -284,7 +275,6 @@ RouteNumber.defaultProps = {
 };
 
 RouteNumber.contextTypes = {
-  intl: intlShape.isRequired,
   config: configShape.isRequired,
 };
 

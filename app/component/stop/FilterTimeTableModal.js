@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import intersection from 'lodash/intersection';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
 import Modal from '@hsl-fi/modal';
 import Icon from '../Icon';
@@ -21,7 +21,7 @@ class FilterTimeTableModal extends React.Component {
   };
 
   static contextTypes = {
-    intl: intlShape.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -134,16 +134,13 @@ class FilterTimeTableModal extends React.Component {
               }
             >
               {intersection(this.state.showRoutes, [o.code]).length > 0 && (
-                <Icon
-                  img="icon-icon_checkbox_checked"
-                  className="checkbox-icon"
-                />
+                <Icon img="icon_box-checked" className="checkbox-icon" />
               )}
             </label>
             {/* eslint-enable jsx-a11y/label-has-associated-control */}
           </div>
           <div className="route-mode">
-            <Icon className={mode} img={`icon-icon_${mode}`} />
+            <Icon className={mode} img={`icon_${mode}`} />
           </div>
           <div
             className={`route-number ${mode} ${cx({
@@ -219,10 +216,7 @@ class FilterTimeTableModal extends React.Component {
               className={this.state.allRoutes ? 'checked' : ''}
             >
               {this.state.allRoutes ? (
-                <Icon
-                  img="icon-icon_checkbox_checked"
-                  className="checkbox-icon"
-                />
+                <Icon img="icon_box-checked" className="checkbox-icon" />
               ) : null}
             </label>
             {/* eslint-enable jsx-a11y/label-has-associated-control */}

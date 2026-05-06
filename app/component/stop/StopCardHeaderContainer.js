@@ -15,6 +15,7 @@ export default createFragmentContainer(
         code
         desc
         zoneId
+        vehicleMode
         alerts {
           alertSeverityLevel
           effectiveEndDate
@@ -25,6 +26,7 @@ export default createFragmentContainer(
         stops {
           name
           desc
+          zoneId
         }
       }
     `,

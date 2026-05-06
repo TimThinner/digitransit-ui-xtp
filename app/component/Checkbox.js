@@ -2,26 +2,24 @@ import cx from 'classnames';
 import uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { intlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 import Message from './Message';
 
 import { isKeyboardSelectionEvent } from '../util/browser';
 import Icon from './Icon';
 
-const Checkbox = (
-  {
-    large,
-    checked,
-    disabled,
-    onChange,
-    labelId,
-    defaultMessage,
-    showLabel,
-    title,
-    name,
-  },
-  { intl },
-) => {
+const Checkbox = ({
+  large,
+  checked,
+  disabled,
+  onChange,
+  labelId,
+  defaultMessage,
+  showLabel,
+  title,
+  name,
+}) => {
+  const intl = useIntl();
   const id = uniqueId('input-');
   return (
     <div className={cx('option-checkbox-container', { large })} title={title}>
@@ -48,7 +46,7 @@ const Checkbox = (
           {checked && (
             <Icon
               className="checkmark"
-              img="icon-icon_check-digitransit"
+              img="icon_check"
               viewBox="0 0 15 11"
               width={1.875}
               height={1.75}
@@ -100,10 +98,6 @@ Checkbox.defaultProps = {
   title: undefined,
   name: undefined,
   large: false,
-};
-
-Checkbox.contextTypes = {
-  intl: intlShape.isRequired,
 };
 
 export default Checkbox;

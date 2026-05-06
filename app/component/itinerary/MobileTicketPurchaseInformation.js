@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { intlShape, FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { configShape, fareShape } from '../../util/shapes';
 import { renderZoneTicket } from './ZoneTicket';
 import { getAlternativeFares, formatFare } from '../../util/fareUtils';
@@ -8,8 +8,9 @@ import { addAnalyticsEvent } from '../../util/analyticsUtils';
 
 export default function MobileTicketPurchaseInformation(
   { fares, zones },
-  { config, intl },
+  { config },
 ) {
+  const intl = useIntl();
   const fare = fares[0]; // Show buy option only if there is single ticket available
   const alternativeFares = getAlternativeFares(
     zones,
@@ -59,12 +60,7 @@ export default function MobileTicketPurchaseInformation(
           onClick={() =>
             addAnalyticsEvent({ event: 'journey_planner_open_app' })
           }
-          href={config.ticketPurchaseLink(
-            fare,
-            config.ticketLinkOperatorCode,
-            config.appName,
-            config.availableTickets,
-          )}
+          href={config.ticketPurchaseLink(fare, config.availableTickets)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -86,7 +82,6 @@ MobileTicketPurchaseInformation.defaultProps = {
 
 MobileTicketPurchaseInformation.contextTypes = {
   config: configShape,
-  intl: intlShape.isRequired,
 };
 
 MobileTicketPurchaseInformation.displayName = 'TicketInformation';

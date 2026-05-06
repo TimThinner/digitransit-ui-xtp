@@ -1,39 +1,29 @@
 import configMerger from '../util/configMerger';
+import { IS_DEV } from '../util/envUtils';
 import walttiConfig from './config.waltti';
 
 const CONFIG = 'jyvaskyla';
 const APP_TITLE = 'Reittiopas Jyväskylä';
 const APP_DESCRIPTION = 'Jyväskylän uusi reittiopas';
-const IS_DEV =
-  process.env.RUN_ENV === 'development' ||
-  process.env.NODE_ENV !== 'production';
 
 const virtualMonitorBaseUrl = IS_DEV
   ? 'https://dev-jyvaskylamonitori.digitransit.fi'
   : 'https://pysakit.jyvaskyla.fi';
-
-const minLat = 61.835318;
-const maxLat = 62.603473;
-const minLon = 25.230388;
-const maxLon = 26.358237;
 
 export default configMerger(walttiConfig, {
   CONFIG,
 
   feedIds: ['LINKKI'],
 
-  searchParams: {
-    'boundary.rect.min_lat': minLat,
-    'boundary.rect.max_lat': maxLat,
-    'boundary.rect.min_lon': minLon,
-    'boundary.rect.max_lon': maxLon,
-  },
+  useSearchPolygon: true,
 
   areaPolygon: [
-    [minLon, minLat],
-    [minLon, maxLat],
-    [maxLon, maxLat],
-    [maxLon, minLat],
+    [25.23039, 61.83532],
+    [26.35824, 61.83532],
+    [26.88962, 62.32949],
+    [26.22059, 62.91141],
+    [25.58789, 62.93897],
+    [24.88556, 62.29714],
   ],
 
   defaultEndpoint: {
@@ -44,19 +34,32 @@ export default configMerger(walttiConfig, {
 
   appBarLink: {
     name: 'Jyväskylän seudun joukkoliikenne',
-    href: 'http://linkki.jyvaskyla.fi/',
+    href: 'https://linkki.jyvaskyla.fi/',
+    altLink: {
+      sv: {
+        name: 'Kollektivtrafiken i Jyväskyläregionen',
+        href: 'https://linkki.jyvaskyla.fi/en',
+      },
+      en: {
+        name: 'Public transportation in the Jyväskylä region',
+        href: 'https://linkki.jyvaskyla.fi/en',
+      },
+    },
   },
 
   colors: {
     primary: '#7DC02D',
-    iconColors: {
-      'mode-bus': '#7DC02D',
-    },
+    bus: '#7DC02D',
   },
 
   socialMedia: {
     title: APP_TITLE,
     description: APP_DESCRIPTION,
+    image: {
+      url: 'img/social-share-jyvaskyla.png',
+      width: 443,
+      height: 443,
+    },
   },
 
   title: APP_TITLE,
@@ -65,10 +68,6 @@ export default configMerger(walttiConfig, {
 
   // Navbar logo
   logo: 'jyvaskyla/jyvaskyla-favicon.png',
-
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
 
   mainMenu: {
     stopMonitor: {
@@ -152,7 +151,7 @@ export default configMerger(walttiConfig, {
           sv: 'Servicekontorer',
           en: 'Service points',
         },
-        url: 'https://jakoon.jkl.fi/reittiopas/Asiakaspalvelupisteet/myyntipisteet.geojson',
+        url: 'https://jakoon.jkl.fi/reittiopas/Asiakaspalvelupisteet/myyntipisteet090226.geojson',
       },
     ],
   },
@@ -183,12 +182,11 @@ export default configMerger(walttiConfig, {
     stops: true,
     itinerary: true,
   },
-  // Notice! Turning on this setting forces the search for car routes (for the CO2 comparison only).
-  showCO2InItinerarySummary: true,
+
   sendAnalyticsCustomEventGoals: true,
 
   defaultSettings: {
-    ...walttiConfig.defaultSettings,
     minTransferTime: 180,
   },
+  useRealtimeTravellerCapacities: true,
 });

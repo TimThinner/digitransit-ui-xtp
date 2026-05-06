@@ -1,13 +1,14 @@
 /* eslint-disable camelcase */
 import PropTypes from 'prop-types';
 import React, { useCallback, useState, useRef, useEffect } from 'react';
-import { intlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 import cx from 'classnames';
 import Icon from './Icon';
 import { isKeyboardSelectionEvent } from '../util/browser';
 import { userShape } from '../util/shapes';
 
-const UserMenu = ({ menuItems, user }, { intl }) => {
+const UserMenu = ({ menuItems, user }) => {
+  const intl = useIntl();
   const [menuOpen, setMenuOpen] = useState(false);
   const useMenuRef = useRef(null);
   const { given_name, family_name } = user;
@@ -49,7 +50,7 @@ const UserMenu = ({ menuItems, user }, { intl }) => {
         aria-expanded={menuOpen}
       >
         <div className="usermenu-header">
-          <Icon img="icon-icon_user" width={2} height={2} color="#fff" />
+          <Icon img="icon_user" width={2} height={2} color="#fff" />
           <div className="usermenu-title-text">{initials}</div>
         </div>
       </button>
@@ -96,10 +97,6 @@ UserMenu.propTypes = {
 
 UserMenu.defaultProps = {
   user: {},
-};
-
-UserMenu.contextTypes = {
-  intl: intlShape.isRequired,
 };
 
 export default UserMenu;

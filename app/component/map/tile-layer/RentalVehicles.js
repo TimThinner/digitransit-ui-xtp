@@ -9,14 +9,11 @@ import {
   drawSmallVehicleRentalMarker,
 } from '../../../util/mapIconUtils';
 
-import {
-  getRentalNetworkConfig,
-  getRentalNetworkIcon,
-} from '../../../util/vehicleRentalUtils';
 import { fetchWithLanguageAndSubscription } from '../../../util/fetchUtils';
 import { getLayerBaseUrl } from '../../../util/mapLayerUtils';
 import { TransportMode } from '../../../constants';
 import { getSettings } from '../../../util/planParamUtil';
+import { createFeatureObjects } from '../../../util/clusterUtils';
 
 class RentalVehicles {
   constructor(tile, config, mapLayers, relayEnvironment) {
@@ -59,7 +56,6 @@ class RentalVehicles {
             const layer = vt.layers.realtimeRentalVehicles;
             const settings = getSettings(this.config);
             const { scooterNetworks } = settings;
-            const scooterIconPrefix = `icon-icon_scooter`;
             const showAllNetworks =
               !this.config.transportModes.scooter.showIfSelectedForRouting;
             if (layer) {
@@ -91,7 +87,7 @@ class RentalVehicles {
               this.canHaveStationUpdates = zoomedIn;
 
               if (this.tile.coords.z >= 13 && this.tile.coords.z < 18) {
-                this.clusterAndDraw(zoomedIn, scooterIconPrefix);
+                this.clusterAndDraw(zoomedIn);
               } else {
                 this.features.forEach(feature => this.draw(feature, zoomedIn));
               }
@@ -106,7 +102,7 @@ class RentalVehicles {
       });
   };
 
-  clusterAndDraw = (zoomedIn, iconPrefix) => {
+  clusterAndDraw = zoomedIn => {
     const index = new Supercluster({
       radius: 40, // in pixels
       maxZoom: 17,
@@ -136,27 +132,24 @@ class RentalVehicles {
     clusters.forEach(clusterFeature => {
       const newFeature = this.featureWithGeom(clusterFeature);
       clusteredFeatures.push(newFeature);
-      this.draw(newFeature, zoomedIn, iconPrefix);
+      this.draw(newFeature, zoomedIn);
     });
     this.features = clusteredFeatures;
   };
 
-  draw = (feature, zoomedIn, iconPrefix) => {
-    const { id, network } = feature.properties;
+  draw = (feature, zoomedIn) => {
+    const { id } = feature.properties;
     const { geom } = feature;
-    const iconName =
-      iconPrefix ||
-      getRentalNetworkIcon(getRentalNetworkConfig(network, this.config));
     const isHighlighted = this.tile.highlightedStops?.includes(id);
     if (zoomedIn || isHighlighted) {
-      drawScooterIcon(this.tile, geom, iconName, isHighlighted);
+      drawScooterIcon(this.tile, geom, isHighlighted);
     } else {
       this.drawSmallScooterMarker(geom);
     }
   };
 
   drawSmallScooterMarker = geom => {
-    const iconColor = this.config.colors.iconColors['mode-scooter'];
+    const iconColor = this.config.colors.scooter;
     drawSmallVehicleRentalMarker(
       this.tile,
       geom,
@@ -178,22 +171,20 @@ class RentalVehicles {
   static getName = () => 'scooter';
 
   pointsInSuperclusterFormat = () => {
-    return this.features.map(feature => {
-      // Convert the feature's x/y to lat/lon for clustering
-      const latLon = this.tile.project({
-        x: feature.geom.x,
-        y: feature.geom.y,
-      });
-      return {
-        type: 'Feature',
-        properties: { ...feature.properties },
-        geom: { ...feature.geom },
-        geometry: {
-          type: 'Point',
-          coordinates: [latLon.lat, latLon.lon],
-        },
-      };
-    });
+    return createFeatureObjects(
+      this.features.map(feature => {
+        // Convert the feature's x/y to lat/lon for clustering
+        const coordinates = this.tile.project({
+          x: feature.geom.x,
+          y: feature.geom.y,
+        });
+        return {
+          properties: feature.properties,
+          lat: coordinates.lat,
+          lon: coordinates.lon,
+        };
+      }),
+    );
   };
 
   featureWithGeom = clusterFeature => {

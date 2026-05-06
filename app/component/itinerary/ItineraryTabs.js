@@ -1,17 +1,25 @@
+/* eslint-disable react/no-array-index-key */
 import PropTypes from 'prop-types';
 import React from 'react';
 import ItineraryDetails from './ItineraryDetails';
-
 import SwipeableTabs from '../SwipeableTabs';
 import { planEdgeShape, xtpShape } from '../../util/shapes';
 
-/* eslint-disable react/no-array-index-key */
-
-function ItineraryTabs({ planEdges, xtpPoints, tabIndex, isMobile, changeHash, ...rest }) {
+function ItineraryTabs({
+  planEdges,
+  xtpPoints,
+  tabIndex,
+  isMobile,
+  changeHash,
+  recommendedIndex,
+  feedback = {},
+  giveFeedback,
+  ...rest
+}) {
   const itineraryTabs = planEdges.map((edge, i) => {
     // From xtpPoints extract only those "infos" where edge_index equals i
     const xtp_edge_points = xtpPoints.filter(p => p.edge_index === i);
-    console.log(["ItineraryTabs index=",i,"xtp_edge_points=",xtp_edge_points]);
+    //console.log(["ItineraryTabs index=",i,"xtp_edge_points=",xtp_edge_points]);
     return (
       <div
         className={`swipeable-tab ${tabIndex !== i && 'inactive'}`}
@@ -24,6 +32,12 @@ function ItineraryTabs({ planEdges, xtpPoints, tabIndex, isMobile, changeHash, .
           hideTitle={!isMobile}
           changeHash={isMobile ? changeHash : undefined}
           isMobile={isMobile}
+          tabIndex={i}
+          recommended={i === recommendedIndex}
+          feedback={feedback[i]}
+          giveFeedback={
+            giveFeedback ? like => giveFeedback(i, like) : undefined
+          }
           {...rest}
         />
       </div>
@@ -36,8 +50,7 @@ function ItineraryTabs({ planEdges, xtpPoints, tabIndex, isMobile, changeHash, .
       tabIndex={tabIndex}
       onSwipe={changeHash}
       classname={isMobile ? 'swipe-mobile-divider' : 'swipe-desktop-view'}
-      ariaFrom="swipe-summary-page"
-      ariaFromHeader="swipe-summary-page-header"
+      ariaRole="swipe-summary-page-tab"
     />
   );
 }
@@ -48,11 +61,9 @@ ItineraryTabs.propTypes = {
   planEdges: PropTypes.arrayOf(planEdgeShape).isRequired,
   xtpPoints: PropTypes.arrayOf(xtpShape),
   changeHash: PropTypes.func,
-};
-
-ItineraryTabs.defaultProps = {
-  changeHash: undefined,
-  xtpPoints: [],
+  recommendedIndex: PropTypes.number,
+  feedback: PropTypes.objectOf(PropTypes.bool),
+  giveFeedback: PropTypes.func,
 };
 
 export default ItineraryTabs;

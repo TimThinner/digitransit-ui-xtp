@@ -3,8 +3,8 @@ import React from 'react';
 import { useFragment } from 'react-relay';
 import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
-import { matchShape } from 'found';
-import { configShape, planEdgeShape, xtpShape } from '../../util/shapes';
+import { useRouter } from 'found';
+import { planEdgeShape, xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import Itinerary from './Itinerary';
 import {
@@ -15,48 +15,38 @@ import {
 import ItineraryListHeader from './ItineraryListHeader';
 import ItinerariesNotFound from './ItinerariesNotFound';
 import Loading from '../Loading';
-import FeedbackPrompt from './FeedbackPrompt';
 import { streetHash } from '../../util/path';
 import { getIntermediatePlaces } from '../../util/otpStrings';
 import { ItineraryListPlanEdges } from './queries/ItineraryListPlanEdges';
+import { useConfigContext } from '../../configurations/ConfigContext';
 
 const spinnerPosition = {
   top: 'top',
   bottom: 'bottom',
 };
 
-function ItineraryList(
-  {
-/*
-<<<<<<< HEAD
-    planEdges,
-    xtpPoints,
-=======
-*/
-    planEdges: planEdgesRef,
-    xtpPoints,
-//>>>>>>> upstream/v3
-    activeIndex,
-    onSelect,
-    onSelectImmediately,
-    searchTime,
-    bikeParkItineraryCount,
-    carDirectItineraryCount,
-    showRelaxedPlanNotifier,
-    rentalVehicleNotifierId,
-    separatorPosition,
-    loadingMore,
-    routingFeedbackPosition,
-    ...rest
-  },
-  context,
-) {
-  const { config } = context;
-  const { location } = context.match;
-  const { hash } = context.match.params;
-
-  const planEdges = useFragment(ItineraryListPlanEdges, planEdgesRef);
-
+function ItineraryList({
+  planEdges: planEdgesRef,
+  xtpPoints,
+  activeIndex,
+  focusToHeader,
+  searchTime,
+  bikeParkItineraryCount = 0,
+  carDirectItineraryCount = 0,
+  showRelaxedPlanNotifier = false,
+  rentalVehicleNotifierId,
+  separator2,
+  loadingMore,
+  separator1,
+  recommendedIndex,
+  feedback = {},
+  giveFeedback,
+  ...rest
+}) {
+  const config = useConfigContext();
+  const { match } = useRouter();
+  const { hash } = match.params;
+  const planEdges = useFragment(ItineraryListPlanEdges, planEdgesRef) || [];
   const co2s = planEdges
     .filter(e => e.node.emissionsPerPerson?.co2 >= 0)
     .map(e => e.node.emissionsPerPerson.co2);
@@ -70,11 +60,13 @@ function ItineraryList(
       itinerary={edge.node}
       xtpPoints={xtpPoints}
       passive={i !== activeIndex}
-      onSelect={onSelect}
-      onSelectImmediately={onSelectImmediately}
-      intermediatePlaces={getIntermediatePlaces(location.query)}
+      focusToHeader={focusToHeader}
+      intermediatePlaces={getIntermediatePlaces(match.location.query)}
       hideSelectionIndicator={i !== activeIndex || planEdges.length === 1}
       lowestCo2value={lowestCo2value}
+      recommended={i === recommendedIndex}
+      feedback={feedback[i]} // single feedback entry
+      giveFeedback={giveFeedback ? like => giveFeedback(i, like) : undefined}
     />
   ));
 
@@ -155,21 +147,26 @@ function ItineraryList(
       );
     }
   }
-  if (separatorPosition) {
+  if (separator2) {
     summaries.splice(
-      separatorPosition,
+      separator2,
       0,
       <div
         className="summary-list-separator"
-        key={`summary-list-separator-${separatorPosition}`}
+        key={`summary-list-separator-${separator2}`}
       />,
     );
   }
-  if (routingFeedbackPosition) {
-    const pos = separatorPosition
-      ? routingFeedbackPosition + 1
-      : routingFeedbackPosition;
-    summaries.splice(pos, 0, <FeedbackPrompt key="feedback-prompt" />);
+  if (separator1) {
+    const pos = separator2 ? separator1 + 1 : separator1;
+    summaries.splice(
+      pos,
+      0,
+      <div
+        className="summary-list-separator"
+        key={`summary-list-separator-${pos}`}
+      />,
+    );
   }
   return (
     <div className="summary-list-container" role="list">
@@ -181,7 +178,7 @@ function ItineraryList(
             'show-alternatives',
           )}
         >
-          <Icon className="icon-icon_settings" img="icon-icon_settings" />
+          <Icon className="icon_settings" img="icon_settings" />
           <div>
             <FormattedMessage
               id="no-route-showing-alternative-options"
@@ -198,7 +195,7 @@ function ItineraryList(
             'summary-notification',
           )}
         >
-          <Icon className="info-icon" img="icon-icon_info" />
+          <Icon className="info-icon" img="icon_info" />
           <div>
             <div className="alternative-vehicle-info-header">
               <FormattedMessage id="no-route-msg" />
@@ -247,32 +244,17 @@ ItineraryList.propTypes = {
   searchTime: PropTypes.number.isRequired,
   planEdges: PropTypes.arrayOf(planEdgeShape),
   xtpPoints: PropTypes.arrayOf(xtpShape),
-  onSelect: PropTypes.func.isRequired,
-  onSelectImmediately: PropTypes.func.isRequired,
+  focusToHeader: PropTypes.func.isRequired,
   bikeParkItineraryCount: PropTypes.number,
   carDirectItineraryCount: PropTypes.number,
   showRelaxedPlanNotifier: PropTypes.bool,
   rentalVehicleNotifierId: PropTypes.string,
-  separatorPosition: PropTypes.number,
+  separator1: PropTypes.number,
+  separator2: PropTypes.number,
   loadingMore: PropTypes.string,
-  routingFeedbackPosition: PropTypes.number,
-};
-
-ItineraryList.defaultProps = {
-  bikeParkItineraryCount: 0,
-  carDirectItineraryCount: 0,
-  planEdges: [],
-  xtpPoints: [],
-  showRelaxedPlanNotifier: false,
-  rentalVehicleNotifierId: undefined,
-  separatorPosition: undefined,
-  loadingMore: undefined,
-  routingFeedbackPosition: undefined,
-};
-
-ItineraryList.contextTypes = {
-  config: configShape.isRequired,
-  match: matchShape.isRequired,
+  recommendedIndex: PropTypes.number,
+  feedback: PropTypes.objectOf(PropTypes.bool),
+  giveFeedback: PropTypes.func,
 };
 
 export { ItineraryList as default, spinnerPosition };

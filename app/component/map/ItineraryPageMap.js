@@ -275,13 +275,9 @@ const ItineraryPageMap = (
   let onSelectLocation;
 
   if (isLocationPopupEnabled) {
-    // max 5 viapoints
-    locationPopup =
-      config.viaPointsEnabled && viaPoints.length < 5
-        ? 'all'
-        : 'origindestination';
+    locationPopup = config.viaPointsEnabled ? 'all' : 'origindestination';
     onSelectLocation = (item, id) =>
-      onLocationPopup(item, id, router, match, executeAction);
+      onLocationPopup(item, id, router, match, executeAction, config);
   }
 
   return (
@@ -293,13 +289,8 @@ const ItineraryPageMap = (
       {...rest}
     >
       {showBackButton && breakpoint !== 'large' && (
-        <BackButton
-          icon="icon-icon_arrow-collapse--left"
-          iconClassName="arrow-icon"
-          fallback="pop"
-        />
+        <BackButton fallback="pop" />
       )}
-
       {breakpoint === 'large' && config.useCookiesPrompt && (
         <CookieSettingsButton />
       )}

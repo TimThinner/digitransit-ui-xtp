@@ -1,4 +1,4 @@
-.disruption-info .icon.disruption-info {
+.disruption-info .icon.info {
   padding-left: 2vh;
   width: 2em;
   fill: $disruption-color;
@@ -11,6 +11,10 @@
 
   .stop-tab-container {
     flex: 0 0 auto;
+
+    .icon.disruption-info {
+      fill: $gray-blue;
+    }
   }
 
   .stop-tab-singletab,
@@ -103,6 +107,14 @@
       }
     }
 
+    .icon.info {
+      color: $dark-gray;
+
+      &.info {
+        fill: $gray-blue;
+      }
+    }
+
     .alert-row-link {
       padding-right: 4px;
       text-decoration: none;
@@ -160,15 +172,15 @@
 
     .alert-body {
       font-size: $font-size-small;
-      font-weight: $disruption-message-font-weight;
+      font-weight: $font-weight-book;
       white-space: pre-wrap;
 
       .alert-url {
-        color: $primary-color;
+        color: $theme-primary-color;
         margin-left: 5px;
 
         .external-link {
-          color: $primary-color;
+          color: $theme-primary-color;
         }
       }
     }

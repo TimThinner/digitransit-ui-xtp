@@ -1,4 +1,4 @@
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Link from 'found/Link';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -26,6 +26,7 @@ import {
 } from '../../util/legUtils';
 import { getIdWithoutFeed } from '../../util/feedScopedIdUtils';
 import ScooterLinkContainer from './ScooterLinkContainer';
+import IconBadge from '../icon/IconBadge';
 
 function VehicleRentalLeg(
   {
@@ -39,8 +40,9 @@ function VehicleRentalLeg(
     nextLegMode,
     nearestScooters,
   },
-  { config, intl },
+  { config },
 ) {
+  const intl = useIntl();
   if (!vehicleRentalStation && !isScooter) {
     return null;
   }
@@ -104,15 +106,19 @@ function VehicleRentalLeg(
                 img={vehicleIcon}
                 width={1.655}
                 height={1.655}
-                badgeText={
-                  vehicleRentalStation &&
-                  vehicleCapacity !== BIKEAVL_UNKNOWN &&
-                  !returnBike
-                    ? vehicleRentalStation?.availableVehicles.total
-                    : ''
+                foreground={
+                  <IconBadge
+                    badgeText={
+                      vehicleRentalStation &&
+                      vehicleCapacity !== BIKEAVL_UNKNOWN &&
+                      !returnBike
+                        ? vehicleRentalStation?.availableVehicles.total
+                        : ''
+                    }
+                    badgeFill={returnBike ? null : availabilityIndicatorColor}
+                    badgeTextFill={returnBike ? null : availabilityTextColor}
+                  />
                 }
-                badgeFill={returnBike ? null : availabilityIndicatorColor}
-                badgeTextFill={returnBike ? null : availabilityTextColor}
               />
             </div>
             <div className="itinerary-with-link-text-container">
@@ -140,11 +146,7 @@ function VehicleRentalLeg(
           </div>
           <div className="link-to-stop">
             <Link to={rentalStationLink}>
-              <Icon
-                img="icon-icon_arrow-collapse--right"
-                height={1.3}
-                width={1.3}
-              />
+              <Icon img="icon_arrow-collapse--right" height={1.3} width={1.3} />
             </Link>
           </div>
         </div>
@@ -198,7 +200,6 @@ VehicleRentalLeg.defaultProps = {
 
 VehicleRentalLeg.contextTypes = {
   config: configShape.isRequired,
-  intl: intlShape.isRequired,
 };
 const VehicleRentalLegWithBreakpoint = withBreakpoint(VehicleRentalLeg);
 

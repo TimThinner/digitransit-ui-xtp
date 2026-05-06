@@ -9,7 +9,7 @@ import FuzzyTripLink from './FuzzyTripLink';
 import AddressRow from '../AddressRow';
 import ServiceAlertIcon from '../ServiceAlertIcon';
 import { fromStopTime } from './DepartureTime';
-import { PREFIX_STOPS } from '../../util/path';
+import { stopPagePath } from '../../util/path';
 import { getActiveAlertSeverityLevel } from '../../util/alertUtils';
 import { estimateItineraryDistance } from '../../util/geo-utils';
 import ZoneIcon from '../ZoneIcon';
@@ -117,7 +117,10 @@ const TripRouteStop = (props, { config }) => {
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ fill: !stopPassed && color, stroke: !stopPassed && color }}
+          style={{
+            fill: !stopPassed ? color : null,
+            stroke: !stopPassed ? color : null,
+          }}
         >
           <circle
             cx="8"
@@ -130,15 +133,11 @@ const TripRouteStop = (props, { config }) => {
         </svg>
         <div
           className={cx('route-stop-now_line', mode)}
-          style={{ backgroundColor: !stopPassed && color }}
+          style={{ backgroundColor: !stopPassed ? color : null }}
         />
       </div>
       <div className="route-stop-row_content-container">
-        <Link
-          as="button"
-          type="button"
-          to={`/${PREFIX_STOPS}/${encodeURIComponent(stop.gtfsId)}`}
-        >
+        <Link as="button" type="button" to={stopPagePath(false, stop.gtfsId)}>
           <div>
             <div className="route-details-upper-row">
               <div className={`route-details_container ${mode}`}>

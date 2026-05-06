@@ -2,8 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Marker from 'react-leaflet/es/Marker';
 import { default as L } from 'leaflet';
+import cx from 'classnames';
 import Icon from '../../Icon';
 import { legShape, configShape } from '../../../util/shapes';
+import { renderAsString } from '../../../util/mapIconUtils';
 
 class LegMarker extends React.Component {
   static propTypes = {
@@ -13,6 +15,7 @@ class LegMarker extends React.Component {
     zIndexOffset: PropTypes.number,
     wide: PropTypes.bool,
     style: PropTypes.string,
+    appendClass: PropTypes.string,
   };
 
   static defaultProps = {
@@ -20,6 +23,7 @@ class LegMarker extends React.Component {
     zIndexOffset: undefined,
     wide: false,
     style: undefined,
+    appendClass: undefined,
   };
 
   static contextTypes = {
@@ -30,6 +34,10 @@ class LegMarker extends React.Component {
   getLegMarker() {
     const color = this.props.color ? this.props.color : 'currentColor';
     const className = this.props.wide ? 'wide' : '';
+    const iconName =
+      this.props.mode === 'bus-express'
+        ? 'icon_bus'
+        : `icon_${this.props.mode}`;
     // Do not display route number if it is an external route and the route number is empty.
     const displayRouteNumber = !(
       this.context.config.externalFeedIds !== undefined &&
@@ -53,16 +61,17 @@ class LegMarker extends React.Component {
         icon={L.divIcon({
           html: `
             <div class="${className}" style="--background-color: ${color}">
-            ${Icon.asString({
-              img: `icon-icon_${this.props.mode}`,
-              className: 'map-route-icon',
-              color,
-            })}
+            ${renderAsString(
+              <Icon img={iconName} className="map-route-icon" color={color} />,
+            )}
               ${routeNumber}
             </div>`,
-          className: `${
-            this.props.style ? `arrow-${this.props.style}` : 'legmarker'
-          } ${this.props.mode} ${displayRouteNumber ? '' : 'only-icon'}`,
+          className: cx(
+            this.props.style ? `arrow-${this.props.style}` : 'legmarker',
+            this.props.mode,
+            { 'only-icon': !displayRouteNumber },
+            this.props.appendClass,
+          ),
           iconSize: null,
         })}
         zIndexOffset={this.props.zIndexOffset}

@@ -1,13 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Modal from '@hsl-fi/modal';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Icon from '../Icon';
 
-export default function WeatherDetailsPopup(
-  { weatherData, onClose },
-  { intl },
-) {
+export default function WeatherDetailsPopup({ weatherData, onClose }) {
+  const intl = useIntl();
   // Icons for night time is represented adding a 100 to an id. For example:
   // iconId 1 (clear sky) for a day is 101 for a night. Subtract this so we don't need duplicate translations.
   const weatherIdForDescription = weatherData.iconId % 100;
@@ -28,7 +26,7 @@ export default function WeatherDetailsPopup(
           {weatherData.time}
         </h3>
         <div className="weather-icon-row">
-          <Icon img={`icon-icon_weather_${weatherData.iconId}`} />
+          <Icon img={`icon_weather_${weatherData.iconId}`} />
           <span className="weather-temperature">
             {`${Math.round(weatherData.temperature) > 1 ? '+' : ''}${Math.round(
               weatherData.temperature,
@@ -53,8 +51,4 @@ WeatherDetailsPopup.propTypes = {
     time: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func.isRequired,
-};
-
-WeatherDetailsPopup.contextTypes = {
-  intl: intlShape.isRequired,
 };

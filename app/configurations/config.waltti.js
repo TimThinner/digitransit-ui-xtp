@@ -1,6 +1,5 @@
-import prUtils from '../util/ParkAndRideUtils';
+import { IS_DEV } from '../util/envUtils';
 
-const HSLParkAndRideUtils = prUtils.HSL;
 const API_URL = process.env.API_URL || 'https://dev-api.digitransit.fi';
 const OTP_URL = process.env.OTP_URL || `${API_URL}/routing/v2/waltti/`;
 const MAP_URL = process.env.MAP_URL || 'https://dev-cdn.digitransit.fi';
@@ -41,6 +40,33 @@ export default {
     },
   },
 
+  aboutThisService: {
+    fi: [
+      {
+        header: 'Käytön seuranta ja analytiikka',
+        paragraphs: [
+          'Käytämme evästeetöntä Plausible Analytics -analytiikkatyökalua palvelun käytön seurantaan ja kehittämiseen. Kerättävä tieto on tilastollista eikä mahdollista yksittäisten käyttäjien tunnistamista.',
+        ],
+      },
+    ],
+    sv: [
+      {
+        header: 'Uppföljning och analys',
+        paragraphs: [
+          'Vi använder det cookiefria analysverktyget Plausible Analytics för att följa upp och utveckla användningen av tjänsten. Den information som samlas in är statistisk och gör det inte möjligt att identifiera enskilda användare.',
+        ],
+      },
+    ],
+    en: [
+      {
+        header: 'Tracking and analytics',
+        paragraphs: [
+          'We use the cookie-free analytics tool Plausible Analytics to monitor and develop the use of the service. The data collected is statistical in nature and does not enable the identification of individual users.',
+        ],
+      },
+    ],
+  },
+
   stopsMinZoom: 14,
 
   vehicleRental: {},
@@ -57,80 +83,45 @@ export default {
     description: APP_DESCRIPTION,
   },
 
-  availableLanguages: ['fi', 'sv', 'en'],
-  defaultLanguage: 'fi',
-
+  vehicles: true,
+  showVehiclesOnStopPage: true,
+  showVehiclesOnItineraryPage: true,
   showCO2InItinerarySummary: true,
 
   transportModes: {
     bus: {
       availableForSelection: true,
       defaultValue: true,
-      nearYouLabel: {
-        fi: 'Bussit ja lähipysäkit kartalla',
-        sv: 'Bussar och hållplatser på kartan',
-        en: 'Buses and nearby stops on map',
-      },
     },
 
     rail: {
       availableForSelection: false,
       defaultValue: false,
-      nearYouLabel: {
-        fi: 'Junat ja lähiasemat kartalla',
-        sv: 'Tåg och stationer på kartan',
-        en: 'Trains and nearby stations on map',
-      },
     },
 
     tram: {
       availableForSelection: false,
       defaultValue: false,
-      nearYouLabel: {
-        fi: 'Raitiovaunut ja lähipysäkit kartalla',
-        sv: 'Spårvagnar och hållplatser på kartan',
-        en: 'Trams and nearby stops on map',
-      },
     },
 
     subway: {
       availableForSelection: false,
       defaultValue: false,
-      nearYouLabel: {
-        fi: 'Metrot ja lähiasemat kartalla',
-        sv: 'Metro och stationer på kartan',
-        en: 'Metro and nearby stations on map',
-      },
     },
 
     citybike: {
       availableForSelection: false,
       defaultValue: false,
-      nearYouLabel: {
-        fi: 'Lähimmät kaupunkipyöräasemat',
-        sv: 'Närmaste cykelstationer',
-        en: 'The closest city bike stations',
-      },
     },
 
     airplane: {
       availableForSelection: false,
       defaultValue: false,
-      nearYouLabel: {
-        fi: 'Lähimmät lentoasemat',
-        sv: 'Närmaste flygplatser',
-        en: 'The closest airports',
-      },
     },
 
     ferry: {
       availableForSelection: false,
       defaultValue: false,
-      nearYouLabel: {
-        fi: 'Lähimmät lauttalaiturit',
-        sv: 'Närmaste färjekajer',
-        en: 'The closest ferry piers',
-      },
     },
 
     funicular: {
@@ -144,10 +135,14 @@ export default {
     },
   },
 
+  showNearYouButtons: true,
+  nearYouTitle: {
+    fi: 'Aikataulut ja linjat',
+    sv: 'Tidtabeller och linjer',
+    en: 'Timetables and routes',
+  },
   nearYouModes: ['bus'],
-  nearbyModeSet: 'waltti',
-
-  maxNearbyStopDistance: {
+  maxNearYouDistance: {
     bus: 30000,
     tram: 30000,
     rail: 50000,
@@ -160,49 +155,26 @@ export default {
 
   nationalServiceLink: {
     fi: {
-      name: 'matka.fi',
-      href: 'https://opas.matka.fi/',
+      name: 'matka.fintraffic.fi',
+      href: 'https://matka.fintraffic.fi/',
     },
     sv: {
-      name: 'matka.fi',
-      href: 'https://opas.matka.fi/sv/',
+      name: 'matka.fintraffic.fi',
+      href: 'https://matka.fintraffic.fi/sv/',
     },
     en: {
-      name: 'matka.fi',
-      href: 'https://opas.matka.fi/en/',
+      name: 'matka.fintraffic.fi',
+      href: 'https://matka.fintraffic.fi/en/',
     },
   },
-
-  showNearYouButtons: true,
-  nearYouButton: {
-    borderRadius: '50%',
-    color: '#000F94',
-  },
-  nearYouTitle: {
-    fi: 'Aikataulut ja linjat',
-    sv: 'Tidtabeller och linjer',
-    en: 'Timetables and routes',
-  },
-
-  allowLogin: false,
 
   messageBarAlerts: true,
 
   includeCarSuggestions: true,
   includeParkAndRideSuggestions: true,
-  // Park and ride and car suggestions separated into two switches
-  separatedParkAndRideSwitch: true,
   showBikeAndParkItineraries: true,
-  parkingAreaSources: ['liipi'],
 
-  parkAndRide: {
-    showParkAndRide: false,
-    showParkAndRideForBikes: false,
-    parkAndRideMinZoom: 13,
-    pageContent: {
-      default: HSLParkAndRideUtils,
-    },
-  },
+  parkAndRide: { parkAndRideMinZoom: 14 },
 
   hostnames: [
     // DEV hostnames
@@ -259,6 +231,10 @@ export default {
       : '';
   },
 
+  // if true we don't show fare information on top of the itinerary
+  // when there are legs from unknown operators
+  hideUnknownFares: true,
+
   startSearchFromUserLocation: true,
 
   minTransferTimeSelection: [
@@ -287,18 +263,13 @@ export default {
     FERRY: { showNotification: true },
   },
 
-  ticketPurchaseLink: function purchaseTicketLink(
-    fare,
-    operatorCode,
-    appName,
-    availableTickets,
-  ) {
+  ticketPurchaseLink: function purchaseTicketLink(fare, availableTickets) {
     const fareId = fare.fareProducts[0].product.id;
     const feed = fareId.split(':')[0];
     const zones = availableTickets[feed][fareId].zones.reduce((acc, zone) => {
       return `${acc}0${zone}`;
     }, '');
-    return `https://waltti.fi/${appName}/busTicket/?operator=${operatorCode}&ticketType=single&customerGroup=adult&zones=${zones}`;
+    return `https://waltti.fi/${this.appName}/busTicket/?operator=${this.ticketLinkOperatorCode}&ticketType=single&customerGroup=adult&zones=${zones}`;
   },
   appName: 'walttiapp',
   ticketButtonTextId: 'buy-in-app',
@@ -319,17 +290,15 @@ export default {
   hideNaviTickets: true, // TODO: temporary force switch
   navigation: true,
 
-  externalFeedIds: ['02Taksi'],
-
-  // features that should not be deployed to production
-  experimental: {
-    allowFlexJourneys:
-      process.env.RUN_ENV === 'development' ||
-      process.env.NODE_ENV !== 'production',
-    allowDirectFlexJourneys:
-      process.env.RUN_ENV === 'development' ||
-      process.env.NODE_ENV !== 'production',
-  },
+  // TODO: flex disabled for now, proper configuration coming in the future
+  /* flex: {
+    internalFlexEnabled: false,
+    allowTaxiJourneys: IS_DEV,
+    directOnlyTaxiJourneys: false,
+    internalAgencies: [],
+    externalAgencies: ['02Taksi:02_taksi'],
+    infoLanguage: 'fi',
+  }, */
 
   replacementBusNotification: {
     header: {
@@ -355,4 +324,6 @@ export default {
       ],
     },
   },
+  showRouteDescNotification: IS_DEV,
+  useAlternativeNameForModes: ['RAIL'],
 };

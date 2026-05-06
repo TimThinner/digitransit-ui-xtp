@@ -1,38 +1,44 @@
 import PropTypes from 'prop-types';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import cx from 'classnames';
 import { isAnyLegPropertyIdentical, isRental } from '../../../util/legUtils';
-import { getRouteMode } from '../../../util/modeUtils';
+import { getTripOrRouteMode, transitIconName } from '../../../util/modeUtils';
 import { configShape, legShape } from '../../../util/shapes';
 import Icon from '../../Icon';
 import NaviCardExtension from './NaviCardExtension';
 import NaviInstructions from './NaviInstructions';
 import { LEGTYPE } from './NaviUtils';
 import usePrevious from './hooks/usePrevious';
+import { IndoorLegType, NaviCardType } from '../../../constants';
+import { getIndoorLegType } from '../../../util/indoorUtils';
 
 const iconMap = {
-  BICYCLE: 'icon-icon_cyclist',
-  CAR: 'icon-icon_car-withoutBox',
-  SCOOTER: 'icon-icon_scooter_rider',
-  WALK: 'icon-icon_walk',
-  WAIT: 'icon-icon_navigation_wait',
-  BUS: 'icon-icon_bus',
-  RAIL: 'icon-icon_rail',
-  SUBWAY: 'icon-icon_subway',
-  TRAM: 'icon-icon_tram',
-  FERRY: 'icon-icon_ferry',
-  'FERRY-EXTERNAL': 'icon-icon_ferry-external',
-  CALL: 'icon-icon_call',
-  'BUS-EXPRESS': 'icon-icon_bus-express',
-  'BUS-LOCAL': 'icon-icon_bus-local',
-  SPEEDTRAM: 'icon-icon_speedtram',
-  WAIT_IN_VEHICLE: 'icon-icon_wait',
+  BICYCLE: 'icon_cyclist',
+  CAR: 'icon_car',
+  SCOOTER: 'icon_scooter_rider',
+  WALK: 'icon_walk',
+  WAIT: 'icon_wait_standing',
+  CALL: 'icon_call',
+  WAIT_IN_VEHICLE: 'icon_wait_sitting',
 };
 
 export default function NaviCard(
-  { leg, nextLeg, legType, time, position, tailLength, cardAnimation },
+  {
+    focusToPoint,
+    previousLeg,
+    leg,
+    nextLeg,
+    legType,
+    time,
+    position,
+    tailLength,
+    cardAnimation,
+    platformUpdated,
+  },
   { config },
 ) {
   const [cardExpanded, setCardExpanded] = useState(false);
+  const [currentCard, setCurrentCard] = useState(NaviCardType.Default);
   const contentRef = useRef();
   const { isEqual: legChanged } = usePrevious(leg, (prev, current) =>
     isAnyLegPropertyIdentical(prev, current, ['legId', 'mode']),
@@ -40,10 +46,12 @@ export default function NaviCard(
 
   const handleClick = () => {
     setCardExpanded(prev => !prev);
+    setCurrentCard(NaviCardType.Default);
   };
 
   if (legChanged) {
     setCardExpanded(false);
+    setCurrentCard(NaviCardType.Default);
   }
 
   if (
@@ -59,10 +67,9 @@ export default function NaviCard(
   let instructions = '';
 
   if (legType === LEGTYPE.TRANSIT) {
-    const m = getRouteMode(leg.route, config);
-    iconColor = config.colors.iconColors[`mode-${m}`] || leg.route.color;
-    iconName = iconMap[m.toUpperCase()];
-
+    const m = getTripOrRouteMode(leg.trip, leg.route, config);
+    iconColor = config.colors[m] || leg.route.color;
+    iconName = transitIconName(m, false);
     instructions = `navileg-in-transit`;
   } else if (
     legType !== LEGTYPE.WAIT &&
@@ -88,6 +95,18 @@ export default function NaviCard(
     ? `${contentRef.current?.scrollHeight}px`
     : '0px';
 
+  useEffect(() => {
+    const element = contentRef.current;
+    if (!element) {
+      return;
+    }
+
+    // Resize card when card size changes.
+    if (cardExpanded || currentCard === NaviCardType.Indoor) {
+      element.style.maxHeight = `${element.scrollHeight}px`;
+    }
+  }, [cardExpanded, currentCard]);
+
   return (
     <button
       type="button"
@@ -96,7 +115,9 @@ export default function NaviCard(
       aria-expanded={cardExpanded}
       aria-controls={`navi-card-content-${leg?.legId}`}
     >
-      <div className="main-card">
+      <div
+        className={cx('main-card', `${currentCard.toLowerCase()}-card-type`)}
+      >
         <div className="content">
           <Icon img={iconName} className="mode" color={iconColor} omitViewBox />
           <div className={`instructions ${cardExpanded ? 'expanded' : ''}`}>
@@ -108,18 +129,24 @@ export default function NaviCard(
               time={time}
               position={position}
               tailLength={tailLength}
+              showDestinationInfo={
+                currentCard === NaviCardType.Default ||
+                (currentCard === NaviCardType.Indoor &&
+                  getIndoorLegType(previousLeg, leg, nextLeg) ===
+                    IndoorLegType.StepsBeforeEntranceInside)
+              }
             />
           </div>
           <div type="button" className="navi-top-card-arrow">
             <Icon
-              img="icon-icon_arrow-collapse"
+              img="icon_arrow-collapse"
               className={`cursor-pointer ${cardExpanded ? 'inverted' : ''}`}
             />
           </div>
         </div>
         <div
           id={`navi-card-content-${leg?.legId}`}
-          className="extension"
+          className="extension-container"
           style={{
             maxHeight,
           }}
@@ -127,10 +154,15 @@ export default function NaviCard(
           aria-hidden={!cardExpanded}
         >
           <NaviCardExtension
+            focusToPoint={focusToPoint}
             legType={legType}
+            previousLeg={previousLeg}
             leg={leg}
             nextLeg={nextLeg}
             time={time}
+            platformUpdated={platformUpdated}
+            currentCard={currentCard}
+            setCurrentCard={setCurrentCard}
           />
         </div>
       </div>
@@ -139,6 +171,8 @@ export default function NaviCard(
 }
 
 NaviCard.propTypes = {
+  focusToPoint: PropTypes.func.isRequired,
+  previousLeg: legShape,
   leg: legShape,
   nextLeg: legShape,
   legType: PropTypes.string.isRequired,
@@ -149,11 +183,14 @@ NaviCard.propTypes = {
   }),
   tailLength: PropTypes.number.isRequired,
   cardAnimation: PropTypes.string.isRequired,
+  platformUpdated: PropTypes.bool,
 };
 NaviCard.defaultProps = {
+  previousLeg: undefined,
   leg: undefined,
   nextLeg: undefined,
   position: undefined,
+  platformUpdated: false,
 };
 
 NaviCard.contextTypes = {

@@ -34,7 +34,7 @@ export const getRentalNetworkName = (
 export const getRentalNetworkIcon = (
   networkConfig = defaultNetworkConfig,
   disabled = false,
-) => `icon-icon_${networkConfig.icon || 'citybike'}${disabled ? '_off' : ''}`;
+) => `icon_${networkConfig.icon || 'citybike'}${disabled ? '_off' : ''}`;
 
 export const getRentalNetworkId = networks => {
   if (isString(networks) && networks.length > 0) {
@@ -235,7 +235,7 @@ export const getRentalVehicleLink = (rentalVehicle, networkConfig) => {
   return null;
 };
 
-export const useDeepLink = (deepLink, fallBackAddress) => {
+export const openDeepLink = (deepLink, fallBackAddress) => {
   window.location.href = deepLink;
   setTimeout(() => {
     if (!document.hidden && document.hasFocus()) {

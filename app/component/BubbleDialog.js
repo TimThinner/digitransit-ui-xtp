@@ -2,7 +2,6 @@ import isFunction from 'lodash/isFunction';
 import PropTypes from 'prop-types';
 import React from 'react';
 import withOutsideClick from 'react-click-outside';
-import { intlShape } from 'react-intl';
 import { matchShape, routerShape } from 'found';
 
 import Icon from './Icon';
@@ -103,7 +102,7 @@ class BubbleDialog extends React.Component {
             }
             type="button"
           >
-            <Icon img="icon-icon_close" />
+            <Icon img="icon_close" />
           </button>
         </div>
         <div className="bubble-dialog-tip-container">
@@ -130,7 +129,7 @@ class BubbleDialog extends React.Component {
           role="button"
           tabIndex="0"
         >
-          <Icon img={`icon-icon_${this.props.icon}`} viewBox="0 0 25 25" />
+          <Icon img={`icon_${this.props.icon}`} viewBox="0 0 25 25" />
         </div>
       </div>
     );
@@ -162,7 +161,7 @@ BubbleDialog.defaultProps = {
 };
 
 BubbleDialog.contextTypes = {
-  intl: intlShape.isRequired,
+  intl: PropTypes.object.isRequired, // eslint-disable-line
   router: routerShape.isRequired,
   match: matchShape.isRequired,
 };

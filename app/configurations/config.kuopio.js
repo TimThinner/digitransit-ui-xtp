@@ -9,19 +9,35 @@ const APP_DESCRIPTION = 'Reittiopas Kuopio';
 export default configMerger(walttiConfig, {
   CONFIG,
 
-  appBarLink: { name: 'Vilkku', href: 'https://vilkku.kuopio.fi/' },
+  appBarLink: {
+    name: 'VILKKU',
+    href: 'https://vilkku.kuopio.fi/',
+    altLink: {
+      sv: {
+        name: 'VILKKU',
+        href: 'https://vilkku.kuopio.fi/en',
+      },
+      en: {
+        name: 'VILKKU',
+        href: 'https://vilkku.kuopio.fi/en',
+      },
+    },
+  },
 
   colors: {
     primary: '#0ab1c8',
-    iconColors: {
-      'mode-bus': '#724f9f',
-      'mode-rail': '#0E7F3C',
-    },
+    bus: '#724f9f',
+    rail: '#0E7F3C',
   },
 
   socialMedia: {
     title: APP_TITLE,
     description: APP_DESCRIPTION,
+    image: {
+      url: 'img/social-share-kuopio.png',
+      width: 760,
+      height: 224,
+    },
   },
 
   title: APP_TITLE,
@@ -30,7 +46,7 @@ export default configMerger(walttiConfig, {
 
   // Navbar logo
   logo: 'kuopio/logo.png',
-  secondaryLogo: 'kuopio/secondary-logo.png',
+  secondaryLogo: 'kuopio/kuopio-secondary-logo.png',
 
   feedIds: ['Kuopio', 'digitraffic'],
 
@@ -39,7 +55,6 @@ export default configMerger(walttiConfig, {
   showTicketInformation: true,
   primaryAgencyName: 'Kuopion seudun joukkoliikenne',
 
-  showTicketLinkOnlyWhenTesting: true,
   ticketLink: {
     fi: 'https://vilkku.kuopio.fi/lipputyypit-hinnat/lippujen-hinnat',
     sv: 'https://vilkku.kuopio.fi/en/ticket-and-fares/ticket-prices',
@@ -67,16 +82,12 @@ export default configMerger(walttiConfig, {
     lon: 27.678136,
   },
 
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
-
   vehicleRental: {
     networks: {
-      freebike_kuopio: {
+      breeze_kuopio: {
         enabled: true,
         season: {
-          start: '29.4',
+          start: '27.4',
           end: '31.10',
         },
         capacity: BIKEAVL_BIKES,
@@ -186,6 +197,7 @@ export default configMerger(walttiConfig, {
     stops: true,
     itinerary: true,
   },
+  externalFareRouteIds: ['600_Skibus'],
 
   modeDisclaimers: {
     RAIL: {

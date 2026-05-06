@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import get from 'lodash/get';
 import { matchShape } from 'found';
-import { intlShape } from 'react-intl';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import getLabel from '@digitransit-search-util/digitransit-search-util-get-label';
 import { configShape } from '../../util/shapes';
@@ -10,7 +9,6 @@ import LocationMarker from './LocationMarker';
 import MapWithTracking from './MapWithTracking';
 import { otpToLocation } from '../../util/otpStrings';
 import { getJson } from '../../util/xhrPromise';
-import { LightenDarkenColor } from '../../util/colorUtils';
 import { mapLayerShape } from '../../store/MapLayerStore';
 import withBreakpoint from '../../util/withBreakpoint';
 import LocationMarkerWithPermanentTooltip from './LocationMarkerWithPermanentTooltip';
@@ -43,7 +41,7 @@ class SelectFromMap extends React.Component {
   static contextTypes = {
     match: matchShape,
     config: configShape,
-    intl: intlShape,
+    intl: PropTypes.object,
   };
 
   static propTypes = {
@@ -179,10 +177,11 @@ class SelectFromMap extends React.Component {
   };
 
   confirmButton = (isEnabled, mapCenter, positionSelectingFromMap) => {
-    const { intl } = this.context;
+    const { intl, config } = this.context;
 
     return (
       <ConfirmLocationFromMapButton
+        key="confirmButton"
         isEnabled={!!isEnabled}
         address={
           isEnabled
@@ -195,11 +194,8 @@ class SelectFromMap extends React.Component {
         })}
         type={this.props.type}
         onConfirm={this.props.onConfirm}
-        color={this.context.config.colors.primary}
-        hoverColor={
-          this.context.config.colors.hover ||
-          LightenDarkenColor(this.context.config.colors.primary, -20)
-        }
+        color={config.colors.primary}
+        hoverColor={config.colors.hover}
       />
     );
   };
@@ -265,6 +261,7 @@ class SelectFromMap extends React.Component {
       leafletObjs.push(markLocation(this.props.type, positionSelectingFromMap));
       leafletObjs.push(
         <LocationMarkerWithPermanentTooltip
+          key="tooltip"
           position={positionSelectingFromMap}
           text={mapCenter.address}
         />,

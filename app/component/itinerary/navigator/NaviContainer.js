@@ -18,13 +18,14 @@ import NaviStarter from './NaviStarter';
 import { DESTINATION_RADIUS, summaryString } from './NaviUtils';
 
 const ADDITIONAL_ARRIVAL_TIME = 30000; // 30 s
-const LEGLOG = true;
+const LEGLOG = false;
 const TOPBAR_PADDING = 8; // pixels
 const START_BUFFER = 120000; // 2 min in ms
 
 function NaviContainer(
   {
     focusToLeg,
+    focusToPoint,
     relayEnvironment,
     setNavigation,
     isNavigatorIntroDismissed,
@@ -154,6 +155,7 @@ function NaviContainer(
         <NaviCardContainer
           legs={itinerary.legs}
           focusToLeg={position ? null : focusToLeg}
+          focusToPoint={focusToPoint}
           time={params.updatedAt}
           position={position}
           tailLength={tailLength}
@@ -187,6 +189,7 @@ function NaviContainer(
 
 NaviContainer.propTypes = {
   focusToLeg: PropTypes.func.isRequired,
+  focusToPoint: PropTypes.func.isRequired,
   relayEnvironment: relayShape.isRequired,
   setNavigation: PropTypes.func.isRequired,
   isNavigatorIntroDismissed: PropTypes.bool,

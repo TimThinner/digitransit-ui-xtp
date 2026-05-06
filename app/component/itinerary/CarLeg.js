@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import cx from 'classnames';
 import { legShape, configShape } from '../../util/shapes';
 import Icon from '../Icon';
@@ -10,8 +10,10 @@ import { durationToString } from '../../util/timeUtils';
 import ItineraryCircleLineWithIcon from './ItineraryCircleLineWithIcon';
 import { legTimeStr, legDestination } from '../../util/legUtils';
 import ItineraryCircleLineLong from './ItineraryCircleLineLong';
+import { splitStringToAddressAndPlace } from '../../util/otpStrings';
 
-export default function CarLeg(props, { config, intl }) {
+export default function CarLeg(props, { config }) {
+  const intl = useIntl();
   const distance = displayDistance(
     parseInt(props.leg.distance, 10),
     config,
@@ -26,16 +28,22 @@ export default function CarLeg(props, { config, intl }) {
       index={props.index}
       modeClassName={modeClassName}
       boardingLeg={props.carBoardingLeg}
+      viaType={props.leg.from.viaLocationType}
     />
   ) : (
     <ItineraryCircleLineWithIcon
       index={props.index}
       modeClassName={modeClassName}
-      icon="icon-icon_car-withoutBox"
+      icon="icon_car"
+      viaType={props.leg.from.viaLocationType}
     />
   );
 
-  const [address, place] = props.leg.from.name.split(/, (.+)/); // Splits the name-string to two parts from the first occurance of ', '
+  const [name, place] = splitStringToAddressAndPlace(props.leg.from.name);
+  const address =
+    props.leg.from.viaLocationType && props.leg.viaAddress
+      ? props.leg.viaAddress
+      : name;
 
   /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
   return (
@@ -68,13 +76,13 @@ export default function CarLeg(props, { config, intl }) {
               {address}
               {props.leg.isViaPoint && (
                 <Icon
-                  img="icon-icon_mapMarker"
+                  img="icon_mapMarker"
                   className="itinerary-mapmarker-icon"
                 />
               )}
               {props.leg.from.stop && (
                 <Icon
-                  img="icon-icon_arrow-collapse--right"
+                  img="icon_arrow-collapse--right"
                   className="itinerary-arrow-icon"
                   color="#333"
                 />
@@ -185,5 +193,4 @@ CarLeg.defaultProps = {
 
 CarLeg.contextTypes = {
   config: configShape.isRequired,
-  intl: intlShape.isRequired,
 };

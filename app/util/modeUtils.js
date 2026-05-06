@@ -6,7 +6,7 @@ import { getCustomizedSettings } from '../store/localStorage';
 import { isInBoundingBox } from './geo-utils';
 import { addAnalyticsEvent } from './analyticsUtils';
 import { ExtendedRouteTypes, TransportMode } from '../constants';
-import { isDevelopmentEnvironment } from './envUtils';
+import { IS_DEV } from './envUtils';
 import { getFeedWithoutId, isExternalFeed } from './feedScopedIdUtils';
 
 function seasonMs(ddmmyyyy) {
@@ -39,13 +39,13 @@ export function isCitybikePreSeasonActive(season) {
   );
 }
 
-export function showCitybikeNetwork(networkConfig, config) {
+export function showCitybikeNetwork(networkConfig) {
   return (
     networkConfig?.enabled &&
     networkConfig.type === 'citybike' &&
     (isCitybikeSeasonActive(networkConfig?.season) ||
       isCitybikePreSeasonActive(networkConfig?.season) ||
-      isDevelopmentEnvironment(config))
+      IS_DEV)
   );
 }
 
@@ -64,7 +64,11 @@ export function useCitybikes(networks, config) {
   );
 }
 
-export function useScooters(networks) {
+export function useScooters(config) {
+  if (!config.transportModes?.scooter?.availableForSelection) {
+    return false;
+  }
+  const networks = config.vehicleRental?.networks;
   if (!networks) {
     return false;
   }
@@ -74,7 +78,7 @@ export function useScooters(networks) {
   );
 }
 
-export function showRentalVehiclesOfType(networks, config, type) {
+export function showRentalVehiclesOfType(networks, type) {
   if (!networks) {
     return false;
   }
@@ -82,18 +86,29 @@ export function showRentalVehiclesOfType(networks, config, type) {
     network =>
       network.type === type.toLowerCase() &&
       network.enabled &&
-      (network.showRentalVehicles || showCitybikeNetwork(network, config)),
+      (network.showRentalVehicles || showCitybikeNetwork(network)),
   );
 }
 
-export function getNearYouModes(config) {
-  if (!config.vehicleRental?.networks) {
-    return config.nearYouModes;
+const nearYouStopTypes = ['stop', 'station'];
+
+export function getNearYouModes(config, favourites) {
+  let modes = config.nearYouModes;
+  let cityBikesActive = config.nearYouModes.includes('citybike');
+  if (cityBikesActive && !useCitybikes(config.vehicleRental.networks, config)) {
+    modes = modes.filter(mode => mode !== 'citybike');
+    cityBikesActive = false;
   }
-  if (!useCitybikes(config.vehicleRental.networks, config)) {
-    return config.nearYouModes.filter(mode => mode !== 'citybike');
+  const nearFavs = favourites.filter(f => {
+    return (
+      nearYouStopTypes.includes(f.type) ||
+      (f.type === 'bikeStation' && cityBikesActive)
+    );
+  });
+  if (!nearFavs.length) {
+    modes = modes.filter(mode => mode !== 'favorite');
   }
-  return config.nearYouModes;
+  return modes;
 }
 
 export function getTransportModes(config) {
@@ -103,7 +118,7 @@ export function getTransportModes(config) {
     if (!useCitybikes(config.vehicleRental.networks, config)) {
       citybikeConfig = { citybike: { availableForSelection: false } };
     }
-    if (!useScooters(config.vehicleRental.networks)) {
+    if (!useScooters(config)) {
       scooterConfig = { scooter: { availableForSelection: false } };
     }
   }
@@ -123,11 +138,11 @@ export function getRouteMode(route, config) {
   }
   switch (route.type) {
     case ExtendedRouteTypes.BusExpress:
-      return 'bus-express';
+      return config?.useExtendedRouteTypes ? 'bus-express' : 'bus';
     case ExtendedRouteTypes.BusLocal:
-      return 'bus-local';
+      return config?.useExtendedRouteTypes ? 'bus-local' : 'bus';
     case ExtendedRouteTypes.SpeedTram:
-      return 'speedtram';
+      return config?.useExtendedRouteTypes ? 'speedtram' : 'tram';
     case ExtendedRouteTypes.CallAgency:
       return 'call';
     case ExtendedRouteTypes.ReplacementBus:
@@ -136,6 +151,92 @@ export function getRouteMode(route, config) {
       return isExternalFeed(getFeedWithoutId(route?.gtfsId), config)
         ? `${route.mode?.toLowerCase()}-external`
         : route.mode?.toLowerCase();
+  }
+}
+
+/**
+ * In NeTEx, mode and submode are properties of the trip. In GTFS, they are
+ * properties of the route. Eventually we hope we can get OTP to always report
+ * them in the more specific entity, trip, but because historically we have
+ * taken them from route, this is a fail safe way of making the change.
+ * @param trip
+ * @param route
+ * @param config
+ * @returns {string|*}
+ */
+export function getTripOrRouteMode(trip, route, config) {
+  if (trip?.isReplacement) {
+    return 'replacement-bus';
+  }
+  return getRouteMode(route, config);
+}
+
+/**
+ * extract stop's transit mode. Handles routes from map API and from OTP graphql query
+ */
+export function getStopMode(vehicleMode, routes, code, config, isTerminal) {
+  if (routes) {
+    switch (vehicleMode) {
+      case 'BUS':
+        if (config.useExtendedRouteTypes && !isTerminal) {
+          const arr = typeof routes === 'string' ? JSON.parse(routes) : routes;
+          if (
+            arr.some(
+              r => (r.gtfsType || r.type) === ExtendedRouteTypes.BusExpress,
+            )
+          ) {
+            return 'bus-express';
+          }
+        }
+        break;
+      case 'TRAM':
+        if (config.useExtendedRouteTypes) {
+          const arr = typeof routes === 'string' ? JSON.parse(routes) : routes;
+          if (
+            arr.some(
+              r => (r.gtfsType || r.type) === ExtendedRouteTypes.SpeedTram,
+            )
+          ) {
+            return 'speedtram';
+          }
+        }
+        break;
+      case 'FERRY':
+        {
+          if (config.externalFerryByStopCode && !isTerminal && !code) {
+            return 'ferry-external';
+          }
+          const arr = typeof routes === 'string' ? JSON.parse(routes) : routes;
+          if (
+            arr.some(r => isExternalFeed(getFeedWithoutId(r.gtfsId), config))
+          ) {
+            return 'ferry-external';
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return vehicleMode.toLowerCase();
+}
+
+/**
+ * @returns icon name
+ */
+export function transitIconName(mode, lollipop) {
+  switch (mode) {
+    case 'bus-express':
+      return lollipop ? 'icon_bus-lollipop' : 'icon_bus';
+    case 'bus-local':
+      return lollipop ? 'icon_bus-lollipop' : 'icon_bus-local';
+    case 'replacement-bus':
+      return lollipop ? 'icon_bus-lollipop' : 'icon_replacement-bus';
+    case 'subway':
+    case 'airplane':
+      return `icon_${mode}`; // no lollipop version
+    default:
+      return lollipop ? `icon_${mode}-lollipop` : `icon_${mode}`;
   }
 }
 
@@ -294,4 +395,128 @@ export function toggleTransportMode(transportMode, config) {
   });
   const modes = xor(getModes(config), [transportMode.toUpperCase()]);
   return modes;
+}
+
+export function getTrackOrPierOrPlatformTextShort(intl, mode) {
+  if (mode === TransportMode.Rail) {
+    return intl.formatMessage({
+      id: 'track',
+      defaultMessage: 'Track',
+    });
+  }
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage({
+      id: 'pier-short-no-num',
+      defaultMessage: 'Pier',
+    });
+  }
+  return intl.formatMessage({
+    id: 'platform-short-no-num',
+    defaultMessage: 'Plat.',
+  });
+}
+
+export function getTrackOrPierOrPlatformText(intl, mode) {
+  if (mode === TransportMode.Rail) {
+    return intl.formatMessage({ id: 'track', defaultMessage: 'Track' });
+  }
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage({ id: 'pier', defaultMessage: 'Pier' });
+  }
+  return intl.formatMessage({ id: 'platform', defaultMessage: 'Platform' });
+}
+
+export function getTrackOrPierOrPlatformWithNumText(intl, mode, platformCode) {
+  if (mode === TransportMode.Rail) {
+    return intl.formatMessage({ id: 'track-num' }, { platformCode });
+  }
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage({ id: 'pier-num' }, { platformCode });
+  }
+  return intl.formatMessage({ id: 'platform-num' }, { platformCode });
+}
+
+export function getTrackOrPierOrPlatformChangeText(intl, mode) {
+  if (mode === TransportMode.Rail) {
+    return intl.formatMessage({
+      id: 'navigation-track-change',
+      defaultMessage: 'Track change',
+    });
+  }
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage({
+      id: 'navigation-pier-change',
+      defaultMessage: 'Pier change',
+    });
+  }
+  return intl.formatMessage({
+    id: 'navigation-platform-change',
+    defaultMessage: 'Platform change',
+  });
+}
+
+export function getTrackOrPierOrPlatformRestoredText(intl, mode) {
+  if (mode === TransportMode.Rail) {
+    return intl.formatMessage({
+      id: 'navigation-track-restored',
+      defaultMessage: 'Track restored',
+    });
+  }
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage({
+      id: 'navigation-pier-restored',
+      defaultMessage: 'Pier restored',
+    });
+  }
+  return intl.formatMessage({
+    id: 'navigation-platform-restored',
+    defaultMessage: 'Platform restored',
+  });
+}
+
+export function getTrackOrPierOrPlatformChangeDetailsText(
+  intl,
+  mode,
+  number,
+  routeName,
+) {
+  if (mode === TransportMode.Rail) {
+    return intl.formatMessage(
+      { id: `navigation-track-change-details` },
+      {
+        number: number || '',
+
+        name: routeName || '',
+      },
+    );
+  }
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage(
+      { id: `navigation-pier-change-details` },
+      {
+        number: number || '',
+        name: routeName || '',
+      },
+    );
+  }
+  return intl.formatMessage(
+    { id: `navigation-platform-change-details` },
+    {
+      number: number || '',
+      name: routeName || '',
+    },
+  );
+}
+
+export function getTerminalOrStationText(intl, mode) {
+  if (mode === TransportMode.Ferry) {
+    return intl.formatMessage({
+      id: 'terminal',
+      defaultMessage: 'Terminal',
+    });
+  }
+  return intl.formatMessage({
+    id: 'station',
+    defaultMessage: 'Station',
+  });
 }

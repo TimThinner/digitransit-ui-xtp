@@ -3,14 +3,14 @@ import React from 'react';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { matchShape, routerShape } from 'found';
 import cx from 'classnames';
-import { intlShape } from 'react-intl';
 import { routeShape, configShape } from '../../util/shapes';
 import RouteStopListContainer from './RouteStopListContainer';
 import withBreakpoint from '../../util/withBreakpoint';
 import RouteControlPanel from './RouteControlPanel';
-import { PREFIX_ROUTES } from '../../util/path';
+import { routePagePath } from '../../util/path';
 import Error404 from '../404';
 import ScrollableWrapper from '../ScrollableWrapper';
+import { ExtendedRouteTypes } from '../../constants';
 
 class PatternStopsContainer extends React.PureComponent {
   static propTypes = {
@@ -25,22 +25,20 @@ class PatternStopsContainer extends React.PureComponent {
 
   static contextTypes = {
     config: configShape.isRequired,
-    intl: intlShape.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   render() {
+    const routeId = this.props.route?.gtfsId;
     if (!this.props.pattern) {
-      if (this.props.route.gtfsId) {
+      if (routeId) {
         // Redirect back to routes default pattern
-        this.props.router.replace(
-          `/${PREFIX_ROUTES}/${this.props.route.gtfsId}`,
-        );
+        this.props.router.replace(routePagePath(routeId));
       } else {
         return <Error404 />;
       }
       return false;
     }
-    const routeId = this.props.route.gtfsId;
     const { locale } = this.context.intl;
     const { constantOperationRoutes } = this.context.config;
 
@@ -73,12 +71,14 @@ class PatternStopsContainer extends React.PureComponent {
             </div>
           </div>
         )}
-        <RouteStopListContainer
-          key="list"
-          pattern={this.props.pattern}
-          patternId={this.props.pattern.code}
-          hideDepartures={!!constantOperationRoutes[routeId]}
-        />
+        {this.props.route.type !== ExtendedRouteTypes.CallAgency && (
+          <RouteStopListContainer
+            key="list"
+            pattern={this.props.pattern}
+            patternId={this.props.pattern.code}
+            hideDepartures={!!constantOperationRoutes[routeId]}
+          />
+        )}
       </ScrollableWrapper>
     );
   }
@@ -106,7 +106,7 @@ export default createFragmentContainer(withBreakpoint(PatternStopsContainer), {
       mode
       type
       ...RouteAgencyInfo_route
-      ...RoutePatternSelect_route @arguments(date: $date)
+      ...RoutePatternSelectContainer_route @arguments(date: $date)
       agency {
         phone
         name

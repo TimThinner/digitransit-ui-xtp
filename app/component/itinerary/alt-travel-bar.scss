@@ -143,7 +143,7 @@
 
     .fake-select-arrow {
       font-size: 0.7rem;
-      color: $primary-color;
+      color: $theme-primary-color;
       margin-top: 1em;
     }
   }
@@ -153,7 +153,6 @@
     text-align: left;
     margin: 0;
     padding: 0 1rem 0 0.9em;
-    font-family: $font-family;
     font-size: $font-size-xxsmall;
     display: inline-block;
     background-color: $white;
@@ -232,6 +231,7 @@
   display: flex;
   align-items: center;
   line-height: 1;
+  min-width: 110px;
 
   > div {
     padding: 0;
@@ -256,6 +256,26 @@
       right: 0;
       top: -2px;
       font-size: $font-size-xxsmall;
+    }
+
+    .customized-settings-indicator {
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+
+      .icon-container {
+        .icon {
+          color: $attention-color;
+          width: 16px;
+          height: 16px;
+          border: solid 1px #fff;
+          border-radius: 999px;
+        }
+      }
     }
   }
 }

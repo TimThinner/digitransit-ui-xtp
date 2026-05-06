@@ -28,7 +28,6 @@ export const ItineraryFragment = graphql`
       duration
       rentedBike
       interlineWithPreviousLeg
-      intermediatePlace
       intermediatePlaces {
         stop {
           zoneId
@@ -52,6 +51,7 @@ export const ItineraryFragment = graphql`
         color
         agency {
           name
+          gtfsId
         }
         alerts {
           alertSeverityLevel
@@ -61,9 +61,21 @@ export const ItineraryFragment = graphql`
       }
       trip {
         gtfsId
+        isReplacement
+        tripShortName
         stoptimes {
           stop {
             gtfsId
+            platformCode
+          }
+          scheduledDeparture
+        }
+        stoptimesForDate {
+          serviceDay
+          scheduledDeparture
+          stop {
+            gtfsId
+            platformCode
           }
         }
         occupancy {
@@ -85,6 +97,7 @@ export const ItineraryFragment = graphql`
             effectiveEndDate
             effectiveStartDate
           }
+          platformCode
         }
         vehicleRentalStation {
           availableVehicles {
@@ -94,6 +107,7 @@ export const ItineraryFragment = graphql`
             networkId
           }
         }
+        viaLocationType
       }
       to {
         stop {
@@ -111,6 +125,18 @@ export const ItineraryFragment = graphql`
         vehicleParking {
           name
           vehicleParkingId
+        }
+        viaLocationType
+      }
+      fareProducts {
+        id
+        product {
+          id
+          ... on DefaultFareProduct {
+            price {
+              amount
+            }
+          }
         }
       }
     }

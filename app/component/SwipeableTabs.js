@@ -1,24 +1,24 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import { useIntl } from 'react-intl';
+import React, { useEffect, useState, useRef } from 'react';
 import ReactSwipe from 'react-swipe';
-import { intlShape } from 'react-intl';
 import cx from 'classnames';
 import Icon from './Icon';
-import { isKeyboardSelectionEvent } from '../util/browser';
 import ScrollableWrapper from './ScrollableWrapper';
+import TabBalls from './TabBalls';
+import { isKeyboardSelectionEvent } from '../util/browser';
 
-const setFocusables = () => {
+export function setFocusables() {
   // Set inactive tab focusables to unfocusable and for active tab set previously made unfocusable elements to focusable
   const focusableTags =
     'a, button, input, textarea, select, details, [tabindex="0"]';
   const unFocusableTags =
     'a, button, input, textarea, select, details, [tabindex="-2"]';
   const swipeableTabs = document.getElementsByClassName('swipeable-tab');
-
   for (let i = 0; i < swipeableTabs.length; i++) {
     const focusables = swipeableTabs[i].querySelectorAll(focusableTags);
     const unFocusables = swipeableTabs[i].querySelectorAll(unFocusableTags);
-    if (swipeableTabs[i].className === 'swipeable-tab inactive') {
+    if (swipeableTabs[i].classList.contains('inactive')) {
       focusables.forEach(focusable => {
         // eslint-disable-next-line no-param-reassign
         focusable.tabIndex = '-2';
@@ -30,339 +30,218 @@ const setFocusables = () => {
       });
     }
   }
-};
+}
 
-const setDecreasingAttributes = tabBalls => {
-  const newTabBalls = tabBalls;
-  for (let i = 0; i < tabBalls.length; i++) {
-    const prev = tabBalls[i - 1];
-    const current = tabBalls[i];
-    const next = tabBalls[i + 1];
-    if (prev && prev.hidden && !current.hidden) {
-      current.smaller = true;
-      next.small = true;
-      newTabBalls[i] = current;
-      newTabBalls[i + 1] = next;
-      break;
-    }
-  }
-  return newTabBalls;
-};
+export default function SwipeableTabs({
+  tabIndex,
+  tabs,
+  onSwipe,
+  hideArrows,
+  navigationOnBottom,
+  classname,
+  ariaRole,
+}) {
+  const intl = useIntl();
+  const reactSwipeEl = useRef();
+  const swipeButtonNavRef = useRef(); // tracks if navigation was initiated by button.swipeButton
+  const [announceTabLabel, setAnnounceTabLabel] = useState('');
 
-const handleKeyPress = (e, reactSwipeEl) => {
-  switch (e.keyCode) {
-    case 37:
-      reactSwipeEl.prev();
-      break;
-    case 39:
-      reactSwipeEl.next();
-      break;
-    default:
-      break;
-  }
-};
-
-export default class SwipeableTabs extends React.Component {
-  static propTypes = {
-    tabIndex: PropTypes.number.isRequired,
-    tabs: PropTypes.arrayOf(PropTypes.node).isRequired,
-    onSwipe: PropTypes.func.isRequired,
-    hideArrows: PropTypes.bool,
-    navigationOnBottom: PropTypes.bool,
-    classname: PropTypes.string,
-    ariaFrom: PropTypes.string.isRequired,
-    ariaFromHeader: PropTypes.string.isRequired,
-  };
-
-  static defaultProps = {
-    hideArrows: false,
-    navigationOnBottom: false,
-    classname: undefined,
-  };
-
-  static contextTypes = {
-    intl: intlShape.isRequired,
-  };
-
-  componentDidMount() {
+  useEffect(() => {
+    setFocusables();
     window.addEventListener('resize', setFocusables);
+    return () => window.removeEventListener('resize', setFocusables);
+  }, []);
+
+  useEffect(() => {
     setFocusables();
-  }
+  }, [tabIndex]);
 
-  componentDidUpdate() {
-    setFocusables();
-  }
-
-  tabBalls = tabsLength => {
-    const tabIndex = parseInt(this.props.tabIndex, 10);
-    const onLeft = tabIndex;
-    const onRight = tabsLength - tabIndex - 1;
-    let tabBalls = [];
-
-    for (let i = 0; i < tabsLength; i++) {
-      const ballObj = { hidden: false };
-      const distanceFromSelected = Math.abs(i - tabIndex);
-      let n = 7;
-      for (let j = -1; j <= 7; j++) {
-        let maxDistance = 0;
-        if ((onLeft > 7 && onRight > -1) || (onLeft > -1 && onRight > 7)) {
-          maxDistance = 6;
-        }
-        if ((onLeft > 6 && onRight > 0) || (onLeft > 0 && onRight > 6)) {
-          maxDistance = 5;
-        }
-        if ((onLeft > 5 && onRight > 1) || (onLeft > 1 && onRight > 5)) {
-          maxDistance = 4;
-        }
-        if (
-          (onLeft > 4 && onRight > 2) ||
-          (onLeft > 3 && onRight > 3) ||
-          (onLeft > 2 && onRight > 4)
-        ) {
-          maxDistance = 3;
-        }
-        if (onLeft > n && onRight > j && distanceFromSelected > maxDistance) {
-          ballObj.hidden = true;
-        }
-        n -= 1;
-      }
-
-      if (tabIndex === i) {
-        ballObj.selected = true;
-        ballObj.hidden = false;
-      }
-
-      tabBalls.push(ballObj);
+  const handleSwipeButtonNav = direction => {
+    let newIndex = tabIndex;
+    if (direction === 'prev' && tabIndex > 0) {
+      newIndex = tabIndex - 1;
+    } else if (direction === 'next' && tabIndex < tabs.length - 1) {
+      newIndex = tabIndex + 1;
     }
-
-    tabBalls = setDecreasingAttributes(tabBalls);
-    tabBalls = setDecreasingAttributes(tabBalls.reverse());
-    tabBalls.reverse();
-    const ballDivs = tabBalls.map((ball, index) => {
-      const key = ball.toString().length + index;
-      return (
-        <div
-          key={key}
-          role="button"
-          aria-label={this.context.intl.formatMessage(
-            {
-              id: 'move-to-tab',
-              defaultMessage: 'Move to tab {number}',
-            },
-            {
-              number: index + 1,
-            },
-          )}
-          tabIndex={0}
-          className={`swipe-tab-ball ${
-            index === this.props.tabIndex ? 'selected' : ''
-          } ${ball.smaller ? 'decreasing-small' : ''} ${
-            ball.small ? 'decreasing' : ''
-          } ${ball.hidden ? 'hidden' : ''}`}
-          onClick={() => {
-            this.props.onSwipe(index);
-          }}
-          onKeyDown={e => {
-            if (isKeyboardSelectionEvent(e)) {
-              this.props.onSwipe(index);
-            }
-          }}
-        />
+    if (newIndex !== tabIndex) {
+      swipeButtonNavRef.current = true;
+      // Get the tab context text from the DOM because aria-live cannot handle aria-describedby reference well enough
+      const tabContextText =
+        document.getElementById(`tab-${newIndex}-context`)?.textContent || '';
+      setAnnounceTabLabel(
+        `${intl.formatMessage(
+          {
+            id: ariaRole,
+            defaultMessage: 'Tab {number}',
+          },
+          { number: newIndex + 1 },
+        )} ${tabContextText}`,
       );
-    });
 
-    return ballDivs;
-  };
-
-  constructAriaMessage = (from, position) => {
-    const fromMessage = this.context.intl
-      .formatMessage({
-        id: from,
-        defaultMessage: 'Swipe results tabs.',
-      })
-      .concat(' ');
-    switch (position) {
-      case 'header':
-        return fromMessage.concat(
-          this.context.intl.formatMessage({
-            id: 'swipe-result-tabs',
-            defaultMessage: 'Switch tabs using arrow keys.',
-          }),
-        );
-      case 'left':
-        return fromMessage.concat(
-          this.context.intl.formatMessage({
-            id: 'swipe-result-tab-left',
-            defaultMessage:
-              'Swipe result tabs left arrow. Press Enter or Space to show the previous tab.',
-          }),
-        );
-      case 'right':
-        return fromMessage.concat(
-          this.context.intl.formatMessage({
-            id: 'swipe-result-tab-right',
-            defaultMessage:
-              'Swipe result tabs right arrow. Press Enter or Space to show the next tab.',
-          }),
-        );
-      default:
-        return null;
+      onSwipe(newIndex);
     }
   };
 
-  render() {
-    const { tabs, hideArrows, navigationOnBottom, ariaFrom, ariaFromHeader } =
-      this.props;
-    const { intl } = this.context;
-    const tabBalls = this.tabBalls(tabs.length);
-    const disabled = tabBalls.length < 2;
-    let reactSwipeEl;
-    const ariaHeader = this.constructAriaMessage(ariaFromHeader, 'header');
-    const ariaLeft = this.constructAriaMessage(ariaFrom, 'left');
-    const ariaRight = this.constructAriaMessage(ariaFrom, 'right');
-    return (
-      <div
-        className={
-          this.props.classname === 'swipe-desktop-view'
-            ? 'swipe-scroll-wrapper'
-            : ''
-        }
-      >
-        {navigationOnBottom && (
-          <ScrollableWrapper>
-            <div className="swipe-scroll-container scroll-target">
-              <ReactSwipe
-                swipeOptions={{
-                  startSlide: this.props.tabIndex,
-                  stopPropagation: true,
-                  continuous: false,
-                  callback: i => {
-                    // force transition after animation should be over because animation can randomly fail sometimes
-                    setTimeout(() => {
-                      this.props.onSwipe(i);
-                    }, 300);
-                  },
-                }}
-                childCount={tabs.length}
-                ref={el => {
-                  reactSwipeEl = el;
-                }}
-              >
-                {tabs}
-              </ReactSwipe>
-            </div>
-          </ScrollableWrapper>
+  const handleTabBallsNav = newIndex => {
+    swipeButtonNavRef.current = false;
+    onSwipe(newIndex);
+  };
+
+  const disabled = tabs.length < 2;
+  const tabsWithId = tabs.map((tab, i) =>
+    React.cloneElement(tab, {
+      id: `tabpanel-${i}`,
+      role: 'tabpanel',
+      'aria-labelledby': `tab-${i}`,
+    }),
+  );
+  return (
+    <div
+      className={
+        classname === 'swipe-desktop-view' ? 'swipe-scroll-wrapper' : ''
+      }
+      role="tablist"
+    >
+      {navigationOnBottom && (
+        <ScrollableWrapper>
+          <div className="swipe-scroll-container scroll-target">
+            <ReactSwipe
+              swipeOptions={{
+                startSlide: tabIndex,
+                stopPropagation: true,
+                continuous: false,
+                callback: i => {
+                  setTimeout(() => onSwipe(i), 300);
+                },
+              }}
+              childCount={tabs.length}
+              ref={reactSwipeEl}
+            >
+              {tabsWithId}
+            </ReactSwipe>
+          </div>
+        </ScrollableWrapper>
+      )}
+      <div className={`swipe-header-container ${classname}`}>
+        {classname === 'swipe-desktop-view' && (
+          <div className="desktop-view-divider" />
         )}
-        <div className={`swipe-header-container ${this.props.classname}`}>
-          {this.props.classname === 'swipe-desktop-view' && (
-            <div className="desktop-view-divider" />
-          )}
-          <button
-            className="sr-only"
-            type="button"
-            onKeyDown={e => handleKeyPress(e, reactSwipeEl)}
-            aria-label={ariaHeader}
-          >
-            {ariaHeader}
-          </button>
-          <div className={`swipe-header ${this.props.classname}`}>
-            {!hideArrows && (
-              <div
-                className={cx('swipe-button-container', {
-                  active: !(disabled || this.props.tabIndex <= 0),
+
+        <div className="sr-only" aria-live="polite">
+          {swipeButtonNavRef.current && announceTabLabel}
+        </div>
+
+        <div className={`swipe-header ${classname}`}>
+          {!hideArrows && (
+            <div
+              className={cx('swipe-button-container', {
+                active: !(disabled || tabIndex <= 0),
+              })}
+            >
+              <button
+                type="button"
+                className="swipe-button"
+                onClick={() => handleSwipeButtonNav('prev')}
+                onKeyDown={e => {
+                  if (isKeyboardSelectionEvent(e)) {
+                    handleSwipeButtonNav('prev');
+                  }
+                }}
+                tabIndex="0"
+                aria-disabled={disabled || tabIndex <= 0}
+                aria-label={intl.formatMessage({
+                  id: 'swipe-result-tab-left',
+                  defaultMessage: 'Show previous tab.',
                 })}
               >
-                <div
-                  className="swipe-button"
-                  onClick={() => reactSwipeEl.prev()}
-                  onKeyDown={e => {
-                    if (e.keyCode === 13 || e.keyCode === 32) {
-                      e.preventDefault();
-                      reactSwipeEl.prev();
-                    }
-                  }}
-                  role="button"
-                  tabIndex="0"
-                  aria-label={ariaLeft}
-                >
-                  <Icon
-                    img="icon-icon_arrow-collapse--left"
-                    className={`itinerary-arrow-icon ${
-                      disabled || this.props.tabIndex <= 0 ? 'disabled' : ''
-                    }`}
-                  />
-                </div>
-              </div>
-            )}
-            <div className="swipe-tab-indicator">
-              <span className="sr-only" aria-live="polite">
-                {intl.formatMessage(
-                  {
-                    id: 'swipe-sr-new-tab-opened',
-                    defaultMessage: 'Tab {number} opened.',
-                  },
-                  { number: this.props.tabIndex + 1 },
-                )}
-              </span>
-              {disabled ? null : tabBalls}
+                <Icon
+                  img="icon_arrow-collapse--left"
+                  className={`itinerary-arrow-icon ${
+                    disabled || tabIndex <= 0 ? 'disabled' : ''
+                  }`}
+                />
+              </button>
             </div>
-            {!hideArrows && (
-              <div
-                className={cx('swipe-button-container', {
-                  active: !(disabled || this.props.tabIndex >= tabs.length - 1),
-                })}
-              >
-                <div
-                  className="swipe-button"
-                  onClick={() => reactSwipeEl.next()}
-                  onKeyDown={e => {
-                    if (e.keyCode === 13 || e.keyCode === 32) {
-                      e.preventDefault();
-                      reactSwipeEl.next();
-                    }
-                  }}
-                  role="button"
-                  tabIndex="0"
-                  aria-label={ariaRight}
-                >
-                  <Icon
-                    img="icon-icon_arrow-collapse--right"
-                    className={`itinerary-arrow-icon ${
-                      disabled || this.props.tabIndex >= tabs.length - 1
-                        ? 'disabled'
-                        : ''
-                    }`}
-                  />
-                </div>
-              </div>
+          )}
+          <div className="swipe-tab-indicator">
+            {!disabled && (
+              <TabBalls
+                tabIndex={tabIndex}
+                tabsLength={tabs.length}
+                onSwipe={handleTabBallsNav}
+                reactSwipeEl={reactSwipeEl}
+                ariaRole={ariaRole}
+              />
             )}
           </div>
-        </div>
-        {!navigationOnBottom && (
-          <ScrollableWrapper>
-            <div className="swipe-scroll-container scroll-target">
-              <ReactSwipe
-                swipeOptions={{
-                  startSlide: this.props.tabIndex,
-                  continuous: false,
-                  callback: i => {
-                    // force transition after animation should be over because animation can randomly fail sometimes
-                    setTimeout(() => {
-                      this.props.onSwipe(i);
-                    }, 300);
-                  },
+          {!hideArrows && (
+            <div
+              className={cx('swipe-button-container', {
+                active: !(disabled || tabIndex >= tabs.length - 1),
+              })}
+            >
+              <button
+                aria-disabled={disabled || tabIndex >= tabs.length - 1}
+                type="button"
+                className="swipe-button"
+                onClick={() => handleSwipeButtonNav('next')}
+                onKeyDown={e => {
+                  if (isKeyboardSelectionEvent(e)) {
+                    handleSwipeButtonNav('next');
+                  }
                 }}
-                childCount={tabs.length}
-                ref={el => {
-                  reactSwipeEl = el;
-                }}
+                tabIndex="0"
+                aria-label={intl.formatMessage({
+                  id: 'swipe-result-tab-right',
+                  defaultMessage: 'Show next tab.',
+                })}
               >
-                {tabs}
-              </ReactSwipe>
+                <Icon
+                  img="icon_arrow-collapse--right"
+                  className={`itinerary-arrow-icon ${
+                    disabled || tabIndex >= tabs.length - 1 ? 'disabled' : ''
+                  }`}
+                />
+              </button>
             </div>
-          </ScrollableWrapper>
-        )}
+          )}
+        </div>
       </div>
-    );
-  }
+      {!navigationOnBottom && (
+        <ScrollableWrapper>
+          <div className="swipe-scroll-container scroll-target">
+            <ReactSwipe
+              swipeOptions={{
+                startSlide: tabIndex,
+                continuous: false,
+                callback: i => {
+                  setTimeout(() => onSwipe(i), 300);
+                },
+              }}
+              childCount={tabs.length}
+              ref={reactSwipeEl}
+            >
+              {tabsWithId}
+            </ReactSwipe>
+          </div>
+        </ScrollableWrapper>
+      )}
+    </div>
+  );
 }
+
+SwipeableTabs.propTypes = {
+  tabIndex: PropTypes.number.isRequired,
+  tabs: PropTypes.arrayOf(PropTypes.node).isRequired,
+  onSwipe: PropTypes.func.isRequired,
+  hideArrows: PropTypes.bool,
+  navigationOnBottom: PropTypes.bool,
+  classname: PropTypes.string,
+  ariaRole: PropTypes.string.isRequired,
+};
+
+SwipeableTabs.defaultProps = {
+  hideArrows: false,
+  navigationOnBottom: false,
+  classname: undefined,
+};

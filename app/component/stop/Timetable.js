@@ -5,7 +5,7 @@ import uniqBy from 'lodash/uniqBy';
 import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import padStart from 'lodash/padStart';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { matchShape, routerShape } from 'found';
 import { useFragment } from 'react-relay';
 import { connectToStores } from 'fluxible-addons-react';
@@ -28,7 +28,12 @@ const mapStopTimes = stoptimesObject =>
   stoptimesObject
     .map(stoptime =>
       stoptime.stoptimes
-        .filter(st => st.pickupType !== 'NONE')
+        .filter(
+          st =>
+            st.pickupType !== 'NONE' ||
+            st.stop.gtfsId !==
+              stoptime.pattern.stops[stoptime.pattern.stops.length - 1].gtfsId,
+        )
         .map(st => ({
           id: stoptime.pattern.code,
           name: stoptime.pattern.route.shortName || stoptime.pattern.headsign,
@@ -85,7 +90,7 @@ const dateForPrinting = date => {
   return (
     <div className="printable-date-container">
       <div className="printable-date-icon">
-        <Icon className="large-icon" img="icon-icon_schedule" />
+        <Icon className="large-icon" img="icon_schedule" />
       </div>
       <div className="printable-date-right">
         <div className="printable-date-header">
@@ -132,12 +137,12 @@ const createTimeTableRows = (timetableMap, showRoutes) =>
 
 function Timetable(
   { stop: stopRef, startDate, onDateChange, date, language },
-  { router, match, config, intl },
+  { router, match, config },
 ) {
   const stop = useFragment(TimetableFragment, stopRef);
+  const intl = useIntl();
   if (!stop) {
-    const path = `/${PREFIX_STOPS}`;
-    router.replace(path);
+    router.replace(`/${PREFIX_STOPS}`);
   }
   const [showRoutes, setShowRoutes] = useState([]);
   const [showFilterModal, setShowFilterModal] = useState(false);
@@ -333,7 +338,7 @@ function Timetable(
                 >
                   <Icon
                     className={cx('no-timetable-icon', 'caution')}
-                    img="icon-icon_info"
+                    img="icon_info"
                     color="#0074be"
                   />
                   {timeDifferenceDays > 30 ? (
@@ -404,7 +409,7 @@ function Timetable(
                 name: null,
               });
             }}
-            buttonIcon="icon-icon_print"
+            buttonIcon="icon_print"
             smallSize
           />
           {stopPDFURL && (
@@ -419,7 +424,7 @@ function Timetable(
                   name: null,
                 });
               }}
-              buttonIcon="icon-icon_print"
+              buttonIcon="icon_print"
               smallSize
             />
           )}
@@ -479,7 +484,6 @@ Timetable.contextTypes = {
   router: routerShape.isRequired,
   match: matchShape.isRequired,
   config: configShape.isRequired,
-  intl: intlShape.isRequired,
 };
 
 Timetable.displayName = 'Timetable';

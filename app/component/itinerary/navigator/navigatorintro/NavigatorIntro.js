@@ -1,7 +1,7 @@
 import Button from '@hsl-fi/button';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { configShape } from '../../../../util/shapes';
 import NavigatorIntroFeature from './NavigatorIntroFeature';
 import Icon from '../../../Icon';
@@ -10,10 +10,10 @@ const NavigatorIntro = (
   { logo, onPrimaryClick, onClose, onOpenGeolocationInfo },
   context,
 ) => {
-  const { config, intl } = context;
+  const intl = useIntl();
+  const { config } = context;
 
-  const primaryColor =
-    config.colors?.accessiblePrimary || config.colors?.primary || 'black';
+  const primaryColor = config.colors.accessiblePrimary;
 
   return (
     <>
@@ -24,14 +24,14 @@ const NavigatorIntro = (
         </FormattedMessage>
         <div className="content">
           <NavigatorIntroFeature
-            icon="icon-icon_future-route"
+            icon="icon_future-route"
             iconColor={primaryColor}
             iconBackgroundColor={config.colors?.backgroundInfo}
             header="navi-support"
             body="navigation-intro-help-body"
           />
           <NavigatorIntroFeature
-            icon="icon-icon_comment"
+            icon="icon_comment"
             iconColor={primaryColor}
             iconBackgroundColor={config.colors?.backgroundInfo}
             header="navi-change-info"
@@ -40,7 +40,7 @@ const NavigatorIntro = (
         </div>
       </div>
       <div className="navi-geolocation-purpose">
-        <Icon img="icon-icon_info" color={primaryColor} />
+        <Icon img="icon_info" color={primaryColor} />
         <div className="info-content">
           <FormattedMessage tagName="p" id="navi-geolocation-purpose" />
           <button
@@ -90,7 +90,6 @@ NavigatorIntro.defaultProps = {
 };
 
 NavigatorIntro.contextTypes = {
-  intl: intlShape.isRequired,
   config: configShape.isRequired,
 };
 

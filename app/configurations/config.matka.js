@@ -1,4 +1,3 @@
-/* eslint-disable prefer-template */
 import HSLConfig from './config.hsl';
 import TurkuConfig from './config.turku';
 import LappeenrantaConfig from './config.lappeenranta';
@@ -7,28 +6,30 @@ import KotkaConfig from './config.kotka';
 import KouvolaConfig from './config.kouvola';
 import KuopioConfig from './config.kuopio';
 import LahtiConfig from './config.lahti';
-import prUtils from '../util/ParkAndRideUtils';
+import { IS_DEV } from '../util/envUtils';
 
-const HSLParkAndRideUtils = prUtils.HSL;
 const CONFIG = 'matka';
 const APP_DESCRIPTION =
   'Fintraffic Matka on reittiopaspalvelu, joka auttaa suunnittelemaan matkoja koko Suomessa yhdistämällä eri liikennemuodot helposti ovelta ovelle.';
 const APP_TITLE = 'Fintraffic Matka – Joukkoliikenteen reittiopas ja matkahaku';
 const YEAR = 1900 + new Date().getYear();
 
-const IS_DEV =
-  process.env.RUN_ENV === 'development' ||
-  process.env.NODE_ENV !== 'production';
-
 const virtualMonitorBaseUrl = IS_DEV
   ? 'https://dev-matkamonitori.digitransit.fi'
   : 'https://matkamonitori.digitransit.fi';
+
+const MAP_URL = process.env.MAP_URL || 'https://dev-cdn.digitransit.fi';
+const POI_MAP_PREFIX = `${MAP_URL}/map/v3/finland`;
 
 export default {
   CONFIG,
   OTPTimeout: process.env.OTP_TIMEOUT || 30000,
   URL: {
     FONT: 'https://cdn.digitransit.fi/matka-fonts/publicsans/publicsans+robotomono.css',
+    AREA_STOP_MAP: {
+      default: `${POI_MAP_PREFIX}/fi/areaStops/`,
+      sv: `${POI_MAP_PREFIX}/sv/areaStops/`,
+    },
   },
 
   mainMenu: {
@@ -39,13 +40,15 @@ export default {
     countrySelection: ['estonia'],
   },
 
-  availableLanguages: ['fi', 'sv', 'en'],
-  defaultLanguage: 'fi',
-
   socialMedia: {
     title: APP_TITLE,
     description: APP_DESCRIPTION,
     locale: 'fi_FI',
+    image: {
+      url: 'img/social-share-matka.png',
+      width: 511,
+      height: 511,
+    },
   },
 
   title: APP_TITLE,
@@ -57,22 +60,12 @@ export default {
 
   colors: {
     primary: '#000',
-    iconColors: {
-      'mode-airplane': '#0046AD',
-      'mode-bus': '#007ac9',
-      'mode-tram': '#5E7921',
-      'mode-metro': '#CA4000',
-      'mode-rail': '#000',
-      'mode-ferry': '#247C7B',
-      'mode-ferry-pier': '#666666',
-      'mode-citybike': '#FCBC19',
-      'mode-citybike-secondary': '#333333',
-      'mode-scooter': '#C5CAD2',
-      'mode-taxi': '#647693',
-    },
+    tram: '#5E7921',
+    rail: '#000',
+    ferry: '#247C7B',
   },
   feedIds: IS_DEV
-    ? ['MATKA']
+    ? ['MATKA', 'flixbus', 'CAR_FERRIES']
     : [
         'MATKA',
         'HSL',
@@ -104,6 +97,7 @@ export default {
         'PahkakankaanLiikenne',
         'IngvesSvanback',
         'CAR_FERRIES',
+        'flixbus',
       ],
   externalFeedIds: ['02Taksi'],
 
@@ -135,10 +129,10 @@ export default {
 
   meta: {
     description: APP_DESCRIPTION,
-    keywords: `reitti,reitit,opas,reittiopas,joukkoliikenne,joukkoliikenne, matkasuunnittelu, matkareitti, aikataulut, bussi, juna, metro, raitiovaunu, lautta, matka, suomen joukkoliikenne, reitti kartalla, matkareitti ovelta ovelle, opas.matka.fi, fintraffic matka, digitransit, reittiopas suomi, liikenneopas, julkinen liikenne, reittihaku, liityntäpysäköinti, pyöräily, autoilu, lennot, matkakumppani, matkaketju, reitti yhdellä haulla`,
+    keywords: `reitti,reitit,opas,reittiopas,joukkoliikenne,joukkoliikenne, matkasuunnittelu, matkareitti, aikataulut, bussi, juna, metro, raitiovaunu, lautta, matka, suomen joukkoliikenne, reitti kartalla, matkareitti ovelta ovelle, matka.fintraffic.fi, fintraffic matka, digitransit, reittiopas suomi, liikenneopas, julkinen liikenne, reittihaku, liityntäpysäköinti, pyöräily, autoilu, lennot, matkakumppani, matkaketju, reitti yhdellä haulla`,
   },
   menu: {
-    copyright: { label: `© Matka.fi ${YEAR}` },
+    copyright: { label: `© Matka.fintraffic.fi ${YEAR}` },
     content: [
       {
         name: 'Fintraffic',
@@ -223,7 +217,7 @@ export default {
       availableForSelection: true,
     },
     scooter: {
-      availableForSelection: true,
+      availableForSelection: false,
       defaultValue: false,
     },
     taxi: {
@@ -275,26 +269,18 @@ export default {
     'citybike',
     'airplane',
   ],
-  useAlternativeNameForModes: ['rail'],
+  useAlternativeNameForModes: ['RAIL'],
 
   showVehiclesOnStopPage: false,
   showVehiclesOnItineraryPage: true,
 
   includeCarSuggestions: true,
   includeParkAndRideSuggestions: true,
-  // Park and ride and car suggestions separated into two switches
-  separatedParkAndRideSwitch: true,
   showBikeAndParkItineraries: true,
-
-  parkingAreaSources: ['liipi'],
 
   parkAndRide: {
     showParkAndRide: true,
     showParkAndRideForBikes: true,
-    parkAndRideMinZoom: 13,
-    pageContent: {
-      default: HSLParkAndRideUtils,
-    },
   },
 
   sourceForAlertsAndDisruptions: {
@@ -457,9 +443,22 @@ export default {
   ],
   navigation: true,
 
-  experimental: {
-    allowFlexJourneys: true,
-    allowDirectFlexJourneys: true,
+  // TODO: flex + transit disabled for now, proper configuration coming in the future
+  /* flex: {
+    internalFlexEnabled: IS_DEV,
+    allowTaxiJourneys: true,
+    directOnlyTaxiJourneys: !IS_DEV,
+    internalAgencies: ['KirkkonummiE:612', 'KirkkonummiP:612'],
+    externalAgencies: ['02Taksi:02_taksi'],
+    infoLanguage: 'fi',
+  }, */
+  flex: {
+    internalFlexEnabled: false,
+    allowTaxiJourneys: true,
+    directOnlyTaxiJourneys: true,
+    internalAgencies: [],
+    externalAgencies: ['02Taksi:02_taksi'],
+    infoLanguage: 'fi',
   },
 
   devAnalytics: true,
@@ -472,4 +471,8 @@ export default {
     g.async=true; g.src='https://cdn.matomo.cloud/fintraffic.matomo.cloud/container_p27GPdXl.js'; s.parentNode.insertBefore(g,s);
     })();\n<\/script>\n`; // eslint-disable-line no-useless-escape
   },
+
+  showStopStatusMarkers: true,
+  showRouteDescNotification: IS_DEV,
+  viaPointsEnabled: true,
 };

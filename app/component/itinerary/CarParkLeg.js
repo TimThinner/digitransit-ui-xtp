@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import cx from 'classnames';
 import { Link } from 'found';
 import { legShape, parkShape, configShape } from '../../util/shapes';
@@ -13,7 +13,8 @@ import { PREFIX_CARPARK } from '../../util/path';
 import ItineraryCircleLine from './ItineraryCircleLine';
 import { legTimeStr, legDestination } from '../../util/legUtils';
 
-function CarParkLeg(props, { config, intl }) {
+function CarParkLeg(props, { config }) {
+  const intl = useIntl();
   const distance = displayDistance(
     parseInt(props.leg.distance, 10),
     config,
@@ -50,12 +51,14 @@ function CarParkLeg(props, { config, intl }) {
           index={props.index}
           modeClassName="car-park-walk"
           carPark
+          viaType={props.leg.from.viaLocationType}
         />
       ) : (
         <ItineraryCircleLineWithIcon
           index={props.index}
           modeClassName="walk"
           carPark
+          viaType={props.leg.from.viaLocationType}
         />
       )}
 
@@ -74,13 +77,13 @@ function CarParkLeg(props, { config, intl }) {
                 <FormattedMessage id="car-park" defaultMessage="Park & Ride" />
                 {props.leg.isViaPoint && (
                   <Icon
-                    img="icon-icon_mapMarker"
+                    img="icon_mapMarker"
                     className="itinerary-mapmarker-icon"
                   />
                 )}
                 {props.carPark && (
                   <Icon
-                    img="icon-icon_arrow-collapse--right"
+                    img="icon_arrow-collapse--right"
                     className="itinerary-arrow-icon"
                     color={config.colors.primary}
                   />
@@ -148,7 +151,6 @@ CarParkLeg.defaultProps = {
 
 CarParkLeg.contextTypes = {
   config: configShape.isRequired,
-  intl: intlShape.isRequired,
 };
 
 export default CarParkLeg;

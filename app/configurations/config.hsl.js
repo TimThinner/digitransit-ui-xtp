@@ -1,10 +1,8 @@
-/* eslint-disable prefer-template */
+import { IS_DEV } from '../util/envUtils';
 import { BIKEAVL_WITHMAX } from '../util/vehicleRentalUtils';
-import prUtils from '../util/ParkAndRideUtils';
 import ttConfig from './timetableConfigUtils';
 
 const HSLTimetables = ttConfig.HSL;
-const HSLParkAndRideUtils = prUtils.HSL;
 const CONFIG = 'hsl';
 const API_URL = process.env.API_URL || 'https://dev-api.digitransit.fi';
 const OTP_URL = process.env.OTP_URL || `${API_URL}/routing/v2/hsl/`;
@@ -20,13 +18,15 @@ const SUGGESTION_URL = process.env.CONTENT_DOMAIN
   ? `${process.env.CONTENT_DOMAIN}/api/v1/search/suggestions`
   : 'https://content.hsl.fi/api/v1/search/suggestions'; // old url
 
-const IS_DEV =
-  process.env.RUN_ENV === 'development' ||
-  process.env.NODE_ENV !== 'production';
-
 const virtualMonitorBaseUrl = IS_DEV
   ? 'https://dev-hslmonitori.digitransit.fi'
   : 'https://omatnaytot.hsl.fi';
+
+const linkLabel = {
+  fi: 'Lisätietoja',
+  en: 'More information',
+  sv: 'Ytterligare information',
+};
 
 export default {
   CONFIG,
@@ -36,6 +36,10 @@ export default {
     STOP_MAP: {
       default: `${POI_MAP_PREFIX}/fi/stops,stations/`,
       sv: `${POI_MAP_PREFIX}/sv/stops,stations/`,
+    },
+    AREA_STOP_MAP: {
+      default: `${POI_MAP_PREFIX}/fi/areaStops/`,
+      sv: `${POI_MAP_PREFIX}/sv/areaStops/`,
     },
     REALTIME_STOP_MAP: {
       default: `${POI_MAP_PREFIX}/fi/realtimeStops,stations/`,
@@ -71,17 +75,25 @@ export default {
       sv: 'https://www.hsl.fi/sv/reseplaneraren_co2',
       en: 'https://www.hsl.fi/en/journey_planner_co2',
     },
+    HOLIDAYS_AND_EXCEPTIONS: {
+      fi: 'https://www.hsl.fi/matkustaminen/juhlapyhat-ja-poikkeusaikataulut',
+      sv: 'https://www.hsl.fi/sv/att-resa/helger-och-avvikande-tidtabeller',
+      en: 'https://www.hsl.fi/en/travelling/bank-holidays-and-changes-to-public-transport-services',
+    },
+    MAJOR_CHANGES: {
+      fi: 'https://www.hsl.fi/hsl/uutiset/teemat/merkittavat-liikenteen-muutokset',
+      sv: 'https://www.hsl.fi/hsl/uutiset/teemat/merkittavat-liikenteen-muutokset',
+      en: 'https://www.hsl.fi/hsl/uutiset/teemat/merkittavat-liikenteen-muutokset',
+    },
   },
 
   indexPath: 'etusivu',
 
   title: 'Reittiopas',
 
-  availableLanguages: ['fi', 'sv', 'en'],
   availableTickets: {
     Sipoo: true,
   },
-  defaultLanguage: 'fi',
   passLanguageToRootLink: true,
 
   favicon: './app/configurations/images/hsl/hsl-favicon.png',
@@ -96,21 +108,20 @@ export default {
   useRoutingFeedbackPrompt: true,
 
   feedIds: ['HSL', 'HSLlautta', 'Sipoo'],
-  externalFeedIds: ['HSLlautta', '02Taksi'],
+  externalFeedIds: ['HSLlautta'],
+  externalFerryByStopCode: true, // no stop code means external ferry
 
   allowLogin: true,
   allowFavouritesFromLocalstorage: !process.env.OIDC_CLIENT_ID,
   loginAnalyticsEventName: 'user-hsl-id',
   loginAnalyticsKey: 'hsl-id',
 
-  nearbyRoutes: {
-    radius: 500,
-    bucketSize: 100,
-  },
-
   defaultSettings: {
     walkSpeed: 1.28,
     showBikeAndParkItineraries: true,
+    transferPenalty: 180,
+    // TODO: flex disabled for now, proper configuration coming in the future
+    // includeTaxiSuggestions: true,
   },
 
   /**
@@ -128,15 +139,10 @@ export default {
   omitNonPickups: true,
 
   parkAndRide: {
-    showParkAndRide: true,
-    parkAndRideMinZoom: 13,
     url: {
       fi: 'https://www.hsl.fi/matkustaminen/liityntapysakointi',
       sv: 'https://www.hsl.fi/sv/att-resa/anslutningsparkering',
       en: 'https://www.hsl.fi/en/travelling/park--ride',
-    },
-    pageContent: {
-      default: HSLParkAndRideUtils,
     },
   },
 
@@ -149,20 +155,9 @@ export default {
     primary: '#0074bf',
     accessiblePrimary: '#0074be',
     hover: '#0062a1',
-    iconColors: {
-      'mode-bus': '#007ac9',
-      'mode-bus-express': '#CA4000',
-      'mode-bus-local': '#007ac9',
-      'mode-rail': '#8c4799',
-      'mode-tram': '#008151',
-      'mode-ferry': '#007A97',
-      'mode-ferry-pier': '#666666',
-      'mode-metro': '#CA4000',
-      'mode-citybike': '#f2b62d',
-      'mode-citybike-secondary': '#333333',
-      'mode-speedtram': '#007E79',
-      'mode-replacement-bus': '#DC0451',
-    },
+    'bus-express': '#CA4000',
+    'bus-local': '#007ac9',
+    speedtram: '#007E79',
   },
   getAutoSuggestIcons: {
     citybikes: station => {
@@ -172,7 +167,7 @@ export default {
       return ['citybike-stop-default', '#f2b62d'];
     },
   },
-  iconModeSet: 'default',
+  iconModeSet: 'hsl',
   fontWeights: {
     medium: 500,
   },
@@ -183,16 +178,16 @@ export default {
 
   nationalServiceLink: {
     fi: {
-      name: 'matka.fi',
-      href: 'https://opas.matka.fi/',
+      name: 'matka.fintraffic.fi',
+      href: 'https://matka.fintraffic.fi/',
     },
     sv: {
-      name: 'matka.fi',
-      href: 'https://opas.matka.fi/sv/',
+      name: 'matka.fintraffic.fi',
+      href: 'https://matka.fintraffic.fi/sv/',
     },
     en: {
-      name: 'matka.fi',
-      href: 'https://opas.matka.fi/en/',
+      name: 'matka.fintraffic.fi',
+      href: 'https://matka.fintraffic.fi/en/',
     },
   },
 
@@ -205,7 +200,7 @@ export default {
     description: APP_DESCRIPTION,
 
     image: {
-      url: '/img/hsl-social-share.png',
+      url: 'img/hsl-social-share.png',
       width: 400,
       height: 400,
     },
@@ -225,9 +220,9 @@ export default {
       availableForSelection: true,
     },
     scooter: {
-      availableForSelection: true,
+      availableForSelection: false,
       defaultValue: false,
-      showIfSelectedForRouting: true,
+      showIfSelectedForRouting: false,
     },
     airplane: {
       availableForSelection: false,
@@ -338,22 +333,6 @@ export default {
     en: 'HSL',
   },
 
-  maxNearbyStopDistance: {
-    favorite: 20000,
-    bus: 20000,
-    tram: 20000,
-    subway: 20000,
-    rail: 20000,
-    ferry: 20000,
-    citybike: 20000,
-  },
-
-  prioritizedStopsNearYou: {
-    ferry: ['HSL:1030701'],
-  },
-
-  showTicketSelector: false,
-
   staticMessages: [
     // {
     //   id: '2',
@@ -446,9 +425,6 @@ export default {
   ticketPurchaseLink: function purchaseTicketLink(fare) {
     return `https://open.app.hsl.fi/zoneTicketWizard/TICKET_TYPE_SINGLE_TICKET/${fare.ticketName}/adult/-`;
   },
-  ticketLink: {
-    fi: 'https://open.app.hsl.fi/tickets',
-  },
   ticketLinkOperatorCode: 'hsl',
   // mapping fareId from OTP fare identifiers to human readable form
   // in the new HSL zone model, just strip off the prefix 'HSL:'
@@ -472,8 +448,8 @@ export default {
       smoove: {
         enabled: true,
         season: {
-          preSeasonStart: '18.3',
-          start: '1.4',
+          preSeasonStart: '1.3',
+          start: '17.3',
           end: '31.10',
         },
         capacity: BIKEAVL_WITHMAX,
@@ -497,49 +473,6 @@ export default {
         },
         timeBeforeSurcharge: 60 * 60,
         showRentalStations: true,
-      },
-      vantaa: {
-        enabled: true,
-        season: {
-          preSeasonStart: '18.3',
-          start: '1.4',
-          end: '31.10',
-        },
-        capacity: BIKEAVL_WITHMAX,
-        icon: 'citybike-secondary',
-        name: {
-          fi: 'Vantaa',
-          sv: 'Vanda',
-          en: 'Vantaa',
-        },
-        type: 'citybike',
-        returnInstructions: {
-          fi: 'https://www.hsl.fi/kaupunkipyorat/vantaa/kayttoohje#palauta',
-          sv: 'https://www.hsl.fi/sv/stadscyklar/vanda/anvisningar#aterlamna',
-          en: 'https://www.hsl.fi/en/citybikes/vantaa/instructions#return',
-        },
-        durationInstructions: {
-          fi: 'https://www.hsl.fi/kaupunkipyorat/vantaa/kayttoohje#aja',
-          sv: 'https://www.hsl.fi/sv/stadscyklar/vanda/anvisningar#cykla',
-          en: 'https://www.hsl.fi/en/citybikes/vantaa/instructions#ride',
-        },
-        timeBeforeSurcharge: 120 * 60,
-        showRentalStations: true,
-      },
-      bolt_helsinki: {
-        enabled: true,
-        season: {
-          alwaysOn: true,
-        },
-        icon: 'scooter',
-        name: {
-          fi: 'Bolt',
-          sv: 'Bolt',
-          en: 'Bolt',
-        },
-        type: 'scooter',
-        showRentalVehicles: true,
-        showRentalStations: false,
       },
     },
     buyUrl: {
@@ -577,10 +510,6 @@ export default {
 
   includeCarSuggestions: true,
   includeParkAndRideSuggestions: true,
-  // Park and ride and car suggestions separated into two switches
-  separatedParkAndRideSwitch: true,
-
-  parkingAreaSources: ['liipi'],
 
   showNearYouButtons: true,
   nearYouModes: [
@@ -589,10 +518,29 @@ export default {
     'tram',
     'subway',
     'rail',
-    'ferry',
+    'carpark',
     'citybike',
+    'ferry',
+    'bikepark',
   ],
+
   narrowNearYouButtons: true,
+  nearYouRoutes: {
+    radius: 500,
+    bucketSize: 100,
+  },
+  maxNearYouDistance: {
+    favorite: 20000,
+    bus: 20000,
+    tram: 20000,
+    subway: 20000,
+    rail: 20000,
+    ferry: 20000,
+    citybike: 20000,
+  },
+  prioritizedStopsNearYou: {
+    ferry: ['HSL:1030701'],
+  },
 
   hostnames: [
     // DEV hostnames
@@ -648,6 +596,7 @@ export default {
         en: 'hsl.fi/matkustaminen/u-liikenne/',
         sv: 'hsl.fi/sv/att-resa/U-trafik/',
       },
+      linkLabel,
     },
     {
       showForRoute: route => route.type === 702,
@@ -659,16 +608,13 @@ export default {
       },
       content: {
         fi: [
-          'Pääset kyytiin myös keskiovista näyttämättä lippua kuljettajalle.',
-          'Linja käyttää valikoituja pysäkkejä eli ei pysähdy kaikilla pysäkeillä.',
+          'Pääset kyytiin myös bussin keskiovista. Varaudu näyttämään lippu pyydettäessä kuljettajalle tai tarkastajalle.',
         ],
         en: [
-          'Passengers can board the buses also through the middle doors.',
-          'The bus will not serve all stops along the route.',
+          'You can also board the bus through the middle doors. Please be ready to show your ticket to the driver or ticket inspector.',
         ],
         sv: [
-          'Man kan stiga på genom mittdörren och behöver inte visa upp sin biljett för föraren.',
-          'För att snabba upp trafiken stannar bussarna inte vid alla hållplatser.',
+          'Du kan också stiga på bussen genom mittdörren. Var beredd på att visa upp din biljett för föraren eller biljettkontrollanten om du blir ombedd.',
         ],
       },
       closeButtonLabel: {
@@ -681,6 +627,7 @@ export default {
         en: 'hsl.fi/en/hsl/trunk-route-network',
         sv: 'hsl.fi/sv/hrt/stomnatet',
       },
+      linkLabel,
     },
     {
       showForRoute: route => route.type === 704,
@@ -714,6 +661,7 @@ export default {
         en: 'hsl.fi/en/travelling/neighborhood-buses',
         sv: 'hsl.fi/sv/att-resa/narbussar',
       },
+      linkLabel,
     },
     {
       showForRoute: route => route.type === 900,
@@ -747,6 +695,33 @@ export default {
         en: 'hsl.fi/en/campaigns/light-rail',
         sv: 'hsl.fi/sv/kampanjer/snabbsparvag',
       },
+      linkLabel,
+    },
+    {
+      showForRoute: route => route.type === 715,
+      id: 'flexBusNotification',
+      header: {
+        fi: 'Kutsuliikenne',
+        en: 'On-demand service',
+        sv: 'Anropsbusstrafiken',
+      },
+      content: {
+        fi: [
+          'Linja toimii ennakkotilauksella. Varmistaaksesi matkan, tee varaus etukäteen. Tarkemmat tiedot palveluntarjoalta.',
+        ],
+        en: [
+          'This service operates by advance booking. To ensure your ride, please book ahead of time. More information is available from the service provider. ',
+        ],
+        sv: [
+          'Linjen fungerar med förhandsbokning. Boka din resa i förväg för att säkerställa resan. Mer information från tjänsteleverantören.',
+        ],
+      },
+      link: {
+        fi: 'hsl.fi/matkustaminen/lahibussit',
+        en: 'hsl.fi/en/travelling/neighborhood-buses',
+        sv: 'hsl.fi/sv/att-resa/narbussar',
+      },
+      linkLabel,
     },
   ],
 
@@ -776,6 +751,7 @@ export default {
     link: {
       fi: 'https://hsl.fi/korvaavabussi',
     },
+    linkLabel,
   },
 
   embeddedSearch: {
@@ -805,28 +781,39 @@ export default {
     },
   },
 
+  favouriteLink: {
+    fi: 'https://tili.hsl.fi/omat-pysakit-paikat-ja-linjat',
+    en: 'https://tili.hsl.fi/en/my-stops-places-and-routes',
+    sv: 'https://tili.hsl.fi/mina-hallplatser-platser-och-linjer',
+  },
+
   startSearchFromUserLocation: true,
 
   navigationLogo: 'hsl/navigator-logo.svg',
   thumbsUpGraphic: 'hsl/thumbs-up.svg',
   trafficLightGraphic: 'hsl/traffic-light.svg',
   naviGeolocationGraphic: 'hsl/geolocation.svg',
+  notFoundGraphic: 'hsl/not-found.svg',
   navigation: true,
   crazyEgg: true,
-  // features that should not be deployed to production
-  experimental: {
-    allowFlexJourneys: IS_DEV,
-    allowDirectFlexJourneys: false,
-  },
 
-  replacementBusRoutes: [
-    'HSL:1099V',
-    'HSL:6211U',
-    'HSL:6211E',
-    'HSL:6249Y',
-    'HSL:2213X',
-    'HSL:4699X',
-    'HSL:9969X',
-    'HSL:2015X',
-  ],
+  showStopStatusMarkers: true,
+
+  // TODO: flex disabled for now, proper configuration coming in the future
+  // taxiOptionLabelOverride: 'demand-responsive-traffic',
+
+  // TODO: flex disabled for now, proper configuration coming in the future
+  /* flex: {
+    internalFlexEnabled: IS_DEV,
+    allowTaxiJourneys: IS_DEV,
+    directOnlyTaxiJourneys: false,
+    internalAgencies: ['KirkkonummiE:612', 'KirkkonummiP:612'],
+    externalAgencies: ['Uber:agency-mog2skf5-1'],
+    allowedExternalFlexRouteTypes: [1501],
+    infoLanguage: 'fi',
+  }, */
+
+  showRouteDescNotification: IS_DEV,
+  personalisation: false,
+  viaPointsEnabled: true,
 };

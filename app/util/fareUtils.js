@@ -1,4 +1,5 @@
 import { uniqBy } from 'lodash';
+import { isCallAgencyLeg } from './legUtils';
 
 // TODO: support for currency
 export function formatFare(fare) {
@@ -32,7 +33,7 @@ export const getFaresFromLegs = (legs, config) => {
     price: leg.fareProducts[0].product.price.amount,
     ticketName:
       // E2E-testing does not work without this check
-      (config.NODE_ENV === 'test' &&
+      (process.env.NODE_ENV === 'test' &&
         leg.fareProducts[0].product.id.split(':')[1]) ||
       config.fareMapping(leg.fareProducts[0].product.id),
   }));
@@ -92,7 +93,10 @@ export const getAlternativeFares = (zones, currentFares, allFares) => {
  *
  * @param {*} config configuration.
  */
-export const shouldShowFareInfo = (config, legs) => {
+export const shouldShowFareInfo = (config, legs, fares) => {
+  if (fares && config.hideUnknownFares && fares.some(fare => fare.isUnknown)) {
+    return false;
+  }
   if (
     config.externalFareRouteIds &&
     legs?.some(
@@ -104,11 +108,18 @@ export const shouldShowFareInfo = (config, legs) => {
     return false;
   }
 
+  if (
+    legs?.some(
+      leg =>
+        isCallAgencyLeg(leg) &&
+        leg.route &&
+        config.flex.internalAgencies.includes(leg.route.agency.gtfsId),
+    )
+  ) {
+    return false;
+  }
+
   return (
-    (!config.showTicketLinkOnlyWhenTesting ||
-      window.localStorage
-        .getItem('favouriteStore')
-        ?.includes('Lippulinkkitestaus2025')) &&
     config.showTicketInformation &&
     config.availableTickets &&
     Array.isArray(config.feedIds) &&
@@ -127,6 +138,10 @@ export const shouldShowFarePurchaseInfo = (config, breakpoint, fares) => {
   }
 
   return (
+    (!config.showTicketLinkOnlyWhenTesting ||
+      window.localStorage
+        .getItem('favouriteStore')
+        ?.includes('Lippulinkkitestaus2025')) &&
     !unknownFares &&
     fares?.length === 1 &&
     config.ticketPurchaseLink &&
@@ -134,4 +149,34 @@ export const shouldShowFarePurchaseInfo = (config, breakpoint, fares) => {
     config.availableTickets &&
     breakpoint !== 'large'
   );
+};
+
+/**
+ *  Returns a string that contains the ticket type(s) for the itinerary.
+ *  If there are multiple fares, they are separated by semicolons.
+ *  If there are alternative fares, they are separated by commas.
+ *  If there are any unknown fares, an empty string is returned.
+ * @param {*} legs
+ * @param {*} zones
+ * @param {*} config
+ * @returns
+ */
+export const getTicketString = (legs, zones, config) => {
+  const fares = getFaresFromLegs(legs, config);
+  let ticket =
+    !fares || fares.some(fare => fare.isUnknown)
+      ? ''
+      : fares.map(fare => fare.ticketName).join(';');
+
+  if (ticket) {
+    const alternativeTickets = getAlternativeFares(
+      zones,
+      fares,
+      config.availableTickets,
+    ).join(',');
+    if (alternativeTickets) {
+      ticket += `,${alternativeTickets}`;
+    }
+  }
+  return ticket;
 };

@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import Link from 'found/Link';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import LegAgencyInfo from './LegAgencyInfo';
@@ -24,8 +24,8 @@ import {
 } from '../../util/alertUtils';
 import {
   PREFIX_DISRUPTION,
-  PREFIX_ROUTES,
-  PREFIX_STOPS,
+  routePagePath,
+  stopPagePath,
 } from '../../util/path';
 import { durationToString } from '../../util/timeUtils';
 import { addAnalyticsEvent } from '../../util/analyticsUtils';
@@ -37,6 +37,9 @@ import {
   showCarBoardingNote,
   legTimeStr,
   legTime,
+  isPlatformChanged,
+  getValidatedLegName,
+  isLocalCallAgency,
 } from '../../util/legUtils';
 import { shouldShowFareInfo } from '../../util/fareUtils';
 import { AlertEntityType, AlertSeverityLevelType } from '../../constants';
@@ -47,6 +50,8 @@ import InterlineInfo from './InterlineInfo';
 import AlternativeLegsInfo from './AlternativeLegsInfo';
 import LegInfo from './LegInfo';
 import ExternalLink from '../ExternalLink';
+import { getBoardingInformationText } from './BoardingInformation';
+import { getTrackOrPierOrPlatformChangeText } from '../../util/modeUtils';
 
 const stopCode = code => code && <StopCode code={code} />;
 
@@ -185,7 +190,7 @@ class TransitLeg extends React.Component {
         return (
           <IntermediateLeg
             placesCount={places.length}
-            color={leg.route ? `#${leg.route.color}` : 'currentColor'}
+            color={leg.route?.color ? `#${leg.route.color}` : undefined}
             key={place.stop.gtfsId}
             gtfsId={place.stop.gtfsId}
             mode={mode}
@@ -193,10 +198,6 @@ class TransitLeg extends React.Component {
             arrival={place.arrival}
             realTime={leg.realTime}
             stopCode={place.stop.code}
-            focusFunction={this.context.focusFunction({
-              lat: place.stop.lat,
-              lon: place.stop.lon,
-            })}
             showZoneLimits={this.context.config.zones.itinerary}
             showCurrentZoneDelimiter={previousZoneIdDiffers}
             previousZoneId={
@@ -227,6 +228,60 @@ class TransitLeg extends React.Component {
     return null;
   }
 
+  renderFareDisclaimer(leg, mode, lang, LegRouteName) {
+    const { config, intl } = this.context;
+    if (
+      leg.fare?.isUnknown &&
+      !config.hideUnknownFares &&
+      shouldShowFareInfo(config)
+    ) {
+      const modeDisclaimer = config.modeDisclaimers?.[mode]?.[lang];
+      if (modeDisclaimer) {
+        return (
+          <div className="disclaimer-container unknown-fare-disclaimer__leg">
+            <div className="description-container">
+              {modeDisclaimer.disclaimer}
+              <a href={modeDisclaimer.link} target="_blank" rel="noreferrer">
+                {modeDisclaimer.text}
+              </a>
+            </div>
+          </div>
+        );
+      }
+
+      if (mode !== 'call') {
+        return (
+          <div className="disclaimer-container unknown-fare-disclaimer__leg">
+            <div className="description-container">
+              <span className="accent">
+                {`${intl.formatMessage({ id: 'pay-attention' })} `}
+              </span>
+              {intl.formatMessage({ id: 'separate-ticket-required' })}
+            </div>
+            <div className="ticket-info">
+              <div className="accent">{LegRouteName}</div>
+              {leg.fare.agency &&
+                !config.hideExternalOperator(leg.fare.agency) && (
+                  <>
+                    <div>{leg.fare.agency.name}</div>
+                    {leg.fare.agency.fareUrl && (
+                      <ExternalLink
+                        className="agency-link"
+                        href={leg.fare.agency.fareUrl}
+                      >
+                        {intl.formatMessage({ id: 'extra-info' })}
+                      </ExternalLink>
+                    )}
+                  </>
+                )}
+            </div>
+          </div>
+        );
+      }
+    }
+    return null;
+  }
+
   renderMain = () => {
     const {
       children,
@@ -244,6 +299,9 @@ class TransitLeg extends React.Component {
     const startMs = legTime(leg.start);
     const time = legTimeStr(leg.start);
     const modeClassName = mode.toLowerCase();
+    const validatedFromLegName = getValidatedLegName(leg.from.name, intl, true);
+    const validatedToLegName = getValidatedLegName(leg.to.name, intl, false);
+
     const LegRouteName = leg.from.name.concat(' - ').concat(leg.to.name);
 
     const textVersionBeforeLink = (
@@ -255,32 +313,28 @@ class TransitLeg extends React.Component {
         }}
       />
     );
+    const platformChanged = isPlatformChanged(leg);
     const textVersionAfterLink = (
-      <FormattedMessage
-        id="itinerary-details.transit-leg-part-2"
-        values={{
-          startStop: leg.from.name,
-          startZoneInfo: intl.formatMessage(
-            { id: 'zone-info' },
-            { zone: leg.from.stop.zoneId },
-          ),
-          endZoneInfo: intl.formatMessage(
-            { id: 'zone-info' },
-            { zone: leg.to.stop.zoneId },
-          ),
-          endStop: leg.to.name,
-          duration: durationToString(leg.duration * 1000),
-          trackInfo: (
-            <PlatformNumber
-              number={leg.from.stop.platformCode}
-              short={false}
-              isRailOrSubway={
-                modeClassName === 'rail' || modeClassName === 'subway'
-              }
-            />
-          ),
-        }}
-      />
+      <>
+        <FormattedMessage
+          id="itinerary-details.transit-leg-part-2"
+          values={{
+            startStop: validatedFromLegName,
+            startZoneInfo: intl.formatMessage(
+              { id: 'zone-info' },
+              { zone: leg.from.stop.zoneId },
+            ),
+            endZoneInfo: intl.formatMessage(
+              { id: 'zone-info' },
+              { zone: leg.to.stop.zoneId },
+            ),
+            endStop: validatedToLegName,
+            duration: durationToString(leg.duration * 1000),
+            trackInfo: getBoardingInformationText(leg, intl, false),
+          }}
+        />
+        {platformChanged && getTrackOrPierOrPlatformChangeText(intl, mode)}
+      </>
     );
 
     const alerts = getActiveLegAlerts(leg, startMs / 1000);
@@ -370,7 +424,7 @@ class TransitLeg extends React.Component {
         >
           {createNotification(notification)}
           <Icon
-            img="icon-icon_arrow-collapse--right"
+            img="icon_arrow-collapse--right"
             className="disruption-link-arrow"
             color={config.colors.primary}
           />
@@ -378,8 +432,9 @@ class TransitLeg extends React.Component {
       );
     };
     const routeNotifications = [];
+    const isCallAgency = mode === 'call';
     if (
-      config.NODE_ENV !== 'test' &&
+      process.env.NODE_ENV !== 'test' &&
       config.routeNotifications &&
       config.routeNotifications.length > 0
     ) {
@@ -392,7 +447,7 @@ class TransitLeg extends React.Component {
           (showCarBoardingInformation &&
             notification.showForCarWithPublic &&
             showCarBoardingNote(leg, config)) ||
-          notification.showForRoute?.(leg.route)
+          (notification.showForRoute?.(leg.route) && !isCallAgency)
         ) {
           routeNotifications.push(
             <div
@@ -427,6 +482,7 @@ class TransitLeg extends React.Component {
           </span>
           <span aria-hidden="true">
             <div className="itinerary-time-column-time">
+              {isCallAgency && <FormattedMessage id="estimate" />}{' '}
               <span className={cx({ realtime: leg.realTime })}>
                 <span className={cx({ canceled: legHasCancelation(leg) })}>
                   {time}
@@ -440,15 +496,18 @@ class TransitLeg extends React.Component {
         <ItineraryCircleLine
           index={index}
           modeClassName={modeClassName}
-          color={leg.route ? `#${leg.route.color}` : 'currentColor'}
+          color={leg.route?.color ? `#${leg.route.color}` : undefined}
           renderBottomMarker={
             !this.state.showIntermediateStops ||
             (leg.intermediatePlaces.length === 0 && interliningLegs.length < 1)
           }
+          viaType={leg.from.viaLocationType}
+          isStop={!!leg.from.stop}
+          appendClass={isLocalCallAgency(leg, config) ? 'call-local' : ''}
         />
         <div
           style={{
-            color: leg.route ? `#${leg.route.color}` : 'currentColor',
+            color: leg.route?.color ? `#${leg.route.color}` : undefined,
           }}
           className={cx(
             'small-9 columns itinerary-instruction-column',
@@ -459,7 +518,7 @@ class TransitLeg extends React.Component {
           <span className="sr-only">
             <FormattedMessage
               id="itinerary-summary.show-on-map"
-              values={{ target: leg.from.name || '' }}
+              values={{ target: validatedFromLegName || '' }}
             />
           </span>
           <div
@@ -469,7 +528,7 @@ class TransitLeg extends React.Component {
           >
             <div className="itinerary-leg-row">
               <Link
-                aria-label={leg.from.name?.toLowerCase()}
+                aria-label={validatedFromLegName?.toLowerCase()}
                 onClick={e => {
                   e.stopPropagation();
                   addAnalyticsEvent({
@@ -478,17 +537,17 @@ class TransitLeg extends React.Component {
                     name: mode,
                   });
                 }}
-                to={`/${PREFIX_STOPS}/${leg.from.stop.gtfsId}`}
+                to={stopPagePath(false, leg.from.stop.gtfsId)}
               >
-                {leg.from.name}
-                {leg.isViaPoint && (
+                {validatedFromLegName}
+                {leg.from.viaLocationType && (
                   <Icon
-                    img="icon-icon_mapMarker"
+                    img="icon_mapMarker"
                     className="itinerary-mapmarker-icon"
                   />
                 )}
                 <Icon
-                  img="icon-icon_arrow-collapse--right"
+                  img="icon_arrow-collapse--right"
                   className="itinerary-arrow-icon"
                   color={config.colors.primary}
                 />
@@ -505,9 +564,8 @@ class TransitLeg extends React.Component {
                 <PlatformNumber
                   number={leg.from.stop.platformCode}
                   short
-                  isRailOrSubway={
-                    modeClassName === 'rail' || modeClassName === 'subway'
-                  }
+                  mode={mode}
+                  updated={platformChanged}
                 />
               </div>
             </div>
@@ -523,7 +581,7 @@ class TransitLeg extends React.Component {
               )}
             </div>
             <ItineraryMapAction
-              target={leg.from.name || ''}
+              target={validatedFromLegName || ''}
               focusAction={focusAction}
             />
           </div>
@@ -536,7 +594,9 @@ class TransitLeg extends React.Component {
             displayTime={this.displayAlternativeLegs()}
             changeHash={this.props.changeHash}
             tabIndex={this.props.tabIndex}
-            isCallAgency={mode === 'call'}
+            isCallAgency={isCallAgency}
+            mobile={this.props.mobile}
+            isTransitLeg
           />
 
           {this.state.showAlternativeLegs &&
@@ -553,7 +613,9 @@ class TransitLeg extends React.Component {
                   l.start / 1000,
                 )}
                 displayTime
-                isCallAgency={mode === 'call'}
+                isCallAgency={isCallAgency}
+                mobile={this.props.mobile}
+                isTransitLeg
               />
             ))}
           {this.displayAlternativeLegs() && (
@@ -576,9 +638,17 @@ class TransitLeg extends React.Component {
                 <Link
                   to={
                     (hasEntitiesOfType(alert, AlertEntityType.Route) &&
-                      `/${PREFIX_ROUTES}/${leg.route.gtfsId}/${PREFIX_DISRUPTION}/${leg.trip.pattern.code}`) ||
+                      routePagePath(
+                        leg.route.gtfsId,
+                        PREFIX_DISRUPTION,
+                        leg.trip.pattern.code,
+                      )) ||
                     (hasEntitiesOfType(alert, AlertEntityType.Stop) &&
-                      `/${PREFIX_STOPS}/${alert.entities[0].gtfsId}/${PREFIX_DISRUPTION}/`)
+                      stopPagePath(
+                        false,
+                        alert.entities[0].gtfsId,
+                        PREFIX_DISRUPTION,
+                      ))
                   }
                   className="disruption-link"
                 >
@@ -594,7 +664,7 @@ class TransitLeg extends React.Component {
                       : alert.alertDescriptionText}
                   </div>
                   <Icon
-                    img="icon-icon_arrow-collapse--right"
+                    img="icon_arrow-collapse--right"
                     className="disruption-link-arrow"
                     color={config.colors.primary}
                   />
@@ -635,48 +705,7 @@ class TransitLeg extends React.Component {
               )}
             </div>
           )}
-          {leg.fare?.isUnknown &&
-            shouldShowFareInfo(config) &&
-            (config.modeDisclaimers?.[mode]?.[lang] ? (
-              <div className="disclaimer-container unknown-fare-disclaimer__leg">
-                <div className="description-container">
-                  {config.modeDisclaimers[mode][lang].disclaimer}
-                  <a
-                    href={config.modeDisclaimers[mode][lang].link}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {config.modeDisclaimers[mode][lang].text}
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <div className="disclaimer-container unknown-fare-disclaimer__leg">
-                <div className="description-container">
-                  <span className="accent">
-                    {`${intl.formatMessage({ id: 'pay-attention' })} `}
-                  </span>
-                  {intl.formatMessage({ id: 'separate-ticket-required' })}
-                </div>
-                <div className="ticket-info">
-                  <div className="accent">{LegRouteName}</div>
-                  {leg.fare.agency &&
-                    !config.hideExternalOperator(leg.fare.agency) && (
-                      <React.Fragment>
-                        <div>{leg.fare.agency.name}</div>
-                        {leg.fare.agency.fareUrl && (
-                          <ExternalLink
-                            className="agency-link"
-                            href={leg.fare.agency.fareUrl}
-                          >
-                            {intl.formatMessage({ id: 'extra-info' })}
-                          </ExternalLink>
-                        )}
-                      </React.Fragment>
-                    )}
-                </div>
-              </div>
-            ))}
+          {this.renderFareDisclaimer(leg, mode, lang, LegRouteName)}
         </div>
         <span className="sr-only">{alertSeverityDescription}</span>
       </div>
@@ -706,6 +735,7 @@ TransitLeg.propTypes = {
   changeHash: PropTypes.func,
   tabIndex: PropTypes.number,
   usingOwnCarWholeTrip: PropTypes.bool,
+  mobile: PropTypes.bool,
 };
 
 TransitLeg.defaultProps = {
@@ -716,12 +746,12 @@ TransitLeg.defaultProps = {
   tabIndex: undefined,
   children: undefined,
   usingOwnCarWholeTrip: false,
+  mobile: undefined,
 };
 
 TransitLeg.contextTypes = {
-  focusFunction: PropTypes.func.isRequired,
   config: configShape.isRequired,
-  intl: intlShape.isRequired,
+  intl: PropTypes.object.isRequired, // eslint-disable-line
 };
 
 const connectedComponent = connectToStores(

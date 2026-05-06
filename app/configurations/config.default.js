@@ -1,7 +1,7 @@
-/* eslint-disable prefer-template */
 import safeJsonParse from '../util/safeJsonParser';
 import { BIKEAVL_WITHMAX } from '../util/vehicleRentalUtils';
 import realtime from './realtimeUtils';
+import prUtils from '../util/ParkAndRideUtils';
 
 const CONFIG = process.env.CONFIG || 'default';
 const API_URL = process.env.API_URL || 'https://dev-api.digitransit.fi';
@@ -13,7 +13,6 @@ const POI_MAP_PREFIX = `${MAP_URL}/map/v3/finland`;
 const OTP_URL = process.env.OTP_URL || `${API_URL}/routing/v2/finland/`;
 const HSL_TIMETABLES_URL =
   process.env.HSL_TIMETABLES_URL || 'https://dev.kartat.hsl.fi';
-const APP_PATH = process.env.APP_CONTEXT || '';
 const API_SUBSCRIPTION_QUERY_PARAMETER_NAME =
   process.env.API_SUBSCRIPTION_QUERY_PARAMETER_NAME ||
   'digitransit-subscription-key';
@@ -22,11 +21,6 @@ const API_SUBSCRIPTION_HEADER_NAME =
 const API_SUBSCRIPTION_TOKEN =
   process.env.API_SUBSCRIPTION_TOKEN || 'c65af0cd2d0a401a9599894970a2b29c';
 
-const {
-  // AXE,
-  NODE_ENV,
-  RUN_ENV,
-} = process.env;
 const hasAPISubscriptionQueryParameter = true;
 const PORT = process.env.PORT || 8080;
 const APP_DESCRIPTION = 'Digitransit journey planning UI';
@@ -39,7 +33,6 @@ export default {
   PORT,
   // AXE,
   CONFIG,
-  NODE_ENV,
   OTPTimeout: OTP_TIMEOUT,
   URL: {
     API_URL,
@@ -116,14 +109,12 @@ export default {
   API_SUBSCRIPTION_QUERY_PARAMETER_NAME,
   API_SUBSCRIPTION_HEADER_NAME,
   API_SUBSCRIPTION_TOKEN,
-  RUN_ENV,
 
   hasAPISubscriptionQueryParameter,
 
   hasAPISubscriptionHeader:
     API_SUBSCRIPTION_HEADER_NAME && API_SUBSCRIPTION_TOKEN,
 
-  APP_PATH: `${APP_PATH}`,
   indexPath: '',
   title: 'Reittihaku',
 
@@ -168,15 +159,15 @@ export default {
     minimalRegexp: /.{2,}/,
   },
 
-  nearbyRoutes: {
+  nearYouRoutes: {
     radius: 10000,
     bucketSize: 1000,
   },
 
   omitNonPickups: true,
-  maxNearbyStopAmount: 5,
-  maxNearbyStopRefetches: 5,
-  maxNearbyStopDistance: {
+  maxNearYouCount: 5,
+  maxNearYouRefetches: 5,
+  maxNearYouDistance: {
     favorite: 20000,
     bus: 50000,
     tram: 20000,
@@ -185,6 +176,8 @@ export default {
     ferry: 50000,
     citybike: 20000,
     airplane: 100000,
+    bikepark: 10000,
+    carpark: 50000,
   },
 
   defaultSettings: {
@@ -210,12 +203,7 @@ export default {
    * If not, the selection may not make any sense.
    */
   defaultOptions: {
-    walkReluctance: {
-      least: 5,
-      less: 3,
-      more: 1,
-      most: 0.2,
-    },
+    highWalkReluctance: 5,
     walkSpeed: [0.69, 0.97, 1.2, 1.67, 2.22],
     bikeSpeed: [2.77, 4.15, 5.55, 6.94, 8.33],
   },
@@ -227,19 +215,8 @@ export default {
   // if you enable car suggestions but the linear distance between all points is less than this, then a car route will
   // not be computed
   suggestCarMinDistance: 2000,
-  availableLanguages: [
-    'fi',
-    'sv',
-    'en',
-    'fr',
-    'nb',
-    'de',
-    'da',
-    'es',
-    'ro',
-    'pl',
-  ],
-  defaultLanguage: 'en',
+  availableLanguages: ['fi', 'sv', 'en'],
+  defaultLanguage: 'fi',
   timeZone: 'Europe/Helsinki',
   allowLogin: false,
   allowFavouritesFromLocalstorage: true,
@@ -349,7 +326,7 @@ export default {
       sv: 'Köp ett abonnemang för en dag, en vecka eller för en hel säsong',
       en: 'Buy a daily, weekly or season pass',
     },
-    maxNearbyRentalVehicleAmount: 5,
+    maxNearYouRentalVehicleAmount: 5,
     maxDistanceToRentalVehiclesInMeters: 100,
     maxMinutesToRentalJourneyStart: 60,
     maxMinutesToRentalJourneyEnd: 720,
@@ -376,19 +353,22 @@ export default {
 
   colors: {
     primary: '#000F94',
+    caution: '#dc0451',
     backgroundInfo: '#ebf6fd',
-    iconColors: {
-      'mode-airplane': '#0046ad',
-      'mode-bus': '#0088ce',
-      'mode-tram': '#6a8925',
-      'mode-metro': '#ed8c00',
-      'mode-rail': '#af8dbc',
-      'mode-ferry': '#247C7B',
-      'mode-citybike': '#f2b62d',
-      'mode-scooter': '#C5CAD2',
-      'mode-taxi': '#647693',
-      'mode-replacement-bus': '#DC0451',
-    },
+    airplane: '#0046ad',
+    bus: '#007ac9',
+    'replacement-bus': '#dc0451',
+    tram: '#008151',
+    subway: '#ca4000',
+    rail: '#8c4799',
+    ferry: '#007a97',
+    'ferry-external': '#666666',
+    citybike: '#f2b62d',
+    'citybike-secondary': '#333333',
+    scooter: '#c5cad2',
+    taxi: '#647693',
+    bikepark: '#f2b62d',
+    carpark: '#007ac9',
   },
   iconModeSet: 'digitransit',
   fontWeights: {
@@ -411,7 +391,7 @@ export default {
     locale: 'en_US',
 
     image: {
-      url: '/img/default-social-share.png',
+      url: 'img/default-social-share.png',
       width: 2400,
       height: 1260,
     },
@@ -751,11 +731,9 @@ export default {
 
   vehicles: false,
   showVehiclesOnStopPage: false,
-  trafficNowLink: '',
+  showVehiclesOnItineraryPage: false,
 
   timetables: {},
-
-  showVehiclesOnItineraryPage: false,
 
   showWeatherInformation: true,
   showBikeAndParkItineraries: false,
@@ -763,8 +741,6 @@ export default {
   includeBikeSuggestions: true,
   includeCarSuggestions: false,
   includeParkAndRideSuggestions: false,
-  // Park and ride and car suggestions separated
-  separatedParkAndRideSwitch: false,
 
   showNearYouButtons: false,
   nearYouModes: [],
@@ -781,7 +757,8 @@ export default {
     itinerary: false,
   },
 
-  viaPointsEnabled: true,
+  viaPointsEnabled: false,
+  viaPointsMax: 1,
 
   // Toggling this off shows the alert bodytext instead of the header
   showAlertHeader: true,
@@ -792,6 +769,14 @@ export default {
 
   constantOperationStops: {},
   constantOperationRoutes: {},
+
+  parkAndRide: {
+    showParkAndRide: false,
+    showParkAndRideForBikes: false,
+    parkAndRideMinZoom: 13,
+    resolver: prUtils.liipi,
+  },
+  parkingAreaSources: ['liipi'],
 
   embeddedSearch: {
     title: {
@@ -851,12 +836,41 @@ export default {
         ],
       },
     },
+    {
+      showForRoute: route => route.type === 715,
+      id: 'flexBusNotification',
+      header: {
+        fi: 'Kutsuliikenne',
+        en: 'On-demand service',
+        sv: 'Anropsbusstrafiken',
+      },
+      content: {
+        fi: [
+          'Linja toimii ennakkotilauksella. Varmistaaksesi matkan, tee varaus etukäteen. Tarkemmat tiedot palveluntarjoalta.',
+        ],
+        en: [
+          'This service operates by advance booking. To ensure your ride, please book ahead of time. More information is available from the service provider. ',
+        ],
+        sv: [
+          'Linjen fungerar med förhandsbokning. Boka din resa i förväg för att säkerställa resan. Mer information från tjänsteleverantören.',
+        ],
+      },
+    },
   ],
   navigation: false,
   sendAnalyticsCustomEventGoals: false,
   shortenLongTextThreshold: 10, // for route number in itinerary summary
-  allowFlexJourneys: false,
-  allowDirectFlexJourneys: false,
-  allowedFlexRouteTypes: [1501],
   showRouteDescNotification: false,
+  showStopStatusMarkers: false,
+
+  flex: {
+    internalFlexEnabled: false,
+    allowTaxiJourneys: false,
+    directOnlyTaxiJourneys: false,
+    internalAgencies: [], // "FeedId:AgencyId"
+    externalAgencies: [], // "FeedId:AgencyId"
+    allowedExternalFlexRouteTypes: [1501],
+    minTransferTime: 900, // seconds
+  },
+  personalisation: false,
 };

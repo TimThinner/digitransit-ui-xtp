@@ -5,7 +5,7 @@ import Link from 'found/Link';
 import { configShape, legTimeShape } from '../../util/shapes';
 import { legTimeStr } from '../../util/legUtils';
 import ZoneIcon from '../ZoneIcon';
-import { PREFIX_STOPS } from '../../util/path';
+import { stopPagePath } from '../../util/path';
 import Icon from '../Icon';
 
 function IntermediateLeg(
@@ -16,7 +16,6 @@ function IntermediateLeg(
     name,
     arrival,
     realTime,
-    focusFunction,
     gtfsId,
     showCurrentZoneDelimiter,
     showZoneLimits,
@@ -29,6 +28,7 @@ function IntermediateLeg(
   },
   { config },
 ) {
+  const { feedIds, colors } = config;
   const modeClassName = mode.toLowerCase();
   const isDualZone = currentZoneId && (previousZoneId || nextZoneId);
   const isTripleZone = currentZoneId && previousZoneId && nextZoneId;
@@ -72,13 +72,12 @@ function IntermediateLeg(
           'zone-previous': currentZoneId && previousZoneId,
         },
       )}
-      onClick={e => focusFunction(e)}
     >
       <div className="small-2 columns itinerary-time-column">
         {showZoneLimits &&
           currentZoneId &&
           gtfsId &&
-          config.feedIds.includes(gtfsId.split(':')[0]) && (
+          feedIds.includes(gtfsId.split(':')[0]) && (
             <div className="time-column-zone-icons-container intermediate-leg">
               {previousZoneId && <ZoneIcon zoneId={previousZoneId} />}
               <ZoneIcon
@@ -138,7 +137,7 @@ function IntermediateLeg(
           onClick={e => {
             e.stopPropagation();
           }}
-          to={`/${PREFIX_STOPS}/${gtfsId}`}
+          to={stopPagePath(false, gtfsId)}
         >
           <div
             className="itinerary-leg-row-intermediate"
@@ -153,15 +152,12 @@ function IntermediateLeg(
               {` ${name}`}
             </div>
             {isViaPoint && (
-              <Icon
-                img="icon-icon_mapMarker"
-                className="itinerary-mapmarker-icon"
-              />
+              <Icon img="icon_mapMarker" className="itinerary-mapmarker-icon" />
             )}
             <Icon
-              img="icon-icon_arrow-collapse--right"
+              img="icon_arrow-collapse--right"
               className="itinerary-arrow-icon"
-              color={config.colors.primary}
+              color={colors.primary}
             />
           </div>
         </Link>
@@ -172,7 +168,6 @@ function IntermediateLeg(
 
 IntermediateLeg.propTypes = {
   placesCount: PropTypes.number,
-  focusFunction: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   arrival: legTimeShape.isRequired,
   realTime: PropTypes.bool,

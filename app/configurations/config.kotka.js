@@ -5,37 +5,34 @@ import walttiConfig from './config.waltti';
 const CONFIG = 'kotka';
 const APP_TITLE = 'Kotkan seudun reittiopas';
 const APP_DESCRIPTION = 'Kotkan seudun reittiopas';
-
-const minLat = 60.243;
-const maxLat = 60.688;
-const minLon = 26.422;
-const maxLon = 27.738;
+const CDN_URL = process.env.MAP_URL || 'https://dev-cdn.digitransit.fi';
 
 export default configMerger(walttiConfig, {
   CONFIG,
 
   appBarLink: {
     name: 'Kotkan seudun joukkoliikenne',
-    href: 'http://www.kotka.fi/asukkaalle/kartat_ja_liikenne/joukkoliikenne',
+    href: 'https://jonnejaminne.fi/',
+    altLink: {
+      sv: {
+        name: 'Kotka regiontrafik',
+        href: 'https://jonnejaminne.fi/sv/',
+      },
+      en: {
+        name: 'Kotka region traffic',
+        href: 'https://jonnejaminne.fi/en/',
+      },
+    },
   },
 
   colors: {
     primary: '#0001FF',
-    iconColors: {
-      'mode-bus': '#0001FF',
-      'mode-citybike': '#f2b62d',
-      'mode-citybike-secondary': '#333333',
-    },
+    bus: '#0001FF',
   },
   transportModes: {
     bus: {
       availableForSelection: true,
       defaultValue: true,
-      nearYouLabel: {
-        fi: 'Lähipysäkit kartalla',
-        sv: 'Hållplatser på kartan',
-        en: 'Nearby stops on map',
-      },
     },
     citybike: {
       availableForSelection: true,
@@ -100,18 +97,14 @@ export default configMerger(walttiConfig, {
   feedIds: ['Kotka', 'KotkaLautat'],
   feedIdFiltering: true,
 
-  searchParams: {
-    'boundary.rect.min_lat': minLat,
-    'boundary.rect.max_lat': maxLat,
-    'boundary.rect.min_lon': minLon,
-    'boundary.rect.max_lon': maxLon,
-  },
+  useSearchPolygon: true,
 
   areaPolygon: [
-    [minLon, minLat],
-    [minLon, maxLat],
-    [maxLon, maxLat],
-    [maxLon, minLat],
+    [26.422, 60.243],
+    [27.618, 60.243],
+    [27.618, 60.852],
+    [27.284, 60.852],
+    [26.422, 60.688],
   ],
 
   defaultEndpoint: {
@@ -170,9 +163,6 @@ export default configMerger(walttiConfig, {
     1: 'A',
     2: 'B',
   },
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
   zones: {
     stops: true,
     itinerary: true,
@@ -188,6 +178,25 @@ export default configMerger(walttiConfig, {
         },
         url: '/assets/geojson/kotka_zone_lines_20250114.geojson',
       },
+      {
+        name: {
+          fi: 'Myyntipisteet',
+          sv: 'Servicekontorer',
+          en: 'Service points',
+        },
+        url: `${CDN_URL}/waltti-assets/v1/salespoints/salespoints_kotka.json`,
+      },
     ],
   },
+
+  showTicketInformation: true,
+  useTicketIcons: true,
+  ticketLink: {
+    fi: 'https://jonnejaminne.fi/liput-ja-hinnastot/hinnasto/',
+    sv: 'https://jonnejaminne.fi/en/tickets-and-prices/price-list/ ',
+    en: 'https://jonnejaminne.fi/en/tickets-and-prices/price-list/ ',
+  },
+  showTicketPrice: true,
+  ticketLinkOperatorCode: 50217,
+  externalFareRouteIds: ['77ELY', '707'],
 });

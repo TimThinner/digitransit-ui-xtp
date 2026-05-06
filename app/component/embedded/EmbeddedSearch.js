@@ -14,6 +14,7 @@ import {
 import {
   buildQueryString,
   buildURL,
+  getIndexPath,
   getPathWithEndpointObjects,
   PREFIX_ITINERARY_SUMMARY,
 } from '../../util/path';
@@ -21,6 +22,7 @@ import Icon from '../Icon';
 import Loading from '../Loading';
 import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import useUTMCampaignParams from './hooks/useUTMCampaignParams';
+import { locationToOTP } from '../../util/otpStrings';
 
 const LocationSearch = withSearchContext(DTAutosuggestPanel, true);
 
@@ -61,14 +63,6 @@ const translations = {
   },
 };
 
-i18next.init({
-  fallbackLng: 'fi',
-  defaultNS: 'translation',
-  interpolation: {
-    escapeValue: false, // not needed for react as it escapes by default
-  },
-});
-
 // test case: http://localhost:8080/haku?address2=Opastinsilta%206%20A,%20Helsinki&lat2=60.199118&lon2=24.940652&bikeOnly=1
 
 /**
@@ -89,16 +83,29 @@ const EmbeddedSearch = (props, context) => {
       : document.location.href;
 
   const buttonRef = useRef(null);
+  const [ready, setReady] = useState(false);
+  const [logo, setLogo] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Object.keys(translations).forEach(language => {
-      i18next.addResourceBundle(
-        language,
-        'translation',
-        translations[language],
-      );
-    });
-  });
+    Object.keys(translations).forEach(l =>
+      i18next.addResourceBundle(l, 'translation', translations[l], true),
+    );
+    i18next.changeLanguage(lang).then(() => setReady(true));
+
+    if (config.secondaryLogo || config.logo) {
+      import(
+        /* webpackChunkName: "embedded-search" */ `../../configurations/images/${
+          config.secondaryLogo || config.logo
+        }`
+      ).then(l => {
+        setLogo(l.default);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
   const defaultOriginExists = query.lat1 && query.lon1;
   const defaultOrigin = {
@@ -116,7 +123,6 @@ const EmbeddedSearch = (props, context) => {
     name: query.address2,
   };
   const useDestinationLocation = query?.destinationLoc;
-  const [logo, setLogo] = useState();
   const [origin, setOrigin] = useState(
     useOriginLocation
       ? {
@@ -139,7 +145,6 @@ const EmbeddedSearch = (props, context) => {
         ? defaultDestination
         : {},
   );
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setOrigin(
@@ -164,10 +169,11 @@ const EmbeddedSearch = (props, context) => {
           ? defaultDestination
           : {},
     );
+    if (lang !== i18next.language) {
+      i18next.changeLanguage(lang);
+    }
   }, [query]);
 
-  const color = colors.primary;
-  const hoverColor = colors.hover;
   const appElement = 'embedded-root';
   let titleText;
   if (bikeOnly) {
@@ -214,8 +220,6 @@ const EmbeddedSearch = (props, context) => {
     lang,
     sources,
     targets: getLocationSearchTargets(config, false),
-    color,
-    hoverColor,
     refPoint,
     searchPanelText: titleText,
     originPlaceHolder: 'search-origin-index',
@@ -223,7 +227,7 @@ const EmbeddedSearch = (props, context) => {
     selectHandler: onSelectLocation,
     onGeolocationStart: onSelectLocation,
     fontWeights,
-    modeIconColors: config.colors.iconColors,
+    colors,
     modeSet: config.iconModeSet,
     isMobile: true,
     showScroll: true,
@@ -241,14 +245,32 @@ const EmbeddedSearch = (props, context) => {
   const executeSearch = () => {
     const urlEnd = bikeOnly ? '/bike' : walkOnly ? '/walk' : '';
 
-    const targetUrl = buildURL([
-      lang,
-      getPathWithEndpointObjects(origin, destination, PREFIX_ITINERARY_SUMMARY),
-      urlEnd,
-    ]);
+    // if origin or destination is missing and current location is not used,
+    // redirect to index page instead
+    const isComplete =
+      (origin.address && destination.address) ||
+      origin.type === 'CurrentLocation' ||
+      destination.type === 'CurrentLocation';
+    const targetUrl = isComplete
+      ? buildURL([
+          lang,
+          getPathWithEndpointObjects(
+            origin,
+            destination,
+            PREFIX_ITINERARY_SUMMARY,
+          ),
+          urlEnd,
+        ])
+      : buildURL([
+          lang,
+          getIndexPath(
+            locationToOTP(origin),
+            locationToOTP(destination),
+            config.indexPath || '',
+          ),
+        ]);
 
     targetUrl.search += buildQueryString(utmCampaignParams);
-
     addAnalyticsEvent({
       category: 'EmbeddedSearch',
       action: 'executeSearch',
@@ -282,26 +304,7 @@ const EmbeddedSearch = (props, context) => {
     }
   };
 
-  useEffect(() => {
-    if (config.secondaryLogo || config.logo) {
-      import(
-        /* webpackChunkName: "embedded-search" */ `../../configurations/images/${
-          config.secondaryLogo || config.logo
-        }`
-      ).then(l => {
-        setLogo(l.default);
-        setLoading(false);
-      });
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  if (i18next.language !== lang) {
-    i18next.changeLanguage(lang);
-  }
-
-  if (loading) {
+  if (loading || !ready) {
     return <Loading />;
   }
 

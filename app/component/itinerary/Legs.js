@@ -31,7 +31,7 @@ import {
   markViaPoints,
   getBoardingLeg,
 } from '../../util/legUtils';
-import { getRouteMode } from '../../util/modeUtils';
+import { getTripOrRouteMode } from '../../util/modeUtils';
 import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import Profile from './Profile';
 import BikeParkLeg from './BikeParkLeg';
@@ -40,10 +40,6 @@ import { getIntermediatePlaces } from '../../util/otpStrings';
 const stopCode = stop => stop && stop.code && <StopCode code={stop.code} />;
 
 export default class Legs extends React.Component {
-  static childContextTypes = {
-    focusFunction: PropTypes.func,
-  };
-
   static propTypes = {
     itinerary: itineraryShape.isRequired,
     xtpEdgePoints: PropTypes.arrayOf(xtpShape),
@@ -73,10 +69,6 @@ export default class Legs extends React.Component {
     usingOwnCarWholeTrip: false,
     relayEnvironment: undefined,
   };
-
-  getChildContext() {
-    return { focusFunction: this.focus };
-  }
 
   focus = position => e => {
     e.stopPropagation();
@@ -161,6 +153,10 @@ export default class Legs extends React.Component {
         previousLeg?.mode === 'BICYCLE' && previousLeg.to.vehicleParking;
       const carPark =
         previousLeg?.mode === 'CAR' && previousLeg.to.vehicleParking;
+      const isSameStopTransfer =
+        leg.transitLeg &&
+        nextLeg?.transitLeg &&
+        leg.to.stop.gtfsId === nextLeg.from.stop.gtfsId;
       const legProps = {
         leg,
         index: j,
@@ -184,15 +180,15 @@ export default class Legs extends React.Component {
         const waitThresholdInMs = waitThreshold * 1000;
         const waitTime = legTime(nextLeg.start) - legTime(leg.end);
         if (
-          waitTime > waitThresholdInMs &&
-          (nextLeg != null ? nextLeg.mode : null) !== 'AIRPLANE' &&
+          (waitTime > waitThresholdInMs || isSameStopTransfer) &&
+          nextLeg.mode !== 'AIRPLANE' &&
           leg.mode !== 'AIRPLANE' &&
           !nextLeg.intermediatePlace &&
           !isNextLegInterlining &&
           leg.to.stop
         ) {
           const waitLegProps = { ...leg };
-          if (nextLeg && nextLeg.isViaPoint) {
+          if (nextLeg.isViaPoint) {
             waitLegProps.isViaPoint = true;
             nextLeg.isViaPoint = false;
           }
@@ -204,7 +200,9 @@ export default class Legs extends React.Component {
               start={leg.end}
               waitTime={waitTime}
               focusAction={this.focus(leg.to)}
-              icon={usingOwnCarWholeTrip ? 'icon-icon_wait-car' : undefined}
+              icon={
+                usingOwnCarWholeTrip ? 'icon_wait-car' : 'icon_wait_standing'
+              }
             >
               {stopCode(leg.to.stop)}
             </WaitLeg>
@@ -223,7 +221,12 @@ export default class Legs extends React.Component {
         legs.push(<TaxiLeg {...legProps} />);
       } else if (isLegOnFoot(leg)) {
         legs.push(
-          <WalkLeg {...legProps} previousLeg={previousLeg} nextLeg={nextLeg}>
+          <WalkLeg
+            {...legProps}
+            previousLeg={previousLeg}
+            nextLeg={nextLeg}
+            focusToPoint={this.props.focusToPoint}
+          >
             {stopCode(leg.from.stop)}
           </WalkLeg>,
         );
@@ -236,7 +239,8 @@ export default class Legs extends React.Component {
           leg.mode === 'FUNICULAR') &&
         !leg.interlineWithPreviousLeg
       ) {
-        const mode = getRouteMode(
+        const mode = getTripOrRouteMode(
+          leg.trip,
           {
             mode: leg.mode,
             type: leg.route?.type,
@@ -337,6 +341,7 @@ export default class Legs extends React.Component {
           nextLeg={compressedLegs[numberOfLegs]}
           focusAction={this.focus(lastLeg.to)}
           focusToLeg={this.focusToLeg(lastLeg)}
+          focusToPoint={this.props.focusToPoint}
         >
           {stopCode(lastLeg.to.stop)}
         </WalkLeg>,

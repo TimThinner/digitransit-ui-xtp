@@ -1,7 +1,6 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { intlShape } from 'react-intl';
 import { matchShape, routerShape } from 'found';
 import connectToStores from 'fluxible-addons-react/connectToStores';
 import DTAutosuggestPanel from '@digitransit-component/digitransit-component-autosuggest-panel';
@@ -22,7 +21,6 @@ import {
 } from '../../util/queryUtils';
 import { getIntermediatePlaces, locationToOTP } from '../../util/otpStrings';
 import { setViaPoints } from '../../action/ViaPointActions';
-import { LightenDarkenColor } from '../../util/colorUtils';
 import { getRefPoint } from '../../util/apiUtils';
 
 const DTAutosuggestPanelWithSearchContext =
@@ -30,7 +28,6 @@ const DTAutosuggestPanelWithSearchContext =
 
 class OriginDestinationBar extends React.Component {
   static propTypes = {
-    className: PropTypes.string,
     origin: locationShape.isRequired,
     destination: locationShape.isRequired,
     language: PropTypes.string,
@@ -38,11 +35,10 @@ class OriginDestinationBar extends React.Component {
     showFavourites: PropTypes.bool.isRequired,
     viaPoints: PropTypes.arrayOf(locationShape),
     locationState: locationStateShape.isRequired,
-    modeSet: PropTypes.string,
   };
 
   static contextTypes = {
-    intl: intlShape.isRequired,
+    intl: PropTypes.object.isRequired,
     router: routerShape.isRequired,
     getStore: PropTypes.func.isRequired,
     executeAction: PropTypes.func.isRequired,
@@ -51,11 +47,9 @@ class OriginDestinationBar extends React.Component {
   };
 
   static defaultProps = {
-    className: undefined,
     language: 'fi',
     isMobile: false,
     viaPoints: [],
-    modeSet: undefined,
   };
 
   constructor(props) {
@@ -137,11 +131,9 @@ class OriginDestinationBar extends React.Component {
       : undefined;
     return (
       <div
-        className={cx(
-          'origin-destination-bar',
-          props.className,
-          'flex-horizontal',
-        )}
+        className={cx('origin-destination-bar', 'flex-horizontal', {
+          'bp-large': !props.isMobile,
+        })}
       >
         <DTAutosuggestPanelWithSearchContext
           appElement="#app"
@@ -165,12 +157,8 @@ class OriginDestinationBar extends React.Component {
           disableAutoFocus={props.isMobile}
           isMobile={props.isMobile}
           itineraryParams={context.match.location.query}
-          color={config.colors.primary}
-          hoverColor={
-            config.colors.hover ||
-            LightenDarkenColor(config.colors.primary, -20)
-          }
-          modeSet={props.modeSet}
+          colors={config.colors}
+          modeSet={config.iconModeSet}
           onFocusChange={() => {}}
           showSwapControl
           showViapointControl={config.viaPointsEnabled}
@@ -186,7 +174,7 @@ const connectedComponent = connectToStores(
   ['PreferencesStore', 'FavouriteStore', 'ViaPointStore', 'PositionStore'],
   ({ getStore }) => ({
     language: getStore('PreferencesStore').getLanguage(),
-    showFavourites: getStore('FavouriteStore').getStatus() === 'has-data',
+    showFavourites: getStore('FavouriteStore').getLocationCount() > 0,
     viaPoints: getStore('ViaPointStore').getViaPoints(),
     locationState: getStore('PositionStore').getLocationState(),
   }),

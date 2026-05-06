@@ -1,11 +1,10 @@
 import cx from 'classnames';
-import connectToStores from 'fluxible-addons-react/connectToStores';
-import { matchShape, routerShape } from 'found';
+import { useRouter } from 'found';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useFragment } from 'react-relay';
-import { getRouteMode } from '../../util/modeUtils';
+import { getTripOrRouteMode } from '../../util/modeUtils';
 import {
   getFaresFromLegs,
   shouldShowFareInfo,
@@ -24,15 +23,17 @@ import {
   isCallAgencyLeg,
   legContainsBikePark,
   legContainsRentalBike,
+  legTimeStr,
 } from '../../util/legUtils';
 import { streetHash } from '../../util/path';
-import { configShape, itineraryShape, relayShape, xtpShape } from '../../util/shapes';
+import { itineraryShape, relayShape, xtpShape } from '../../util/shapes';
 import { getFutureText } from '../../util/timeUtils';
 import { BreakpointConsumer } from '../../util/withBreakpoint';
 import BackButton from '../BackButton';
 import Emissions from './Emissions';
 import EmissionsInfo from './EmissionsInfo';
 import FareDisclaimer from './FareDisclaimer';
+import Feedback from './Feedback';
 import RouteDisclaimer from './RouteDisclaimer';
 import ItinerarySummary from './ItinerarySummary';
 import Legs from './Legs';
@@ -41,38 +42,8 @@ import StartNavi from './StartNavi';
 import TicketInformation from './TicketInformation';
 import VehicleRentalDurationInfo from './VehicleRentalDurationInfo';
 import { ItineraryDetailsFragment } from './queries/ItineraryDetailsFragment';
-/*
-<<<<<<< HEAD
-class ItineraryDetails extends React.Component {
-  static propTypes = {
-    itinerary: itineraryShape.isRequired,
-    xtpEdgePoints: PropTypes.arrayOf(xtpShape),
-    focusToPoint: PropTypes.func.isRequired,
-    focusToLeg: PropTypes.func.isRequired,
-    isMobile: PropTypes.bool.isRequired,
-    hideTitle: PropTypes.bool,
-    carEmissions: PropTypes.number,
-    currentLanguage: PropTypes.string,
-    changeHash: PropTypes.func,
-    openSettings: PropTypes.func.isRequired,
-    startNavigation: PropTypes.func,
-    bikePublicItineraryCount: PropTypes.number,
-    carPublicItineraryCount: PropTypes.number,
-    relayEnvironment: relayShape,
-  };
+import { useConfigContext } from '../../configurations/ConfigContext';
 
-  static defaultProps = {
-    xtpEdgePoints: [],
-    hideTitle: false,
-    currentLanguage: 'fi',
-    changeHash: () => {},
-    bikePublicItineraryCount: 0,
-    carPublicItineraryCount: 0,
-    carEmissions: undefined,
-    relayEnvironment: undefined,
-    startNavigation: undefined,
-=======
-*/
 function getExtraProps(itinerary, intl) {
   const compressedItinerary = {
     ...itinerary,
@@ -104,35 +75,40 @@ function getExtraProps(itinerary, intl) {
     },
     futureText,
     isMultiRow,
-//>>>>>>> upstream/v3
   };
 }
 
-function ItineraryDetails(
-  {
-    itinerary: itineraryRef,
-    xtpEdgePoints,
-    focusToPoint,
-    focusToLeg,
-    isMobile,
-    hideTitle,
-    carEmissions,
-    currentLanguage,
-    changeHash,
-    openSettings,
-    startNavigation,
-    bikePublicItineraryCount,
-    carPublicItineraryCount,
-    relayEnvironment,
-  },
-  { config, match, intl },
-) {
+function ItineraryDetails({
+  itinerary: itineraryRef,
+  xtpEdgePoints,
+  focusToPoint,
+  focusToLeg,
+  isMobile,
+  tabIndex,
+  hideTitle = false,
+  carEmissions,
+  changeHash = () => {},
+  openSettings,
+  startNavigation,
+  bikePublicItineraryCount = 0,
+  carPublicItineraryCount = 0,
+  relayEnvironment,
+  recommended = false,
+  feedback,
+  giveFeedback,
+}) {
+  const { match } = useRouter();
+  const config = useConfigContext();
+  const { language } = config;
   const itinerary = useFragment(ItineraryDetailsFragment, itineraryRef);
+  const intl = useIntl();
 
   const shouldShowDisclaimer =
     config.showDisclaimer &&
     match.params.hash !== streetHash.walk &&
     match.params.hash !== streetHash.bike;
+
+  const shouldShowFeedback = giveFeedback && !streetHash[match.params.hash];
 
   if (!itinerary?.legs[0]) {
     return null;
@@ -205,14 +181,14 @@ function ItineraryDetails(
   const disclaimers = [];
   const externalOperatorJourneys = legsWithScooter;
   if (
-    shouldShowFareInfo(config) &&
+    shouldShowFareInfo(config, itinerary.legs, fares) &&
     (fares.some(fare => fare.isUnknown) || externalOperatorJourneys)
   ) {
     const found = {};
     itinerary.legs.forEach(leg => {
       if (config.modeDisclaimers?.[leg.mode] && !found[leg.mode]) {
         found[leg.mode] = true;
-        const disclaimer = config.modeDisclaimers[leg.mode][currentLanguage];
+        const disclaimer = config.modeDisclaimers[leg.mode][language];
         disclaimers.push(
           <FareDisclaimer
             key={leg.mode}
@@ -224,14 +200,22 @@ function ItineraryDetails(
       }
     });
 
-    const info = config.callAgencyInfo?.[currentLanguage];
-    if (info && itinerary.legs.some(leg => isCallAgencyLeg(leg))) {
+    // Show call agency ticket disclaimer for external agencies
+    const callAgencyInfo = config.callAgencyInfo?.[language];
+    if (
+      callAgencyInfo &&
+      itinerary.legs.some(
+        leg =>
+          isCallAgencyLeg(leg) &&
+          !config.flex.internalAgencies.includes(leg.route.agency.gtfsId),
+      )
+    ) {
       disclaimers.push(
         <FareDisclaimer
           key={disclaimers.length}
           textId="separate-ticket-required-for-call-agency-disclaimer"
-          href={info.callAgencyInfoLink}
-          linkText={info.callAgencyInfoLinkText}
+          href={callAgencyInfo.callAgencyInfoLink}
+          linkText={callAgencyInfo.callAgencyInfoLinkText}
         />,
       );
     }
@@ -245,7 +229,7 @@ function ItineraryDetails(
             agencyName:
               typeof config.primaryAgencyName === 'string'
                 ? config.primaryAgencyName
-                : config.primaryAgencyName?.[currentLanguage],
+                : config.primaryAgencyName?.[language],
           }}
         />,
       );
@@ -256,7 +240,7 @@ function ItineraryDetails(
     itinerary.legs.forEach(({ route, trip }) => {
       const isReplacementRoute =
         route &&
-        (getRouteMode(route, config)?.includes('replacement') ||
+        (getTripOrRouteMode(trip, route, config)?.includes('replacement') ||
           config.replacementBusRoutes?.includes(route.gtfsId));
       const isReplacementTrip =
         trip?.submode?.includes('replacement') || trip?.submode?.includes(714);
@@ -267,209 +251,62 @@ function ItineraryDetails(
           config.showRouteDescNotification &&
           route.desc?.length
             ? { content: route.desc, link: route.url }
-            : config.replacementBusNotification;
-        const notificationText =
-          notification.content?.[currentLanguage]?.join(' ');
+            : {
+                content:
+                  config.replacementBusNotification?.content?.[language]?.join(
+                    ' ',
+                  ),
+                link: config.replacementBusNotification?.link?.[language],
+              };
+
         const key = `replacementBusNotification-${
           route.gtfsId || trip?.gtfsId
         }`;
-        if (!disclaimers.some(d => d.props?.text === notificationText)) {
+        if (!disclaimers.some(d => d.props?.text === notification.content)) {
           disclaimers.push(
             <RouteDisclaimer
               key={key}
-              text={notificationText}
-              href={notification.link?.[currentLanguage]}
+              text={notification.content}
+              href={notification.link}
               linkText={intl.formatMessage({ id: 'extra-info' })}
               header={intl.formatMessage({ id: 'replacement-bus' })}
             />,
           );
         }
       }
-/*
-<<<<<<< HEAD
-
-      if (!disclaimers.length) {
-        disclaimers.push(
-          <FareDisclaimer
-            key="faredisclaimer-separate-ticket-key"
-            textId="separate-ticket-required-disclaimer"
-            values={{
-              agencyName:
-                typeof config.primaryAgencyName === 'string'
-                  ? config.primaryAgencyName
-                  : config.primaryAgencyName?.[currentLanguage],
-            }}
-          />,
-        );
-      }
-    }
-
-    return (
-      <div className="itinerary-tab">
-        <h2 className="sr-only" key="srlabel">
-          <FormattedMessage
-            id="summary-page.row-label"
-            values={{
-              number: itineraryIndex,
-            }}
-          />
-        </h2>
-        <BreakpointConsumer>
-          {breakpoint => [
-            breakpoint === 'large' && !this.props.hideTitle && (
-              <div className="desktop-title" key="header">
-                <div className="title-container h2">
-                  <BackButton
-                    title={
-                      <FormattedMessage
-                        id="itinerary-page.title"
-                        defaultMessage="Itinerary suggestions"
-                      />
-                    }
-                    icon="icon-icon_arrow-collapse--left"
-                    iconClassName="arrow-icon"
-                    fallback="pop"
-                  />
-                </div>
-              </div>
-            ),
-            <ItinerarySummary
-              itinerary={itinerary}
-              key="summary"
-              walking={walking}
-              biking={biking}
-              driving={driving}
-              futureText={futureText}
-              isMultiRow={isMultiRow}
-              isMobile={isMobile}
-              hideBottomDivider={
-                isMobile &&
-                shouldShowFarePurchaseInfo(config, breakpoint, fares)
-              }
-            />,
-            showRentalBikeDurationWarning && (
-              <VehicleRentalDurationInfo
-                key="rentaldurationinfo"
-                networks={Array.from(rentalBikeNetworks)}
-                config={config}
-              />
-            ),
-            shouldShowFareInfo(config, itinerary) &&
-              (shouldShowFarePurchaseInfo(config, breakpoint, fares) ? (
-                <MobileTicketPurchaseInformation
-                  key="mobileticketpurchaseinformation"
-                  fares={fares}
-                  zones={getZones(itinerary.legs)}
-                />
-              ) : (
-                <TicketInformation
-                  key="ticketinformation"
-                  fares={fares}
-                  zones={getZones(itinerary.legs)}
-                  legs={itinerary.legs}
-                />
-              )),
-
-            this.props.startNavigation && (
-              <StartNavi
-                key="navigation"
-                startNavigation={this.props.startNavigation}
-              />
-            ),
-            config.showCO2InItinerarySummary && !legsWithScooter && (
-              <EmissionsInfo
-                key="emissionsummary"
-                itinerary={itinerary}
-                isMobile={isMobile}
-              />
-            ),
-            <div
-              className={cx('momentum-scroll itinerary-tabs__scroll', {
-                multirow: isMultiRow,
-              })}
-              key="legs"
-            >
-              <div
-                className={cx('itinerary-main', {
-                  'bp-large': breakpoint === 'large',
-                })}
-                key="legwrapper"
-              >
-                {disclaimers}
-                <Legs
-                  key="itinerarylegs"
-                  fares={fares}
-                  itinerary={itinerary}
-                  xtpEdgePoints={this.props.xtpEdgePoints}
-                  focusToPoint={this.props.focusToPoint}
-                  focusToLeg={this.props.focusToLeg}
-                  changeHash={this.props.changeHash}
-                  tabIndex={itineraryIndex - 1}
-                  openSettings={this.props.openSettings}
-                  showBikeBoardingInformation={showBikeBoardingInformation}
-                  showCarBoardingInformation={showCarBoardingInformation}
-                  usingOwnCarWholeTrip={usingOwnCarWholeTrip}
-                  relayEnvironment={this.props.relayEnvironment}
-                />
-              </div>
-              {config.showCO2InItinerarySummary && !legsWithScooter && (
-                <Emissions
-                  key="emissionsinfo"
-                  config={config}
-                  itinerary={itinerary}
-                  carEmissions={this.props.carEmissions}
-                  emissionsInfolink={
-                    config.URL.EMISSIONS_INFO?.[currentLanguage]
-                  }
-                />
-              )}
-              {this.shouldShowDisclaimer(config) && (
-                <div className="itinerary-disclaimer" key="disclaimer">
-                  <FormattedMessage
-                    id="disclaimer"
-                    defaultMessage="Results are based on estimated travel times"
-                  />
-                </div>
-              )}
-              <div className="itinerary-empty-space" key="emptyspace" />
-            </div>,
-          ]}
-        </BreakpointConsumer>
-      </div>
-    );
-=======
-*/
     });
-//>>>>>>> upstream/v3
   }
 
   return (
     <div className="itinerary-tab">
-      <h2 className="sr-only" key="srlabel">
+      <h2 className="sr-only">
         <FormattedMessage
           id="summary-page.row-label"
           values={{
             number: itineraryIndex,
           }}
         />
+        <FormattedMessage id="leaves">
+          {msg => (
+            <span id={`tab-${tabIndex}-context`}>{`, ${msg} ${legTimeStr(
+              itinerary.legs[0].start,
+            )}.`}</span>
+          )}
+        </FormattedMessage>
       </h2>
       <BreakpointConsumer>
         {breakpoint => [
           breakpoint === 'large' && !hideTitle && (
             <div className="desktop-title" key="header">
-              <div className="title-container h2">
-                <BackButton
-                  title={
-                    <FormattedMessage
-                      id="itinerary-page.title"
-                      defaultMessage="Itinerary suggestions"
-                    />
-                  }
-                  icon="icon-icon_arrow-collapse--left"
-                  iconClassName="arrow-icon"
-                  fallback="pop"
-                />
-              </div>
+              <BackButton
+                title={
+                  <FormattedMessage
+                    id="itinerary-page.title"
+                    defaultMessage="Itinerary suggestions"
+                  />
+                }
+                fallback="pop"
+              />
             </div>
           ),
           <ItinerarySummary
@@ -492,7 +329,7 @@ function ItineraryDetails(
               config={config}
             />
           ),
-          shouldShowFareInfo(config, itinerary.legs) &&
+          shouldShowFareInfo(config, itinerary.legs, fares) &&
             (shouldShowFarePurchaseInfo(config, breakpoint, fares) ? (
               <MobileTicketPurchaseInformation
                 key="mobileticketpurchaseinformation"
@@ -505,7 +342,7 @@ function ItineraryDetails(
                 fares={fares}
                 zones={getZones(itinerary.legs)}
                 legs={itinerary.legs}
-                ticketLink={localizedUrl(config.ticketLink, currentLanguage)}
+                ticketLink={localizedUrl(config.ticketLink, language)}
               />
             )),
 
@@ -540,7 +377,7 @@ function ItineraryDetails(
                 focusToPoint={focusToPoint}
                 focusToLeg={focusToLeg}
                 changeHash={changeHash}
-                tabIndex={itineraryIndex - 1}
+                tabIndex={tabIndex}
                 openSettings={openSettings}
                 showBikeBoardingInformation={showBikeBoardingInformation}
                 showCarBoardingInformation={showCarBoardingInformation}
@@ -554,7 +391,7 @@ function ItineraryDetails(
                 config={config}
                 itinerary={itinerary}
                 carEmissions={carEmissions}
-                emissionsInfolink={config.URL.EMISSIONS_INFO?.[currentLanguage]}
+                emissionsInfolink={config.URL.EMISSIONS_INFO?.[language]}
               />
             )}
             {shouldShowDisclaimer && (
@@ -562,6 +399,17 @@ function ItineraryDetails(
                 <FormattedMessage
                   id="disclaimer"
                   defaultMessage="Results are based on estimated travel times"
+                />
+              </div>
+            )}
+            {shouldShowFeedback && (
+              <div className="itinerary-disclaimer" key="feedback">
+                <div className="separator" />
+                <div className="itinerary-empty-space" />
+                <Feedback
+                  recommended={recommended}
+                  feedback={feedback}
+                  giveFeedback={giveFeedback}
                 />
               </div>
             )}
@@ -578,9 +426,9 @@ ItineraryDetails.propTypes = {
   focusToPoint: PropTypes.func.isRequired,
   focusToLeg: PropTypes.func.isRequired,
   isMobile: PropTypes.bool.isRequired,
+  tabIndex: PropTypes.number.isRequired,
   hideTitle: PropTypes.bool,
   carEmissions: PropTypes.number,
-  currentLanguage: PropTypes.string,
   changeHash: PropTypes.func,
   openSettings: PropTypes.func.isRequired,
   startNavigation: PropTypes.func,
@@ -588,34 +436,9 @@ ItineraryDetails.propTypes = {
   carPublicItineraryCount: PropTypes.number,
   relayEnvironment: relayShape,
   xtpEdgePoints: PropTypes.arrayOf(xtpShape),
+  recommended: PropTypes.bool,
+  feedback: PropTypes.bool,
+  giveFeedback: PropTypes.func,
 };
 
-ItineraryDetails.defaultProps = {
-  hideTitle: false,
-  currentLanguage: 'fi',
-  changeHash: () => {},
-  bikePublicItineraryCount: 0,
-  carPublicItineraryCount: 0,
-  carEmissions: undefined,
-  relayEnvironment: undefined,
-  startNavigation: undefined,
-  xtpEdgePoints: [],
-};
-
-ItineraryDetails.contextTypes = {
-  config: configShape.isRequired,
-  router: routerShape.isRequired,
-  match: matchShape.isRequired,
-  intl: intlShape.isRequired,
-  getStore: PropTypes.func.isRequired,
-};
-
-const connectedComponent = connectToStores(
-  ItineraryDetails,
-  ['PreferencesStore'],
-  context => ({
-    currentLanguage: context.getStore('PreferencesStore').getLanguage(),
-  }),
-);
-
-export { ItineraryDetails as Component, connectedComponent as default };
+export default ItineraryDetails;

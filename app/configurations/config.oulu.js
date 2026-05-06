@@ -1,13 +1,11 @@
 import configMerger from '../util/configMerger';
+import { IS_DEV } from '../util/envUtils';
 import walttiConfig from './config.waltti';
 
 const CONFIG = 'oulu';
 const APP_DESCRIPTION = 'Oulun seudun reittiopas';
 const APP_TITLE = 'Reittiopas';
-
-const IS_DEV =
-  process.env.RUN_ENV === 'development' ||
-  process.env.NODE_ENV !== 'production';
+const CDN_URL = process.env.MAP_URL || 'https://dev-cdn.digitransit.fi';
 
 const virtualMonitorBaseUrl = IS_DEV
   ? 'https://dev-oulumonitori.digitransit.fi'
@@ -21,13 +19,21 @@ export default configMerger(walttiConfig, {
   appBarLink: {
     name: 'Oulun seudun liikenne',
     href: 'https://www.osl.fi/',
+    altLink: {
+      sv: {
+        name: 'Uleåborgsregionens Trafik',
+        href: 'https://www.osl.fi/en/',
+      },
+      en: {
+        name: 'Oulu Regional Transport',
+        href: 'https://www.osl.fi/en/',
+      },
+    },
   },
 
   colors: {
     primary: '#e10669',
-    iconColors: {
-      'mode-bus': '#e10669',
-    },
+    bus: '#e10669',
   },
 
   socialMedia: {
@@ -35,6 +41,11 @@ export default configMerger(walttiConfig, {
     description: APP_DESCRIPTION,
     twitter: {
       site: '@oulunkaupunki',
+    },
+    image: {
+      url: 'img/social-share-oulu.png',
+      width: 1181,
+      height: 472,
     },
   },
 
@@ -46,24 +57,26 @@ export default configMerger(walttiConfig, {
   logo: 'oulu/oulu-logo.png',
   secondaryLogo: 'oulu/secondary-oulu-logo.png',
 
-  searchParams: {
-    'boundary.rect.min_lat': 64.71,
-    'boundary.rect.max_lat': 65.38,
-    'boundary.rect.min_lon': 24.37,
-    'boundary.rect.max_lon': 26.61,
-  },
-
   transportModes: {
     citybike: {
       availableForSelection: false,
     },
   },
 
+  useSearchPolygon: true,
+
   areaPolygon: [
-    [24.37, 64.71],
-    [24.37, 65.38],
-    [26.61, 65.38],
-    [26.61, 64.71],
+    [24.362, 64.682],
+    [24.934, 64.67],
+    [25.912, 64.443],
+    [26.409, 64.453],
+    [26.836, 64.879],
+    [26.836, 65.089],
+    [26.603, 65.324],
+    [26.414, 65.395],
+    [26.189, 65.833],
+    [25.022, 65.671],
+    [24.362, 65.246],
   ],
 
   defaultEndpoint: {
@@ -108,12 +121,16 @@ export default configMerger(walttiConfig, {
         },
         url: '/assets/geojson/oulu_zone_lines_20241011.geojson',
       },
+      {
+        name: {
+          fi: 'Myyntipisteet',
+          sv: 'Servicekontorer',
+          en: 'Service points',
+        },
+        url: `${CDN_URL}/oulu-assets/v1/lipunmyyntipisteet`,
+      },
     ],
   },
-
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
 
   aboutThisService: {
     fi: [
@@ -173,4 +190,9 @@ export default configMerger(walttiConfig, {
   showTicketPrice: true,
   ticketLinkOperatorCode: 50229,
   appName: 'oslapp',
+
+  parkAndRide: {
+    showParkAndRide: true,
+    showParkAndRideForBikes: true,
+  },
 });

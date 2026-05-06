@@ -65,21 +65,18 @@ export default function AlternativeLegsInfo({
   const message =
     (showAlternativeLegs && (
       <FormattedMessage
-        className="alternative-leg-info"
         id="itinerary-hide-alternative-legs"
         defaultMessage="Hide alternative legs"
       />
     )) ||
     (legs.length > 1 ? (
       <FormattedMessage
-        className="alternative-leg-info"
         id="alternative-legs"
         values={values}
         defaultMessage="Also {leg1} at {startTime1} and {leg2} at {startTime2}"
       />
     ) : (
       <FormattedMessage
-        className="alternative-leg-info"
         id="alternative-legs-single"
         values={values}
         defaultMessage="Also {leg1} at {startTime1}"
@@ -107,7 +104,7 @@ export default function AlternativeLegsInfo({
       <div className="alternative-legs-information">
         {message}
         <Icon
-          img="icon-icon_arrow-collapse--right"
+          img="icon_arrow-collapse--right"
           className="itinerary-search-icon"
         />
       </div>

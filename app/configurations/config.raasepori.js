@@ -13,22 +13,28 @@ export default configMerger(walttiConfig, {
 
   appBarLink: {
     name: 'Bosse',
-    href: 'https://raasepori.fi/bosse',
-    alternativeHref: {
-      sv: 'https://raseborg.fi/bosse',
+    href: 'https://www.raseborg.fi/fi/liikenne-kadut-ja-yleiset-alueet/joukkoliikenne/',
+    altLink: {
+      sv: {
+        name: 'Bosse',
+        href: 'https://www.raseborg.fi/trafik-gator-och-allmanna-omraden/kollektivtrafik/',
+      },
     },
   },
 
   colors: {
     primary: '#5B7B32',
-    iconColors: {
-      'mode-bus': '#5B7B32',
-    },
+    bus: '#5B7B32',
   },
 
   socialMedia: {
     title: APP_TITLE,
     description: APP_DESCRIPTION,
+    image: {
+      url: 'img/social-share-raasepori.png',
+      width: 1528,
+      height: 650,
+    },
   },
 
   title: APP_TITLE,
@@ -90,11 +96,6 @@ export default configMerger(walttiConfig, {
       },
     ],
   },
-
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
-
   aboutThisService: {
     fi: [
       {

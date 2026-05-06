@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import cx from 'classnames';
 import { matchShape } from 'found';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import Icon from '../Icon';
 import ItineraryMapAction from './ItineraryMapAction';
 import { parseLocation } from '../../util/path';
@@ -38,7 +38,7 @@ function EndLeg(props, context) {
       <div className={`leg-before ${modeClassName}`} aria-hidden="true">
         <div className={`leg-before-circle circle ${modeClassName}`} />
         <div className="itinerary-icon-container">
-          <Icon img="icon-icon_mapMarker" className="itinerary-icon to to-it" />
+          <Icon img="icon_mapMarker" className="itinerary-icon to to-it" />
         </div>
       </div>
       <div className="small-9 columns itinerary-instruction-column to end">
@@ -87,7 +87,6 @@ EndLeg.defaultProps = {
 };
 
 EndLeg.contextTypes = {
-  intl: intlShape.isRequired,
   match: matchShape.isRequired,
 };
 

@@ -1,14 +1,11 @@
-import connectToStores from 'fluxible-addons-react/connectToStores';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { intlShape } from 'react-intl';
 import getLabel from '@digitransit-search-util/digitransit-search-util-get-label';
 import { configShape } from '../../../util/shapes';
 import MarkerPopupBottom from '../MarkerPopupBottom';
 import Card from '../../Card';
 import Loading from '../../Loading';
 import ZoneIcon from '../../ZoneIcon';
-import PreferencesStore from '../../../store/PreferencesStore';
 import { getJson } from '../../../util/xhrPromise';
 import { addAnalyticsEvent } from '../../../util/analyticsUtils';
 import { splitStringToAddressAndPlace } from '../../../util/otpStrings';
@@ -18,11 +15,10 @@ import PopupHeader from '../PopupHeader';
 class LocationPopup extends React.Component {
   static contextTypes = {
     config: configShape.isRequired,
-    intl: intlShape.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   static propTypes = {
-    language: PropTypes.string.isRequired,
     lat: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
     locationPopup: PropTypes.string,
@@ -53,7 +49,7 @@ class LocationPopup extends React.Component {
       'point.lat': lat,
       'point.lon': lon,
       'boundary.circle.radius': 0.1, // 100m
-      lang: this.props.language,
+      lang: this.context.config.language,
       size: 1,
       layers: 'address',
       zones: 1,
@@ -151,13 +147,4 @@ class LocationPopup extends React.Component {
   }
 }
 
-const connectedComponent = connectToStores(
-  LocationPopup,
-  [PreferencesStore],
-  ({ getStore }) => {
-    const language = getStore(PreferencesStore).getLanguage();
-    return { language };
-  },
-);
-
-export { connectedComponent as default, LocationPopup as Component };
+export default LocationPopup;

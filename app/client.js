@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import BrowserProtocol from 'farce/BrowserProtocol';
@@ -17,18 +16,19 @@ import {
 import OfflinePlugin from 'offline-plugin/runtime';
 import { Helmet } from 'react-helmet';
 import { Environment, RecordSource, Store } from 'relay-runtime';
-import { ReactRelayContext } from 'react-relay';
+import { RelayEnvironmentProvider } from 'react-relay';
 import { setRelayEnvironment } from '@digitransit-search-util/digitransit-search-util-query-utils';
 import { Settings } from 'luxon';
+import { IntlProvider } from 'react-intl';
 import { configShape } from './util/shapes';
+import i18n from './i18n';
 import { historyMiddlewares, render } from './routes';
-import StoreListeningIntlProvider from './util/StoreListeningIntlProvider';
 import appCreator from './app';
-import translations from './translations';
 import { BUILD_TIME } from './buildInfo';
 import ErrorBoundary from './component/ErrorBoundary';
 import oldParamParser from './util/oldParamParser';
 import { ClientProvider as ClientBreakpointProvider } from './util/withBreakpoint';
+import IntlBridge from './util/IntlBridge';
 import meta from './meta';
 import {
   initAnalyticsClientSide,
@@ -42,6 +42,8 @@ import {
   fetchFavourites,
   fetchFavouritesComplete,
 } from './action/FavouriteActions';
+import { ConfigProvider } from './configurations/ConfigContext';
+import { FavouriteProvider } from './hooks/FavouriteContext';
 
 window.debug = debug; // Allow _debug.enable('*') in browser console
 
@@ -66,22 +68,6 @@ const getParams = query => {
 };
 
 async function init() {
-  // Guard againist Samsung et.al. which are not properly polyfilled by polyfill-service
-  if (typeof window.Intl === 'undefined') {
-    const modules = [
-      import(/* webpackChunkName: "intl",  webpackMode: "lazy" */ 'intl'),
-    ];
-
-    config.availableLanguages.forEach(language => {
-      modules.push(
-        import(
-          /* webpackChunkName: "intl",  webpackMode: "lazy-once" */ `intl/locale-data/jsonp/${language}`
-        ),
-      );
-    });
-    await Promise.all(modules);
-  }
-
   // Get additional feedIds and searchParams from localstorage
   if (config.mainMenu.countrySelection) {
     const selectedCountries = context.getStore('CountryStore').getCountries();
@@ -117,10 +103,9 @@ async function init() {
     ? `?${config.API_SUBSCRIPTION_QUERY_PARAMETER_NAME}=${config.API_SUBSCRIPTION_TOKEN}`
     : '';
 
-  const language = context
-    .getComponentContext()
-    .getStore('PreferencesStore')
-    .getLanguage();
+  const { language } = config;
+  const translations = await import(`./translations/${language}`);
+  i18n.changeLanguage(language);
 
   const network = new RelayNetworkLayer([
     cacheMiddleware({
@@ -210,35 +195,41 @@ async function init() {
       });
   }
 
-  const ContextProvider = provideContext(StoreListeningIntlProvider, {
-    /* eslint-disable-next-line */
+  const ContextProvider = provideContext(IntlProvider, {
     config: configShape,
-    headers: PropTypes.objectOf(PropTypes.string),
   });
 
   const content = (
-    <ClientBreakpointProvider>
-      <ContextProvider
-        translations={translations}
-        context={context.getComponentContext()}
-      >
-        <ReactRelayContext.Provider value={{ environment }}>
-          <ErrorBoundary>
-            <React.Fragment>
-              <Helmet
-                {...meta(
-                  context.getStore('PreferencesStore').getLanguage(),
-                  window.location.host,
-                  window.location.href,
-                  config,
-                )}
-              />
-              <Router resolver={resolver} />
-            </React.Fragment>
-          </ErrorBoundary>
-        </ReactRelayContext.Provider>
-      </ContextProvider>
-    </ClientBreakpointProvider>
+    <ConfigProvider value={config}>
+      <ClientBreakpointProvider>
+        <ContextProvider
+          locale={language}
+          messages={translations.default[language]}
+          context={context.getComponentContext()}
+          textComponent="span"
+        >
+          <IntlBridge>
+            <RelayEnvironmentProvider environment={environment}>
+              <FavouriteProvider context={context.getComponentContext()}>
+                <ErrorBoundary>
+                  <React.Fragment>
+                    <Helmet
+                      {...meta(
+                        language,
+                        window.location.host,
+                        window.location.href,
+                        config,
+                      )}
+                    />
+                    <Router resolver={resolver} />
+                  </React.Fragment>
+                </ErrorBoundary>
+              </FavouriteProvider>
+            </RelayEnvironmentProvider>
+          </IntlBridge>
+        </ContextProvider>
+      </ClientBreakpointProvider>
+    </ConfigProvider>
   );
 
   const rootNode = document.getElementById('app');

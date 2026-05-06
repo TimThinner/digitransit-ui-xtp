@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import autoprefixer from 'autoprefixer';
-import commonjs from 'rollup-plugin-commonjs';
+import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss';
 import babel from 'rollup-plugin-babel';
@@ -17,8 +17,9 @@ const globals = {
   'react-dom': 'ReactDOM',
   classnames: 'cx',
   'prop-types': 'PropTypes',
+  'react-is': 'react-is',
   i18next: 'i18next',
-  'react-autosuggest': 'Autosuggest',
+  'react-i18next': 'reactI18next',
   'react-sortablejs': 'reactSortablejs',
   'react-modal': 'ReactModal',
   '@hsl-fi/modal': 'Modal',
@@ -48,6 +49,9 @@ const globals = {
   'lodash/uniq': 'uniq',
   'lodash/compact': 'compact',
   'react-relay': 'reactRelay',
+  downshift: 'downshift',
+  luxon: 'luxon',
+  'react-select': 'Select',
 };
 
 async function getSortedPackages() {
@@ -100,7 +104,7 @@ export default async () => {
         peerDepsExternal({
           packageJsonPath: path.join(__dirname, basePath, 'package.json'),
         }),
-        nodeResolve(),
+        nodeResolve({ browser: true }),
         babel({
           runtimeHelpers: true,
           configFile: './config/babel.config.js',
@@ -118,7 +122,19 @@ export default async () => {
           extract: false,
           plugins: [autoprefixer()],
           modules: true,
-          use: ['sass'],
+          use: [
+            [
+              'sass',
+              {
+                quietDeps: true,
+                silenceDeprecations: [
+                  'import',
+                  'global-builtin',
+                  'color-functions',
+                ],
+              },
+            ],
+          ],
           config: false,
         }),
         json(),

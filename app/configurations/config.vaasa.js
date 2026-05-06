@@ -1,38 +1,51 @@
-/* eslint-disable */
 import configMerger from '../util/configMerger';
+import { IS_DEV } from '../util/envUtils';
 import walttiConfig from './config.waltti';
 
 const CONFIG = 'vaasa';
 const APP_TITLE = 'Vaasan reittiopas';
 const APP_DESCRIPTION = '';
 
-const minLat = 63.005;
-const maxLat = 63.152;
-const minLon = 21.527;
-const maxLon = 22.170;
-const IS_DEV =
-process.env.RUN_ENV === 'development' ||
-process.env.NODE_ENV !== 'production';
+const minLat = 62.96;
+const maxLat = 63.19;
+const minLon = 21.42;
+const maxLon = 22.18;
 
 const virtualMonitorBaseUrl = IS_DEV
-? 'https://dev-vaasamonitori.digitransit.fi'
-: 'https://pysakit-vaasa.digitransit.fi';
+  ? 'https://dev-vaasamonitori.digitransit.fi'
+  : 'https://pysakit-vaasa.digitransit.fi';
 
 export default configMerger(walttiConfig, {
   CONFIG,
 
-  appBarLink: { name: 'Vaasa', href: 'https://www.vaasa.fi/' },
+  appBarLink: {
+    name: 'Lifti – Vaasan seudun joukkoliikenne',
+    href: 'https://www.vaasa.fi/asu-ja-ela/liikenne-ja-kadut/joukkoliikenne/',
+    altLink: {
+      sv: {
+        name: 'Lifti – Vasaregionens kollektivtrafik',
+        href: 'https://www.vaasa.fi/sv/bo-och-lev/trafik-och-gator/kollektivtrafik/',
+      },
+      en: {
+        name: 'Lifti – Public transport for the Vaasa region',
+        href: 'https://www.vaasa.fi/en/living/traffic-and-streets/public-transport/',
+      },
+    },
+  },
 
   colors: {
     primary: '#000a8c',
-    iconColors: {
-      'mode-bus': '#000a8c',
-    },
+    bus: '#000a8c',
   },
 
   socialMedia: {
     title: APP_TITLE,
     description: APP_DESCRIPTION,
+    image: {
+      url: 'img/social-share-vaasa.png',
+      width: 1280,
+      height: 400,
+    },
 
     twitter: {
       site: '@vaasavasa',
@@ -42,7 +55,7 @@ export default configMerger(walttiConfig, {
   title: APP_TITLE,
 
   logo: 'vaasa/vaasa-favicon.png',
-  secondaryLogo: 'vaasa/secondary-logo.png',
+  secondaryLogo: 'vaasa/vaasa-secondary-logo.png',
 
   feedIds: ['Vaasa'],
 
@@ -71,11 +84,11 @@ export default configMerger(walttiConfig, {
     content: [
       {
         name: 'menu-feedback',
-        href: { 
+        href: {
           fi: 'https://kartta.vaasa.fi/eFeedback/fi/Feedback/6-Joukkoliikenne',
           sv: 'https://kartta.vaasa.fi/eFeedback/sv/Feedback/6-Kollektivtrafik',
           en: 'https://kartta.vaasa.fi/eFeedback/fi/Feedback/6-Joukkoliikenne',
-        }
+        },
       },
       {
         name: 'about-this-service',
@@ -127,10 +140,6 @@ export default configMerger(walttiConfig, {
     ],
   },
 
-  vehicles: true,
-  showVehiclesOnStopPage: true,
-  showVehiclesOnItineraryPage: true,
-
   stopCard: {
     header: {
       virtualMonitorBaseUrl,
@@ -140,7 +149,7 @@ export default configMerger(walttiConfig, {
   mainMenu: {
     stopMonitor: {
       show: true,
-      url:`${virtualMonitorBaseUrl}/createview`,
+      url: `${virtualMonitorBaseUrl}/createview`,
     },
   },
 
@@ -159,10 +168,10 @@ export default configMerger(walttiConfig, {
   zoneIdMapping: {
     1: 'A',
     2: 'B',
-    3: 'C'
+    3: 'C',
   },
   zones: {
     stops: true,
     itinerary: true,
-  }
+  },
 });

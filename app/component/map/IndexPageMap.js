@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connectToStores } from 'fluxible-addons-react';
 import { matchShape } from 'found';
-import { intlShape } from 'react-intl';
 import MapWithTracking from './MapWithTracking';
 import { sameLocations } from '../../util/path';
 import OriginStore from '../../store/OriginStore';
@@ -97,7 +96,6 @@ function IndexPageMap(
 
 IndexPageMap.propTypes = {
   match: matchShape.isRequired,
-  lang: PropTypes.string.isRequired,
   origin: locationShape,
   destination: locationShape,
   mapLayers: mapLayerShape.isRequired,
@@ -111,21 +109,18 @@ IndexPageMap.defaultProps = {
 IndexPageMap.contextTypes = {
   config: configShape.isRequired,
   executeAction: PropTypes.func.isRequired,
-  intl: intlShape.isRequired,
 };
 
 const IndexPageMapWithStores = connectToStores(
   IndexPageMap,
-  [OriginStore, DestinationStore, 'PreferencesStore', 'MapLayerStore'],
+  [OriginStore, DestinationStore, 'MapLayerStore'],
   ({ getStore }) => {
     const origin = getStore(OriginStore).getOrigin();
     const destination = getStore(DestinationStore).getDestination();
-    const lang = getStore('PreferencesStore').getLanguage();
 
     return {
       origin,
       destination,
-      lang,
       mapLayers: getStore('MapLayerStore').getMapLayers(),
     };
   },

@@ -1,111 +1,31 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { useFragment, ReactRelayContext } from 'react-relay';
-import { matchShape, routerShape } from 'found';
-import getContext from 'recompose/getContext';
-import { intlShape, FormattedMessage } from 'react-intl';
-import { configShape, planEdgeShape, xtpShape } from '../../util/shapes';
+import { useFragment } from 'react-relay';
+import { useRouter } from 'found';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { planEdgeShape, xtpShape } from '../../util/shapes';
 import Icon from '../Icon';
 import ItineraryList from './ItineraryList';
-import { getItineraryPagePath, streetHash } from '../../util/path';
-import { addAnalyticsEvent } from '../../util/analyticsUtils';
 import { isIOS, isSafari } from '../../util/browser';
 import ItineraryNotification from './ItineraryNotification';
 import { transitEdges } from './ItineraryPageUtils';
 import { ItineraryListContainerPlanEdges } from './queries/ItineraryListContainerPlanEdges';
 
-function ItineraryListContainer(
-  {
-/*
-<<<<<<< HEAD
-    planEdges,
-    xtpPoints,
-=======
-*/
-    planEdges: planEdgesRef,
-//>>>>>>> upstream/v3
-    xtpPoints,
-    activeIndex,
-    params,
-    focusToHeader,
-    onLater,
-    onEarlier,
-    settingsNotification,
-    topNote,
-    bottomNote,
-    ...rest
-  },
-  { router, match, intl },
-) {
+function ItineraryListContainer({
+  planEdges: planEdgesRef,
+  xtpPoints,
+  activeIndex,
+  focusToHeader,
+  onLater,
+  onEarlier,
+  settingsNotification,
+  topNote,
+  bottomNote,
+  ...rest
+}) {
   const planEdges = useFragment(ItineraryListContainerPlanEdges, planEdgesRef);
-
-  function getSubPath(fallback) {
-    const modesWithSubpath = [
-      streetHash.bikeAndVehicle,
-      streetHash.parkAndRide,
-      streetHash.carAndVehicle,
-    ];
-    const { hash } = params;
-    if (modesWithSubpath.includes(hash)) {
-      return `/${hash}/`;
-    }
-    return fallback;
-  }
-
-  const onSelectImmediately = index => {
-    const subpath = getSubPath('/');
-    // eslint-disable-next-line compat/compat
-    const momentumScroll =
-      document.getElementsByClassName('momentum-scroll')[0];
-    if (momentumScroll) {
-      momentumScroll.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }
-
-    addAnalyticsEvent({
-      event: 'sendMatomoEvent',
-      category: 'Itinerary',
-      action: 'OpenItineraryDetails',
-      name: index,
-    });
-    const newLocation = {
-      ...match.location,
-      state: {
-        ...match.location.state,
-        selectedItineraryIndex: index,
-      },
-    };
-    const basePath = `${getItineraryPagePath(
-      params.from,
-      params.to,
-    )}${subpath}`;
-    const indexPath = `${basePath}${index}`;
-
-    newLocation.pathname = basePath;
-    router.replace(newLocation);
-    newLocation.pathname = indexPath;
-    router.push(newLocation);
-    focusToHeader();
-  };
-
-  const onSelectActive = index => {
-    if (activeIndex === index) {
-      onSelectImmediately(index);
-    } else {
-      router.replace({
-        ...match.location,
-        state: {
-          ...match.location.state,
-          selectedItineraryIndex: index,
-        },
-      });
-
-      addAnalyticsEvent({
-        category: 'Itinerary',
-        action: 'HighlightItinerary',
-        name: index,
-      });
-    }
-  };
+  const intl = useIntl();
+  const { match } = useRouter();
 
   function laterButton(reversed) {
     return (
@@ -121,7 +41,7 @@ function ItineraryListContainer(
         onClick={() => onLater()}
       >
         <Icon
-          img="icon-icon_arrow-collapse"
+          img="icon_arrow-collapse"
           className={`cursor-pointer back ${reversed ? 'arrow-up' : ''}`}
         />
         <FormattedMessage
@@ -147,7 +67,7 @@ function ItineraryListContainer(
         onClick={() => onEarlier()}
       >
         <Icon
-          img="icon-icon_arrow-collapse"
+          img="icon_arrow-collapse"
           className={`cursor-pointer ${reversed ? '' : 'arrow-up'}`}
         />
         <FormattedMessage
@@ -184,15 +104,14 @@ function ItineraryListContainer(
         planEdges={planEdges}
         xtpPoints={xtpPoints}
         activeIndex={activeIndex}
-        onSelect={onSelectActive}
-        onSelectImmediately={onSelectImmediately}
+        focusToHeader={focusToHeader}
         {...rest}
       />
       {settingsNotification && (
         <ItineraryNotification
           headerId="settings-missing-itineraries-header"
           bodyId="settings-missing-itineraries-body"
-          iconId="icon-icon_settings"
+          iconId="icon_settings"
         />
       )}
       {bottomNote && <ItineraryNotification bodyId={bottomNote} />}
@@ -205,12 +124,6 @@ ItineraryListContainer.propTypes = {
   planEdges: PropTypes.arrayOf(planEdgeShape).isRequired,
   xtpPoints: PropTypes.arrayOf(xtpShape),
   activeIndex: PropTypes.number.isRequired,
-  params: PropTypes.shape({
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-    hash: PropTypes.string,
-    secondHash: PropTypes.string,
-  }).isRequired,
   focusToHeader: PropTypes.func.isRequired,
   onLater: PropTypes.func.isRequired,
   onEarlier: PropTypes.func.isRequired,
@@ -226,20 +139,4 @@ ItineraryListContainer.defaultProps = {
   bottomNote: undefined,
 };
 
-ItineraryListContainer.contextTypes = {
-  router: routerShape.isRequired,
-  match: matchShape.isRequired,
-  intl: intlShape.isRequired,
-};
-
-const withConfig = getContext({
-  config: configShape.isRequired,
-})(props => (
-  <ReactRelayContext.Consumer>
-    {({ environment }) => (
-      <ItineraryListContainer {...props} relayEnvironment={environment} />
-    )}
-  </ReactRelayContext.Consumer>
-));
-
-export { withConfig as default, ItineraryListContainer as Component };
+export default ItineraryListContainer;
