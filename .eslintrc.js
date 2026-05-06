@@ -58,6 +58,7 @@ module.exports = {
     //  },
     //],
     'prettier/prettier': 0,
+    'camelcase': 'off',
   },
   env: {
     browser: true,
