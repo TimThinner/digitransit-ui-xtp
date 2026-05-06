@@ -1,4 +1,3 @@
-/* eslint-disable camelcase prettier */
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';

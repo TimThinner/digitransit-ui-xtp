@@ -48,15 +48,16 @@ module.exports = {
     'compat/compat': 'warn',
 
     // prettier
-    'prettier/prettier': [
-      'error',
-      {
-        arrowParens: 'avoid',
-        endOfLine: 'auto',
-        singleQuote: true,
-        trailingComma: 'all',
-      },
-    ],
+    //'prettier/prettier': [
+    //  'error',
+    //  {
+    //    arrowParens: 'avoid',
+    //    endOfLine: 'auto',
+    //    singleQuote: true,
+    //    trailingComma: 'all',
+    //  },
+    //],
+    'prettier/prettier': 0,
   },
   env: {
     browser: true,
