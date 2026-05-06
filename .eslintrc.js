@@ -59,6 +59,13 @@ module.exports = {
     //],
     'prettier/prettier': 0,
     'camelcase': 'off',
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "markers": ["/"]
+      }
+    ],
   },
   env: {
     browser: true,
