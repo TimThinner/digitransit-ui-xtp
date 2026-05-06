@@ -1082,7 +1082,7 @@ export default function ItineraryPage(props, context) {
     const polylines  = params.polylines;
     const infos      = params.infos;
 
-    console.log(['SET OR NOT? polylines=',polylines,'infos=',infos]);
+    // console.log(['SET OR NOT? polylines=',polylines,'infos=',infos]);
 
     let ready = true;
     Object.keys(polylines).every(key=>{
@@ -1093,7 +1093,7 @@ export default function ItineraryPage(props, context) {
       return true; // continue with next item.
     });
     if (ready) {
-      console.log(['WE ARE READY TO SET STATE => infos=',infos]);
+      // console.log(['WE ARE READY TO SET STATE => infos=',infos]);
       const new_data = [];
       infos.forEach(info => {
         const p_hash = 'edge_index_'+info.edge_index+'_leg_index_'+info.leg_index;
@@ -1110,11 +1110,11 @@ export default function ItineraryPage(props, context) {
           name: info.name
         });
       });
-      console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
+      // console.log(['ALL ALTERNATE POLYLINES FETCHED!!!! setXTPInfoState new_data=',new_data]);
       setXTPInfoState(new_data);
-      console.log('setXTPInfoState DONE!!!!!!!');
+      // console.log('setXTPInfoState DONE!!!!!!!');
     } else {
-      console.log('setStateIfAllFetched NOT READY ... WAIT!');
+      // console.log('setStateIfAllFetched NOT READY ... WAIT!');
     }
   }
   
@@ -1133,14 +1133,14 @@ export default function ItineraryPage(props, context) {
     
     if (polylines[alt_hash]['already_in_queue']) {
       
-      console.log('=== NO NED TO FETCH (DUPLICATE). CHECK IF ALL FETCHED =====');
+      // console.log('=== NO NED TO FETCH (DUPLICATE). CHECK IF ALL FETCHED =====');
       setStateIfAllFetched({polylines:polylines,infos:infos});
       
     } else {
       polylines[alt_hash]['already_in_queue'] = true;
       const request = polylines[alt_hash].request;
       const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
-      console.log('====================   FETCH POLYLINE  ============================');
+      // console.log('====================   FETCH POLYLINE  ============================');
       try {
         const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
           method: "POST",
@@ -1150,22 +1150,22 @@ export default function ItineraryPage(props, context) {
           },
         });
         const alt_resp = await alt_polyline_response.json();
-        console.log(['alt_resp=',alt_resp]);
+        // console.log(['alt_resp=',alt_resp]);
         const alt_polyline = alt_resp.google_polyline ? alt_resp.google_polyline : '';
-        console.log(['alt_polyline=',alt_polyline]);
+        // console.log(['alt_polyline=',alt_polyline]);
         polylines[alt_hash]['response'] = alt_polyline;
         polylines[alt_hash]['fetched'] = true;
 
         setStateIfAllFetched({polylines:polylines,infos:infos});
 
       } catch (error) {
-        console.log(['error.message=',error.message]);
+        // console.log(['error.message=',error.message]);
       }
     }
   }
   
   async function makeXTPInfoQuery() {
-    //const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
+    // const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
     const SEARCH_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
     const JSON_DATA = {infos:[]};
     const request_data = {
@@ -1173,9 +1173,9 @@ export default function ItineraryPage(props, context) {
       edges:[]
     };
     const polylines = {};
-    //const combinedEdges = getCombinedPlanEdges();
-    //const plan = mapHashToPlan();
-    console.log(['makeXTPInfoQuery state.plan=',state.plan]);
+    // const combinedEdges = getCombinedPlanEdges();
+    // const plan = mapHashToPlan();
+    // console.log(['makeXTPInfoQuery state.plan=',state.plan]);
     const stateEdges = state.plan?.edges || [];
 
     // NEW! ALWAYS RESET the XTPInfoState before any async calls!
@@ -1186,8 +1186,8 @@ export default function ItineraryPage(props, context) {
       stateEdges.forEach((edge, i) => {
         const legs = [];
         edge.node.legs.forEach((leg,j) => {
-          console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
-          //const decoded = polyline.decode(leg.legGeometry.points);
+          // console.log(['edge_index=',i,'leg_index=',j,'from=',leg.from.name,'to=',leg.to.name]);
+          // const decoded = polyline.decode(leg.legGeometry.points);
           legs.push({
             leg_index: j,
             from: {
@@ -1222,9 +1222,9 @@ export default function ItineraryPage(props, context) {
         });
         request_data.edges.push({edge_index:i,legs:legs});
       });
-      console.log(['XTP-INFO REQUEST POST request_data=',request_data]);
+      // console.log(['XTP-INFO REQUEST POST request_data=',request_data]);
       try {
-        //const data = await (await fetch(JSON_URL)).json();
+        // const data = await (await fetch(JSON_URL)).json();
         const response = await fetch(SEARCH_URL, {
           method: "POST",
           body: JSON.stringify(request_data),
@@ -1236,12 +1236,12 @@ export default function ItineraryPage(props, context) {
           throw new Error(`Response status: ${response.status}`);
         }
         const resp = await response.json();
-        console.log(['response resp=',resp]);
+        // console.log(['response resp=',resp]);
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
-            //const edge_index = info.edgeIndex;
-            //const leg_index = info.legIndex;
-            //const found_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
+            // const edge_index = info.edgeIndex;
+            // const leg_index = info.legIndex;
+            // const found_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
             if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
               info.guides.forEach(guide=>{
                 const type = guide.type ? guide.type : 'photo';
@@ -1266,7 +1266,7 @@ export default function ItineraryPage(props, context) {
             // copied to infos
             // NOTE: All legs are NOT returned in MediaServer response (in infos)
             // => we must mark which ones are relevant for alternate polyline fetching
-            //polylines[found_hash]['relevant'] = true;
+            // polylines[found_hash]['relevant'] = true;
             makeAltPolylineQuery({
               polylines: polylines,
               edge_index: info.edgeIndex,
@@ -1274,15 +1274,15 @@ export default function ItineraryPage(props, context) {
               infos: JSON_DATA.infos
             });
           });
-          //console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
-          //setXTPInfoState(JSON_DATA.infos);
-          //console.log('setXTPInfoState DONE!!!!!!!');
-        } //else {
+          // console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
+          // setXTPInfoState(JSON_DATA.infos);
+          // console.log('setXTPInfoState DONE!!!!!!!');
+        } // else {
         // No xtpPoints found => Must reset the state!
-        //setXTPInfoState([]);
-        //}
+        // setXTPInfoState([]);
+        // }
       } catch (error) {
-        console.log(['error.message=',error.message]);
+        // console.log(['error.message=',error.message]);
       }
     }
   }
@@ -1296,9 +1296,9 @@ export default function ItineraryPage(props, context) {
   }
   */
   useEffect(() => {
-    console.log('useEffect state.plan HAS CHANGED => makeXTPInfoQuery');
+    // console.log('useEffect state.plan HAS CHANGED => makeXTPInfoQuery');
     makeXTPInfoQuery();
-    console.log('makeXTPInfoQuery DONE!');
+    // console.log('makeXTPInfoQuery DONE!');
   }, [state.plan]); // dependency array, if any of these change => we must trigger this useEffect action.
   
   // merge two separate bike + transit plans into one
@@ -1644,7 +1644,7 @@ export default function ItineraryPage(props, context) {
   const viaPoints = getIntermediatePlaces(query);
   const xtpPoints = xtpInfoState;
   
-  console.log(['Just before renderMap xtpPoints=',xtpPoints]);
+  // console.log(['Just before renderMap xtpPoints=',xtpPoints]);
 
   const hasItineraries = combinedEdges.length > 0;
   if (hasItineraries && match.routes.some(route => route.printPage)) {

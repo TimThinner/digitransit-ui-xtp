@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import { matchShape, routerShape } from 'found';
 import PropTypes from 'prop-types';
-//import React from 'react';
+// import React from 'react';
 import React, { useState } from 'react';
 import { onLocationPopup } from '../../util/queryUtils';
 import {
@@ -74,7 +74,7 @@ const ItineraryPageMap = (
   
   const xtpHandlePrev = () => {
     const index = xtpForce.index;
-    console.log(['HANDLE previous index=',index]);
+    // console.log(['HANDLE previous index=',index]);
     if (index > 0) {
       setXtpForce({...xtpForce,index:index-1});
     }
@@ -82,7 +82,7 @@ const ItineraryPageMap = (
   
   const xtpHandleNext = () => {
     const index = xtpForce.index;
-    console.log(['HANDLE next index=',index]);
+    // console.log(['HANDLE next index=',index]);
     if (index < xtpActivePoints.length-1) {
       setXtpForce({...xtpForce,index:index+1});
     }
@@ -90,7 +90,7 @@ const ItineraryPageMap = (
   
   const xtpHandleSetIndex = (new_index) => {
     if (xtpForce.index !== new_index) {
-      console.log(['HANDLE SetIndex CHANGE new_index=',new_index]);
+      // console.log(['HANDLE SetIndex CHANGE new_index=',new_index]);
       setXtpForce({...xtpForce,index:new_index});
     }
   }
@@ -151,15 +151,15 @@ const ItineraryPageMap = (
   }
 
   if (itinerary) {
-    console.log(['itinerary => ItineraryLine itinerary.legs=',itinerary.legs]);
+    // console.log(['itinerary => ItineraryLine itinerary.legs=',itinerary.legs]);
     const alt_legs = xtpPointsHasEdge(active) ? clone_legs(itinerary.legs, active) : itinerary.legs;
-    console.log(['alt_legs=',alt_legs]);
+    // console.log(['alt_legs=',alt_legs]);
     leafletObjs.push(
       <ItineraryLine
         key={`line_${active}`}
         hash={active}
         streetMode={hash}
-        legs={alt_legs} //{itinerary.legs}
+        legs={alt_legs} // {itinerary.legs}
         showIntermediateStops
         showDurationBubble={showDurationBubble}
         realtimeTransfers={realtimeTransfers}
@@ -169,9 +169,9 @@ const ItineraryPageMap = (
     if (!showActiveOnly) {
       planEdges.forEach((edge, i) => {
         if (i !== active) {
-          console.log(['!showActiveOnly => ItineraryLine edge.node.legs=',edge.node.legs]);
+          // console.log(['!showActiveOnly => ItineraryLine edge.node.legs=',edge.node.legs]);
           const alt_legs = xtpPointsHasEdge(i) ? clone_legs(edge.node.legs, i) : edge.node.legs;
-          console.log(['alt_legs=',alt_legs]);
+          // console.log(['alt_legs=',alt_legs]);
           leafletObjs.push(
             <ItineraryLine
               key={`line_${i}`}
@@ -184,9 +184,9 @@ const ItineraryPageMap = (
       });
     }
     if (active < planEdges.length) {
-      console.log(['active < planEdges.length => planEdges[active].node.legs=',planEdges[active].node.legs]);
+      // console.log(['active < planEdges.length => planEdges[active].node.legs=',planEdges[active].node.legs]);
       const alt_legs = xtpPointsHasEdge(active) ? clone_legs(planEdges[active].node.legs, active) : planEdges[active].node.legs;
-      console.log(['alt_legs=',alt_legs]);
+      // console.log(['alt_legs=',alt_legs]);
       leafletObjs.push(
         <ItineraryLine
           key={`line_${active}`}
@@ -250,7 +250,7 @@ const ItineraryPageMap = (
   });
   const xtp_last_index = xtpActivePoints.length-1;
   xtpActivePoints.forEach((xtp, i) => {
-    //console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
+    // console.log(['ACTIVE MARKERS i=',i,'XTP=',xtp]);
     const pid = 'xtp_'+i;
     const pos = {lat:xtp.lat, lon:xtp.lon};
     leafletObjs.push(

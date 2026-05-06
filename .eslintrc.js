@@ -48,7 +48,7 @@ module.exports = {
     'compat/compat': 'warn',
 
     // prettier
-    //'prettier/prettier': [
+    // 'prettier/prettier': [
     //  'error',
     //  {
     //    arrowParens: 'avoid',
@@ -56,7 +56,7 @@ module.exports = {
     //    singleQuote: true,
     //    trailingComma: 'all',
     //  },
-    //],
+    // ],
     'prettier/prettier': 0,
     'camelcase': 'off',
     "spaced-comment": [

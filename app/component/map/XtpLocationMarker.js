@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-//import React, { useRef } from 'react';
+// import React, { useRef } from 'react';
 import { 
   xtpShape,
   locationShape,
@@ -13,7 +13,7 @@ import XtpPopup from './popups/XtpPopup';
 import PositionStore from '../../store/PositionStore';
 import { connectToStores } from 'fluxible-addons-react';
 import distance from '@digitransit-search-util/digitransit-search-util-distance';
-//import useWindowSize from '../../hooks/useWindowSize';
+// import useWindowSize from '../../hooks/useWindowSize';
 /*
 key
 position
@@ -22,17 +22,17 @@ xtp
 xtp_last_index
 pid
 */
-//export default function XtpLocationMarker({
+// export default function XtpLocationMarker({
 function XtpLocationMarker(props) {
-  //position,
-  //type,
-  //className,
-  //isLarge,
-  //disabled,
-  //xtp,
-  //xtp_last_index,
-  //pid,
-  //}) {
+  // position,
+  // type,
+  // className,
+  // isLarge,
+  // disabled,
+  // xtp,
+  // xtp_last_index,
+  // pid,
+  // }) {
 
   /*
   XTP: We want to show different icon for XTP "LocationMarker".
@@ -56,10 +56,10 @@ function XtpLocationMarker(props) {
   const validType = 'xtp';
   const sideLength = props.isLarge ? 30 : 24;
   
-  //const windowSize = useWindowSize();
-  //const sizeH = Math.round(windowSize.height/2);
-  //const sizeW = Math.round(windowSize.width/2);
-  //console.log(['useWindowSize size=',windowSize]);
+  // const windowSize = useWindowSize();
+  // const sizeH = Math.round(windowSize.height/2);
+  // const sizeW = Math.round(windowSize.width/2);
+  // console.log(['useWindowSize size=',windowSize]);
   /*
   Keep aspect ratio 3/4
   const new_h = size.height-40;
@@ -67,12 +67,12 @@ function XtpLocationMarker(props) {
   setImgSize({fullscreen:true, width:new_w, height:new_h});
   */
   
-  //const test_classes = cx(validType, props.className, props.pid);
-  //console.log(['LocationMarker test_classes=',test_classes]);
+  // const test_classes = cx(validType, props.className, props.pid);
+  // console.log(['LocationMarker test_classes=',test_classes]);
   
-  //const dist = distance(props.xtp, props.locationState);
-  //console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
-  //console.log(['LocationMarker alternate_polyline=',props.xtp.alternate_polyline]);
+  // const dist = distance(props.xtp, props.locationState);
+  // console.log(['LocationMarker activation_range=',props.xtp.activation_range]);
+  // console.log(['LocationMarker alternate_polyline=',props.xtp.alternate_polyline]);
   /*
   if (dist < props.xtp.activation_range) {
     setTimeout(() => {
@@ -92,14 +92,14 @@ function XtpLocationMarker(props) {
   props.xtp_active_markers.forEach((am_xtp, i) => {
     // HACK: If activation_range is very small (<40) force it to 40 metres.
     const A_RANGE = am_xtp.activation_range < 40 ? 40 : am_xtp.activation_range;
-    //console.log(['props.locationState lat=',props.locationState.lat,'lon=',props.locationState.lon]);
+    // console.log(['props.locationState lat=',props.locationState.lat,'lon=',props.locationState.lon]);
     const dist = distance(am_xtp, props.locationState);
     if (dist <= A_RANGE) {
       const pid = 'xtp_'+i;
       within_activation_range.push({pid:pid,dist:dist});
     }
   });
-  //console.log(['within_activation_range=',within_activation_range]);
+  // console.log(['within_activation_range=',within_activation_range]);
   // find the closest of those candidates
   const min_distance = {pid:null,dist:100000};
   within_activation_range.forEach((war) => {
@@ -132,7 +132,7 @@ function XtpLocationMarker(props) {
   // that last index is opened over and over again.
   const autoOpenByForce = getAutoByIndex(pid_index) ? true : false;
   const autoOpenByProxi = getAutoByProximity(min_distance.pid) ? true : false;
-  //console.log(['autoOpenByForce=',autoOpenByForce,'autoOpenByProxi=',autoOpenByProxi]);
+  // console.log(['autoOpenByForce=',autoOpenByForce,'autoOpenByProxi=',autoOpenByProxi]);
 
   const isAutoEnabled = autoOpenByForce || autoOpenByProxi;
   

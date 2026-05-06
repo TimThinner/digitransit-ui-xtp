@@ -80,13 +80,13 @@ class XtpPopup extends React.Component {
   
   componentDidMount() {
     // Runs immediately after the DOM has been updated.
-    console.log('componentDidMount');
+    // console.log('componentDidMount');
     this.props.leaflet.map.on('zoomend', this.onMapZoom);
     window.addEventListener('resize', this.updateDimensions);
   }
 
   componentWillUnmount() {
-    console.log('componentWillUnmount');
+    // console.log('componentWillUnmount');
     this.props.leaflet.map.off('zoomend', this.onMapZoom);
     window.removeEventListener('resize', this.updateDimensions);
   }
@@ -207,11 +207,11 @@ class XtpPopup extends React.Component {
         offset={[0, 0]}
         autoPanPaddingTopLeft={[5, 125]}
         onClose={() => {
-          console.log('onClose.');
+          // console.log('onClose.');
         }}
         onOpen={() => {
           const c_index = parseInt(this.props.pid.slice(4));
-          console.log(['onOpen c_index=',c_index]);
+          // console.log(['onOpen c_index=',c_index]);
           this.props.handleSetIndex(c_index);
         }}
         maxWidth={dimwpx}
