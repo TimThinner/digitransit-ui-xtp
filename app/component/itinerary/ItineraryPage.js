@@ -1128,7 +1128,7 @@ export default function ItineraryPage(props, context) {
     // NO NEED TO fetch alternate polyline if it has SAME hash.
 
     const alt_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
-    // NOTE: This olyline is marked "relevant". Only relevant ones need to be "fetched".
+    // NOTE: This polyline is marked "relevant". Only relevant ones need to be "fetched".
     polylines[alt_hash]['relevant'] = true;
     
     if (polylines[alt_hash]['already_in_queue']) {
@@ -1139,7 +1139,7 @@ export default function ItineraryPage(props, context) {
     } else {
       polylines[alt_hash]['already_in_queue'] = true;
       const request = polylines[alt_hash].request;
-      const ALT_POLYLINE_URL = 'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route';
+      const ALT_POLYLINE_URL = config.URL.XTP_ALT_POLYLINE;
       // console.log('====================   FETCH POLYLINE  ============================');
       try {
         const alt_polyline_response = await fetch(ALT_POLYLINE_URL, {
@@ -1163,10 +1163,31 @@ export default function ItineraryPage(props, context) {
       }
     }
   }
-  
+  /*
+  {
+    "infos": [
+        {
+            "edgeIndex": 0,
+            "legIndex": 0,
+            "alternatePolyline": "",
+            "guides": [
+                {
+                    "guidanceFileURL": "https://....JPG",
+                    "pointLocation": {
+                        "latitude": "60.1864456683333",
+                        "longitude": "24.8137260333333",
+                        "streetAddress": "not defined"
+                    },
+                    "activationRange": 20
+                }
+            ]
+        }
+    ]
+  }
+  */
   async function makeXTPInfoQuery() {
-    // const MOCK_URL = 'https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=perl&site=stackoverflow';
-    const SEARCH_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
+    //const SEARCH_URL = 'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search';
+    const SEARCH_URL = config.URL.XTP_MEDIA_SEARCH;
     const JSON_DATA = {infos:[]};
     const request_data = {
       "search_range":"200", // New parameter
@@ -1201,8 +1222,8 @@ export default function ItineraryPage(props, context) {
               name: leg.to.name
             },
             legGeometry: {
-              points: "", //leg.legGeometry.points,
-              decoded: [] //decoded
+              points: "", // leg.legGeometry.points,
+              decoded: [] // decoded
             }
           });
           const alt_hash = 'edge_index_'+i+'_leg_index_'+j;
@@ -1236,12 +1257,13 @@ export default function ItineraryPage(props, context) {
           throw new Error(`Response status: ${response.status}`);
         }
         const resp = await response.json();
-        // console.log(['response resp=',resp]);
+        console.log(['response resp=',resp]);
         if (resp.infos.length > 0) {
           resp.infos.forEach(info=>{
             // const edge_index = info.edgeIndex;
             // const leg_index = info.legIndex;
             // const found_hash = 'edge_index_'+edge_index+'_leg_index_'+leg_index;
+            const altPolyline = info.alternatePolyline ? info.alternatePolyline : '';
             if (info.guides && Array.isArray(info.guides) && info.guides.length > 0) {
               info.guides.forEach(guide=>{
                 const type = guide.type ? guide.type : 'photo';
@@ -1251,7 +1273,7 @@ export default function ItineraryPage(props, context) {
                 JSON_DATA.infos.push({
                   edge_index: info.edgeIndex,
                   leg_index: info.legIndex,
-                  alternate_polyline: '',
+                  alternate_polyline: altPolyline,
                   activation_range: guide.activationRange,
                   type: type,
                   url: guide.guidanceFileURL,
@@ -1267,12 +1289,14 @@ export default function ItineraryPage(props, context) {
             // NOTE: All legs are NOT returned in MediaServer response (in infos)
             // => we must mark which ones are relevant for alternate polyline fetching
             // polylines[found_hash]['relevant'] = true;
-            makeAltPolylineQuery({
-              polylines: polylines,
-              edge_index: info.edgeIndex,
-              leg_index: info.legIndex,
-              infos: JSON_DATA.infos
-            });
+            //
+            // Test if this is necessary or not?
+            // makeAltPolylineQuery({
+            //   polylines: polylines,
+            //   edge_index: info.edgeIndex,
+            //   leg_index: info.legIndex,
+            //   infos: JSON_DATA.infos
+            // });
           });
           // console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
           // setXTPInfoState(JSON_DATA.infos);

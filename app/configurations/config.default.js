@@ -101,8 +101,10 @@ export default {
     },
     WEATHER_DATA:
       'https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature&storedquery_id=fmi::forecast::harmonie::surface::point::simple&timestep=5&parameters=temperature,WindSpeedMS,WeatherSymbol3',
-    XTP_DATA:
-      'https://route-media-server-immon-testi.vtt.fi/api/infos',
+    XTP_MEDIA_SEARCH:
+      'https://demohub.northeurope.cloudapp.azure.com/mediaserver/search',
+    XTP_ALT_POLYLINE:
+      'https://demohub.northeurope.cloudapp.azure.com/proxy/find-route',
     EMBEDDED_SEARCH_GENERATION: '/reittihakuelementti',
   },
 
