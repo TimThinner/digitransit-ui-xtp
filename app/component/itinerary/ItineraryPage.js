@@ -1299,7 +1299,7 @@ export default function ItineraryPage(props, context) {
             // });
           });
           // console.log(['NOW do the setXTPInfoState JSON_DATA.infos=',JSON_DATA.infos]);
-          // setXTPInfoState(JSON_DATA.infos);
+          setXTPInfoState(JSON_DATA.infos);
           // console.log('setXTPInfoState DONE!!!!!!!');
         } // else {
         // No xtpPoints found => Must reset the state!
