@@ -366,4 +366,6 @@ export default configMerger(walttiConfig, {
   defaultSettings: {
     minTransferTime: 180,
   },
+  
+  hideHeader: true,
 });
